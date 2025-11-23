@@ -15,14 +15,6 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
 );
 
-const TwitterIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 3.3 4.4 3.3 4.4s-1.4 1.4-2.8 2.1c.2 2.2-2.3 4.6-4.2 5.5-1.4.7-4.6 1.4-6.2-1.9-1.4-2.8-2.2-4.2-2.2-4.2s-4.6-.7-6.2-3.4c-1.4-2.8-.7-5.5.7-6.9.7-.7 1.4-1.4 2.8-1.4.7 0 1.4.7 1.4.7s-1.4.7-2.1 2.1c-.7 1.4 0 2.8.7 3.5.7.7 2.1.7 2.1.7s-.7-1.4-.7-2.1c0-1.4.7-2.1 2.1-2.8 1.4-.7 2.8-.7 4.2 0 1.4.7 2.1 2.1 2.1 2.8s.7 2.1 2.1 2.8c1.4.7 2.8 0 3.5-.7.7-.7 1.4-2.1 1.4-2.1s-1.4 0-2.8-.7c-1.4-.7-2.1-2.1-2.1-3.5 0-.7.7-1.4 1.4-1.4h.7z"></path></svg>
-);
-
-const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 12a4 4 0 1 0 4 4V8a8 8 0 1 1-8-8"></path></svg>
-);
-
 const CommentIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
 );
@@ -242,8 +234,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
                             <div className="flex items-center gap-3 mt-4">
                                <a href={model.socials.instagram} target="_blank" rel="noopener noreferrer" className="p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors"><InstagramIcon className="w-5 h-5"/></a>
-                               <a href={model.socials.twitter} target="_blank" rel="noopener noreferrer" className="p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors"><TwitterIcon className="w-5 h-5"/></a>
-                               <a href={model.socials.tiktok} target="_blank" rel="noopener noreferrer" className="p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors"><TikTokIcon className="w-5 h-5"/></a>
                             </div>
                         </div>
 
