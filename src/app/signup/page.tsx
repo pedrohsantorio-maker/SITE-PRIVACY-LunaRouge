@@ -36,12 +36,16 @@ export default function SignupPage() {
     const { user, isUserLoading } = useUser();
     const formRef = useRef<HTMLFormElement>(null);
 
+    // This tracks if we have already attempted to save to Firestore
+    const isDataSaved = useRef(false);
+
     const [state, formAction] = useActionState(signupAction, { message: '' });
     
     // This effect runs when the user object changes (i.e., after successful signup)
     // to save the user's data to Firestore.
     useEffect(() => {
-        if (user && formRef.current) {
+        // Only run if we have a user, a valid form, and haven't saved data yet.
+        if (user && formRef.current && !isDataSaved.current) {
              const formData = new FormData(formRef.current);
              const name = formData.get('name') as string;
              const email = formData.get('email') as string;
@@ -49,13 +53,20 @@ export default function SignupPage() {
 
             // Check if we have the necessary form data to prevent writing on simple re-logins
             if (name && email && age && firestore) {
+                isDataSaved.current = true; // Mark as saved immediately
                 const userDocRef = doc(firestore, 'users', user.uid);
+                
                 setDoc(userDocRef, {
                     id: user.uid,
                     name,
                     email,
                     age,
-                }, { merge: true }).catch(err => {
+                }, { merge: true })
+                .then(() => {
+                    // Once data is successfully saved, then redirect.
+                    redirect('/dashboard');
+                })
+                .catch(err => {
                     // This error is okay to console.error, it's a developer error if it happens.
                     console.error("Failed to save user data", err)
                 });
@@ -63,11 +74,20 @@ export default function SignupPage() {
         }
     }, [user, firestore]);
     
-    // This handles redirecting the user if they are already logged in
-    // and land on this page.
+
+    // This handles redirecting the user if they are ALREADY logged in
+    // and just navigate to the signup page.
     useEffect(() => {
         if (user && !isUserLoading) {
-            redirect('/dashboard');
+             // A small delay to ensure Firestore write has a chance to complete
+             // if triggered by a new signup.
+             setTimeout(() => {
+                // Check if data has been saved before redirecting
+                // This prevents premature redirection if the user is just re-visiting the page
+                 if (isDataSaved.current) {
+                    redirect('/dashboard');
+                }
+             }, 500);
         }
     }, [user, isUserLoading]);
 
@@ -130,7 +150,7 @@ export default function SignupPage() {
                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
                                     <Input id="password" name="password" type="password" required className="bg-white/10 text-white border-white/20 pl-10 focus:ring-primary focus:border-primary transition-all duration-300" />
                                 </div>
-                                {state.message && <p className="text-red-500 text-sm mt-2">{state.message}</p>}
+                                {state?.message && <p className="text-red-500 text-sm mt-2">{state.message}</p>}
                             </div>
                            <SubmitButton />
                         </div>

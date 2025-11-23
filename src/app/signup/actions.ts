@@ -23,14 +23,18 @@ export async function signupAction(prevState: any, formData: FormData) {
 
   try {
     const { auth } = initializeFirebase();
+    // This function signs the user in automatically after creation
     await createUserWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
+
   } catch (error: any) {
-    if (error.code === 'auth/email-already-in-use') {
+    if (error.code === 'auth/email-already-in-use' || error.code === 'auth/email-already-exists') {
       return { message: 'Este email já está cadastrado. Por favor, faça login.' };
     }
     console.error('Signup error:', error);
     return { message: 'Ocorreu um erro ao criar a conta. Tente novamente.' };
   }
   
-  redirect('/dashboard');
+  // We no longer redirect from the server action.
+  // The client will handle redirection after saving data to Firestore.
+  return { message: '' };
 }
