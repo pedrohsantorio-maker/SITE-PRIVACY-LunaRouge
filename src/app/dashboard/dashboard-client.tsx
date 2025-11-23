@@ -323,11 +323,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="previews" className="mt-4">
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-4">
                              {model.previewsGallery.map(item => {
                                 const isRevealed = revealedPreviews.includes(item.id);
                                 return (
-                                    <Card key={item.id} onClick={() => handlePreviewClick(item)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-md cursor-pointer">
+                                    <Card key={item.id} onClick={() => handlePreviewClick(item)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
                                         <div className="relative group">
                                             <Image 
                                                 src={item.type === 'video' ? item.thumbnailUrl! : item.url}
@@ -335,12 +335,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 data-ai-hint={item.hint}
                                                 width={item.width}
                                                 height={item.height}
-                                                className={`object-cover w-full h-auto transition-all duration-300 ${!isRevealed ? 'blur-md' : 'blur-none'}`}
+                                                className={`object-cover w-full h-auto transition-all duration-500 ${!isRevealed ? 'blur-lg' : 'blur-none'}`}
                                             />
                                             {!isRevealed && (
-                                                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center p-4">
+                                                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center p-4 transition-opacity duration-300">
                                                     <p className="text-white font-semibold text-sm">{getOverlayText(item.id)}</p>
-                                                    <p className="text-primary font-bold text-xs mt-2 uppercase">Clique para revelar</p>
+                                                    <p className="text-primary font-bold text-xs mt-2 uppercase animate-pulse-reveal">Clique para revelar</p>
                                                 </div>
                                             )}
                                             {isRevealed && item.type === 'video' && (
