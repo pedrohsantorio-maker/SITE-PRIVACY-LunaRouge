@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { Mail, Lock, User, Calendar } from 'lucide-react';
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ export default function SignupPage() {
         imageHint: "futuristic woman"
     };
 
-    const [state, formAction] = useFormState(signupAction, { message: '' });
+    const [state, formAction] = useActionState(signupAction, { message: '' });
 
 
   return (

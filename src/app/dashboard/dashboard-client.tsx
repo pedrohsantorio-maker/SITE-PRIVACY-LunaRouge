@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useActionState } from 'react';
 import { Heart, Users, Rss, Wand2, ChevronDown, ChevronUp } from 'lucide-react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormStatus } from 'react-dom';
 
 import { getAiSuggestionsAction } from '@/app/actions';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,7 @@ function SubmitButton() {
 
 export function DashboardClient({ model }: { model: ModelData }) {
   const [isBioExpanded, setIsBioExpanded] = useState(false);
-  const [aiState, formAction] = useFormState(getAiSuggestionsAction, { descriptionSuggestions: '', imageSuggestions: '', subscriptionPlanSuggestions: '' });
+  const [aiState, formAction] = useActionState(getAiSuggestionsAction, { descriptionSuggestions: '', imageSuggestions: '', subscriptionPlanSuggestions: '' });
 
   const subscriptionPlansAsString = model.subscriptionPlans.map(p => `${p.name}: R$${p.price} ${p.discount ? `(${p.discount})` : ''}`).join('\n');
 

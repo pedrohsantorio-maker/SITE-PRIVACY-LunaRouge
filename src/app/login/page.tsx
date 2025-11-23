@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { Mail, Lock } from 'lucide-react';
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,7 @@ export default function LoginPage() {
         imageHint: "futuristic woman"
     };
 
-    const [state, formAction] = useFormState(loginAction, { message: '' });
+    const [state, formAction] = useActionState(loginAction, { message: '' });
 
   return (
      <div className="w-full min-h-screen relative">
