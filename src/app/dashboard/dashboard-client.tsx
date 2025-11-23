@@ -387,5 +387,3 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
-
-    
