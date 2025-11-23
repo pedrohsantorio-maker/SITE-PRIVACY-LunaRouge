@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useActionState } from 'react';
+import { useState, useActionState, useEffect } from 'react';
 import { Heart, Users, Rss, Wand2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useFormStatus } from 'react-dom';
 
@@ -40,6 +40,18 @@ function SubmitButton() {
       {pending ? 'Gerando Sugestões...' : <> <Wand2 className="mr-2 h-4 w-4" /> Gerar Sugestões </>}
     </Button>
   );
+}
+
+// Client-side component to format numbers and prevent hydration mismatch
+function FormattedStat({ value }: { value: number }) {
+    const [formattedValue, setFormattedValue] = useState<string | number>(value);
+
+    useEffect(() => {
+        // This runs only on the client, after hydration
+        setFormattedValue(value.toLocaleString());
+    }, [value]);
+
+    return <span>{formattedValue}</span>;
 }
 
 export function DashboardClient({ model }: { model: ModelData }) {
@@ -85,15 +97,15 @@ export function DashboardClient({ model }: { model: ModelData }) {
             <div className="flex justify-center sm:justify-start items-center gap-6 mt-4 text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-accent" />
-                <span>{model.stats.subscribers.toLocaleString()} Assinantes</span>
+                <FormattedStat value={model.stats.subscribers} /> Assinantes
               </div>
               <div className="flex items-center gap-2">
                 <Heart className="h-5 w-5 text-accent" />
-                <span>{model.stats.likes.toLocaleString()} Likes</span>
+                <FormattedStat value={model.stats.likes} /> Likes
               </div>
               <div className="flex items-center gap-2">
                 <Rss className="h-5 w-5 text-accent" />
-                <span>{model.stats.followers.toLocaleString()} Seguidores</span>
+                <FormattedStat value={model.stats.followers} /> Seguidores
               </div>
             </div>
           </div>
