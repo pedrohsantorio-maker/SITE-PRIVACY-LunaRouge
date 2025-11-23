@@ -2,16 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useActionState, useEffect } from 'react';
-import { Heart, Users, Rss, Wand2, ChevronDown, ChevronUp } from 'lucide-react';
-import { useFormStatus } from 'react-dom';
+import { useState, useEffect } from 'react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp } from 'lucide-react';
 
-import { getAiSuggestionsAction } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 type ModelData = {
@@ -33,15 +29,6 @@ type ModelData = {
     }[];
 };
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" disabled={pending} className="w-full sm:w-auto">
-      {pending ? 'Gerando Sugestões...' : <> <Wand2 className="mr-2 h-4 w-4" /> Gerar Sugestões </>}
-    </Button>
-  );
-}
-
 // Client-side component to format numbers and prevent hydration mismatch
 function FormattedStat({ value }: { value: number }) {
     const [formattedValue, setFormattedValue] = useState<string | number>(value);
@@ -56,9 +43,6 @@ function FormattedStat({ value }: { value: number }) {
 
 export function DashboardClient({ model }: { model: ModelData }) {
   const [isBioExpanded, setIsBioExpanded] = useState(false);
-  const [aiState, formAction] = useActionState(getAiSuggestionsAction, { descriptionSuggestions: '', imageSuggestions: '', subscriptionPlanSuggestions: '' });
-
-  const subscriptionPlansAsString = model.subscriptionPlans.map(p => `${p.name}: R$${p.price} ${p.discount ? `(${p.discount})` : ''}`).join('\n');
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -149,60 +133,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </Card>
             ))}
             </div>
-        </section>
-        
-        <Separator className="my-12" />
-
-        {/* AI Profile Optimizer */}
-        <section>
-          <div className="text-center mb-6">
-            <h2 className="text-3xl font-headline font-bold">Otimizador de Perfil com IA</h2>
-            <p className="text-muted-foreground mt-2 font-light">Receba sugestões para melhorar seu perfil e atrair mais assinantes.</p>
-          </div>
-          <Card className="bg-secondary/50">
-            <CardContent className="p-6">
-              <form action={formAction}>
-                 {/* Hidden inputs to pass current data to the server action */}
-                 <input type="hidden" name="profileDescription" value={model.bio_long} />
-                 <input type="hidden" name="profileImage" value={model.avatarUrl} />
-                 <input type="hidden" name="subscriptionPlans" value={subscriptionPlansAsString} />
-
-                <div className="mb-6">
-                    <p className="text-muted-foreground font-light">Clique no botão abaixo para analisar a descrição, imagem e planos de assinatura atuais e receber sugestões de otimização da nossa IA.</p>
-                </div>
-
-                <SubmitButton />
-              </form>
-
-              {(aiState.descriptionSuggestions || aiState.imageSuggestions || aiState.subscriptionPlanSuggestions) && (
-                <div className="mt-6 space-y-6">
-                    <Separator />
-                    <h3 className="text-xl font-semibold">Sugestões da IA</h3>
-                    {aiState.descriptionSuggestions && (
-                        <Alert>
-                            <Wand2 className="h-4 w-4" />
-                            <AlertTitle className="font-bold">Descrição do Perfil</AlertTitle>
-                            <AlertDescription className="font-light">{aiState.descriptionSuggestions}</AlertDescription>
-                        </Alert>
-                    )}
-                    {aiState.imageSuggestions && (
-                        <Alert>
-                            <Wand2 className="h-4 w-4" />
-                            <AlertTitle className="font-bold">Imagem do Perfil</AlertTitle>
-                            <AlertDescription className="font-light">{aiState.imageSuggestions}</AlertDescription>
-                        </Alert>
-                    )}
-                    {aiState.subscriptionPlanSuggestions && (
-                        <Alert>
-                            <Wand2 className="h-4 w-4" />
-                            <AlertTitle className="font-bold">Planos de Assinatura</AlertTitle>
-                            <AlertDescription className="font-light">{aiState.subscriptionPlanSuggestions}</AlertDescription>
-                        </Alert>
-                    )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </section>
       </main>
     </div>
