@@ -4,6 +4,11 @@ const profileImage = PlaceHolderImages.find(img => img.id === 'model-profile');
 const postPreviewImage = PlaceHolderImages.find(img => img.id === 'post-preview-1');
 const galleryImages = PlaceHolderImages.filter(img => img.id.startsWith('gallery-preview-'));
 
+const videoUrls = [
+  "https://imgur.com/SDWrcl3.jpeg",
+  "https://imgur.com/FpUhVzf.jpeg"
+];
+
 export const modelData = {
   name: 'Luna Rouge',
   handle: 'rouge_luna_',
@@ -46,5 +51,6 @@ export const modelData = {
     hint: img.imageHint,
     width: 600,
     height: 600,
+    type: videoUrls.includes(img.imageUrl) ? 'video' : 'image',
   }))
 };

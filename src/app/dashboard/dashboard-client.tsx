@@ -36,6 +36,7 @@ type GalleryItem = {
     hint: string;
     width: number;
     height: number;
+    type: 'image' | 'video';
 };
 
 type ModelData = {
@@ -307,6 +308,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                             fill
                                             className="object-cover"
                                         />
+                                        {item.type === 'video' && (
+                                            <div className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
+                                                <Video size={16} className="text-white" />
+                                            </div>
+                                        )}
                                     </div>
                                 </Card>
                             ))}
