@@ -301,14 +301,15 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     <TabsContent value="previews" className="mt-4">
                         <div className="grid grid-cols-2 gap-2">
                             {model.previewsGallery.map(item => (
-                                <Card key={item.id} onClick={() => item.type === 'video' && setPlayingVideoUrl(item.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-md aspect-square cursor-pointer">
-                                    <div className="relative w-full h-full group">
+                                <Card key={item.id} onClick={() => item.type === 'video' && setPlayingVideoUrl(item.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-md cursor-pointer">
+                                    <div className="relative group">
                                         <Image 
                                             src={item.type === 'video' ? item.thumbnailUrl! : item.url}
                                             alt={item.hint}
                                             data-ai-hint={item.hint}
-                                            fill
-                                            className="object-cover"
+                                            width={item.width}
+                                            height={item.height}
+                                            className="object-cover w-full h-auto"
                                         />
                                         {item.type === 'video' && (
                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
