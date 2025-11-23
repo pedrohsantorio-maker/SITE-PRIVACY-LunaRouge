@@ -103,7 +103,7 @@ function UrgencyPopup({ count, isVisible, onClose, onOpen, isMinimized }: { coun
         return (
             <div className="popup-minimized-message">
                 <p>Aproveite a oportunidade, só mais <span id="remaining-count-minimized">{count}</span> assinaturas!</p>
-                <button onClick={onOpen} className="popup-button">Ver mais</button>
+                <button onClick={onClose} className="popup-button">Fechar</button>
             </div>
         );
     }
@@ -165,7 +165,6 @@ function UrgencyPromotion() {
 
     const handleOpenPopup = () => {
         setIsPopupMinimized(false);
-        // We remove the item so if they close it again, it re-minimizes
         sessionStorage.removeItem('popupMinimized'); 
     };
 
