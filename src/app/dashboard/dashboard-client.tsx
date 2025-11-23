@@ -186,6 +186,30 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [isBioExpanded, setIsBioExpanded] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [playingVideoUrl, setPlayingVideoUrl] = useState<string | null>(null);
+    const [revealedPreviews, setRevealedPreviews] = useState<string[]>([]);
+    
+    const overlayTexts = [
+        "Um gostinho do que você vai receber...",
+        "Se aqui já está assim, imagina no conteúdo exclusivo!",
+        "Curioso(a)? Assine para ver tudo.",
+        "Isso é só o começo. O melhor está lá dentro.",
+    ];
+
+    const getOverlayText = (id: string) => {
+        const index = parseInt(id.replace('gallery-preview-', ''), 10) % overlayTexts.length;
+        return overlayTexts[index];
+    };
+
+    const handlePreviewClick = (item: GalleryItem) => {
+        if (revealedPreviews.includes(item.id)) {
+            if (item.type === 'video') {
+                setPlayingVideoUrl(item.url);
+            }
+        } else {
+            setRevealedPreviews(prev => [...prev, item.id]);
+        }
+    };
+
 
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
@@ -300,25 +324,34 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </TabsList>
                     <TabsContent value="previews" className="mt-4">
                         <div className="grid grid-cols-2 gap-2">
-                            {model.previewsGallery.map(item => (
-                                <Card key={item.id} onClick={() => item.type === 'video' && setPlayingVideoUrl(item.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-md cursor-pointer">
-                                    <div className="relative group">
-                                        <Image 
-                                            src={item.type === 'video' ? item.thumbnailUrl! : item.url}
-                                            alt={item.hint}
-                                            data-ai-hint={item.hint}
-                                            width={item.width}
-                                            height={item.height}
-                                            className="object-cover w-full h-auto"
-                                        />
-                                        {item.type === 'video' && (
-                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <PlayCircle size={48} className="text-white" />
-                                            </div>
-                                        )}
-                                    </div>
-                                </Card>
-                            ))}
+                             {model.previewsGallery.map(item => {
+                                const isRevealed = revealedPreviews.includes(item.id);
+                                return (
+                                    <Card key={item.id} onClick={() => handlePreviewClick(item)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-md cursor-pointer">
+                                        <div className="relative group">
+                                            <Image 
+                                                src={item.type === 'video' ? item.thumbnailUrl! : item.url}
+                                                alt={item.hint}
+                                                data-ai-hint={item.hint}
+                                                width={item.width}
+                                                height={item.height}
+                                                className={`object-cover w-full h-auto transition-all duration-300 ${!isRevealed ? 'blur-md' : 'blur-none'}`}
+                                            />
+                                            {!isRevealed && (
+                                                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center p-4">
+                                                    <p className="text-white font-semibold text-sm">{getOverlayText(item.id)}</p>
+                                                    <p className="text-primary font-bold text-xs mt-2 uppercase">Clique para revelar</p>
+                                                </div>
+                                            )}
+                                            {isRevealed && item.type === 'video' && (
+                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <PlayCircle size={48} className="text-white" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </Card>
+                                )
+                            })}
                         </div>
                     </TabsContent>
                     <TabsContent value="posts">
