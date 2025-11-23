@@ -5,8 +5,8 @@ const postPreviewImage = PlaceHolderImages.find(img => img.id === 'post-preview-
 const galleryImages = PlaceHolderImages.filter(img => img.id.startsWith('gallery-preview-'));
 
 export const modelData = {
-  name: 'Mari Ávila',
-  handle: 'mariavila',
+  name: 'Luna Rouge',
+  handle: 'lunarouge',
   isVerified: true,
   avatarUrl: profileImage?.imageUrl || "https://picsum.photos/seed/elena/1080/1350",
   avatarHint: profileImage?.imageHint || "woman portrait",
