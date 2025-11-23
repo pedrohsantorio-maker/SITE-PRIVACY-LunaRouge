@@ -9,7 +9,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Logo from '@/components/logo';
 
 export default function SignupPage() {
-    const signupImage = PlaceHolderImages.find(img => img.id === 'model-landing-hero');
+    const signupImage = PlaceHolderImages.find(img => img.id === 'model-profile');
 
     async function signup(formData: FormData) {
         'use server';
