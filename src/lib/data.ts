@@ -12,9 +12,8 @@ export const modelData = {
   bannerHint: "woman taking selfie",
   bio: 'aqui você vai INVESTIR um valor super ACESSÍVEL e vai encontrar mais de 800 VÍDEOS e FOTOS: Dando muuuito minha bucetinha rosinha no pelo com gozada dentro, fazendo oral bem babad...',
   stats: {
-    photos: 420,
-    videos: 465,
-    locked: 36,
+    posts: 121,
+    media: 125,
     likes: 265800,
   },
   socials: {
@@ -29,4 +28,15 @@ export const modelData = {
     { name: '3 meses', price: '47,98', discount: '20% off', id: 'quarterly' },
     { name: '6 meses', price: '95,95', discount: '20% off', id: 'biannual' },
   ],
+  posts: [
+      {
+          id: 'post1',
+          isLocked: true,
+          stats: {
+              images: 31,
+              videos: 94,
+              likes: 2200,
+          }
+      }
+  ]
 };
