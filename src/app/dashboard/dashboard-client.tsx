@@ -183,18 +183,41 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </Card>
 
                 {/* Posts Section */}
-                 <Tabs defaultValue="posts" className="w-full">
+                 <Tabs defaultValue="previews" className="w-full">
                     <TabsList className="grid w-full grid-cols-3 bg-[#121212] rounded-xl h-12">
+                        <TabsTrigger value="previews" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
+                            <Eye size={16} /> {model.stats.previews} Prévias
+                        </TabsTrigger>
                         <TabsTrigger value="posts" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                            <Newspaper size={16} /> {model.stats.posts} Postagens
                         </TabsTrigger>
                         <TabsTrigger value="media" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                             <ImageIcon size={16} /> {model.stats.media} Mídias
                         </TabsTrigger>
-                        <TabsTrigger value="previews" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
-                            <Eye size={16} /> {model.stats.previews} Prévias
-                        </TabsTrigger>
                     </TabsList>
+                    <TabsContent value="previews">
+                        {model.posts.filter(p => p.isLocked).map(post => (
+                             <Card key={`preview-${post.id}`} className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800 mt-4 p-4 space-y-4">
+                               <div className="group relative aspect-video w-full rounded-lg overflow-hidden">
+                                  <Image 
+                                      src={post.previewUrl} 
+                                      alt={post.previewHint}
+                                      data-ai-hint={post.previewHint}
+                                      fill
+                                      className="object-cover transition-all duration-300 blur-md group-hover:blur-sm"
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4">
+                                    <Lock size={48} className="mb-2"/>
+                                    <p className="font-semibold text-lg">Assine para desbloquear</p>
+                                    <p className="text-sm text-neutral-300 text-center">Acesse este e todo o conteúdo exclusivo.</p>
+                                  </div>
+                               </div>
+                               <Button asChild size="lg" className="w-full h-12 text-md font-bold bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl">
+                                <Link href="/pagamento">Assinar agora</Link>
+                               </Button>
+                            </Card>
+                        ))}
+                    </TabsContent>
                     <TabsContent value="posts">
                         {model.posts.map(post => (
                         <div key={post.id}>
@@ -249,33 +272,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             </CardContent>
                         </Card>
                     </TabsContent>
-                     <TabsContent value="previews">
-                        {model.posts.filter(p => p.isLocked).map(post => (
-                             <Card key={`preview-${post.id}`} className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800 mt-4 p-4 space-y-4">
-                               <div className="group relative aspect-video w-full rounded-lg overflow-hidden">
-                                  <Image 
-                                      src={post.previewUrl} 
-                                      alt={post.previewHint}
-                                      data-ai-hint={post.previewHint}
-                                      fill
-                                      className="object-cover transition-all duration-300 blur-md group-hover:blur-sm"
-                                  />
-                                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4">
-                                    <Lock size={48} className="mb-2"/>
-                                    <p className="font-semibold text-lg">Assine para desbloquear</p>
-                                    <p className="text-sm text-neutral-300 text-center">Acesse este e todo o conteúdo exclusivo.</p>
-                                  </div>
-                               </div>
-                               <Button asChild size="lg" className="w-full h-12 text-md font-bold bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl">
-                                <Link href="/pagamento">Assinar agora</Link>
-                               </Button>
-                            </Card>
-                        ))}
-                    </TabsContent>
                 </Tabs>
             </div>
         </div>
     );
 }
-
-    
