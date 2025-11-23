@@ -1,42 +1,70 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Heart, Users, Rss, ChevronDown, ChevronUp } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
+// Inline SVG for social icons to avoid installing a new library
+const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+);
+
+const TwitterIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 3.3 4.4 3.3 4.4s-1.4 1.4-2.8 2.1c.2 2.2-2.3 4.6-4.2 5.5-1.4.7-4.6 1.4-6.2-1.9-1.4-2.8-2.2-4.2-2.2-4.2s-4.6-.7-6.2-3.4c-1.4-2.8-.7-5.5.7-6.9.7-.7 1.4-1.4 2.8-1.4.7 0 1.4.7 1.4.7s-1.4.7-2.1 2.1c-.7 1.4 0 2.8.7 3.5.7.7 2.1.7 2.1.7s-.7-1.4-.7-2.1c0-1.4.7-2.1 2.1-2.8 1.4-.7 2.8-.7 4.2 0 1.4.7 2.1 2.1 2.1 2.8s.7 2.1 2.1 2.8c1.4.7 2.8 0 3.5-.7.7-.7 1.4-2.1 1.4-2.1s-1.4 0-2.8-.7c-1.4-.7-2.1-2.1-2.1-3.5 0-.7.7-1.4 1.4-1.4h.7z"></path></svg>
+);
+
+const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
+ <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 12a4 4 0 1 0 4 4V8a8 8 0 1 1-8-8"></path></svg>
+);
+
 
 type ModelData = {
     name: string;
+    handle: string;
+    isVerified: boolean;
     avatarUrl: string;
     avatarHint: string;
-    bio_short: string;
-    bio_long:string;
+    bannerUrl: string;
+    bannerHint: string;
+    bio: string;
     stats: {
-        subscribers: number;
+        photos: number;
+        videos: number;
+        locked: number;
         likes: number;
-        followers: number;
     };
-    subscriptionPlans: {
+    socials: {
+        instagram: string;
+        twitter: string;
+        tiktok: string;
+    };
+    subscriptions: {
         name: string;
         price: string;
-        discount: string | null;
+        id: string;
+    }[];
+    promotions: {
+        name: string;
+        price: string;
+        discount: string;
         id: string;
     }[];
 };
 
-// Client-side component to format numbers and prevent hydration mismatch
 function FormattedStat({ value }: { value: number }) {
     const [formattedValue, setFormattedValue] = useState<string | number>(value);
 
     useEffect(() => {
-        // This runs only on the client, after hydration
         if (typeof value === 'number') {
-            setFormattedValue(value.toLocaleString('pt-BR'));
+            if (value >= 1000) {
+                setFormattedValue((value / 1000).toFixed(1) + 'K');
+            } else {
+                setFormattedValue(value.toLocaleString('pt-BR'));
+            }
         }
     }, [value]);
 
@@ -44,99 +72,100 @@ function FormattedStat({ value }: { value: number }) {
 }
 
 export function DashboardClient({ model }: { model: ModelData }) {
-  const [isBioExpanded, setIsBioExpanded] = useState(false);
+    const [isBioExpanded, setIsBioExpanded] = useState(false);
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <main className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
-        {/* Profile Header */}
-        <section className="flex flex-col sm:flex-row items-center gap-6 mb-8">
-            <Dialog>
-                <DialogTrigger asChild>
-                    <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-full overflow-hidden cursor-pointer ring-4 ring-primary/50 hover:ring-primary transition-all duration-300">
+    return (
+        <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+            <Card className="w-full max-w-md bg-[#121212] rounded-2xl overflow-hidden border-neutral-800">
+                <CardContent className="p-0">
+                    {/* Header with Banner */}
+                    <div className="relative">
+                        <div className="absolute top-4 left-4 font-bold text-lg">{model.name}</div>
+                        <div className="absolute top-4 right-4">
+                            <MoreVertical />
+                        </div>
                         <Image
-                            src={model.avatarUrl}
-                            alt={`Foto de perfil de ${model.name}`}
-                            width={192}
-                            height={192}
-                            className="w-full h-full object-cover"
-                            priority
-                            data-ai-hint={model.avatarHint}
+                            src={model.bannerUrl}
+                            alt={model.bannerHint}
+                            data-ai-hint={model.bannerHint}
+                            width={448}
+                            height={150}
+                            className="w-full h-[150px] object-cover"
                         />
+                        <div className="absolute -bottom-12 left-4">
+                            <Image
+                                src={model.avatarUrl}
+                                alt={`Foto de perfil de ${model.name}`}
+                                data-ai-hint={model.avatarHint}
+                                width={100}
+                                height={100}
+                                className="rounded-full border-4 border-[#121212]"
+                            />
+                        </div>
                     </div>
-                </DialogTrigger>
-                <DialogContent className="max-w-3xl p-0 border-0">
-                     <DialogTitle className="sr-only">Foto de perfil de {model.name} em tamanho ampliado</DialogTitle>
-                     <DialogDescription className="sr-only">A imagem a seguir é uma versão ampliada da foto de perfil da modelo {model.name}.</DialogDescription>
-                     <Image
-                        src={model.avatarUrl}
-                        alt={`Foto de perfil de ${model.name}`}
-                        width={1080}
-                        height={1350}
-                        className="w-full h-auto object-contain rounded-lg"
-                        data-ai-hint={model.avatarHint}
-                    />
-                </DialogContent>
-            </Dialog>
 
+                    {/* Stats section */}
+                    <div className="flex justify-end items-center gap-4 px-4 pt-2 text-sm text-neutral-400">
+                        <div className="flex items-center gap-1"><ImageIcon size={16}/> <FormattedStat value={model.stats.photos} /></div>
+                        <div className="flex items-center gap-1"><Video size={16}/> <FormattedStat value={model.stats.videos} /></div>
+                        <div className="flex items-center gap-1"><Lock size={16}/> <FormattedStat value={model.stats.locked} /></div>
+                        <div className="flex items-center gap-1"><Heart size={16}/> <FormattedStat value={model.stats.likes} /></div>
+                    </div>
 
-          <div className="text-center sm:text-left">
-            <h1 className="text-4xl sm:text-5xl font-headline font-bold">{model.name}</h1>
-            <div className="flex justify-center sm:justify-start items-center gap-6 mt-4 text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-accent" />
-                <FormattedStat value={model.stats.subscribers} /> Assinantes
-              </div>
-              <div className="flex items-center gap-2">
-                <Heart className="h-5 w-5 text-accent" />
-                <FormattedStat value={model.stats.likes} /> Likes
-              </div>
-              <div className="flex items-center gap-2">
-                <Rss className="h-5 w-5 text-accent" />
-                <FormattedStat value={model.stats.followers} /> Seguidores
-              </div>
-            </div>
-          </div>
-        </section>
+                    {/* Profile Info */}
+                    <div className="px-4 pb-4 pt-8">
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-xl font-bold">{model.name}</h1>
+                            {model.isVerified &&
+                                <div className="w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                                    <Check size={12} className="text-black" />
+                                </div>
+                            }
+                        </div>
+                        <p className="text-sm text-neutral-400">@{model.handle}</p>
+                        
+                        <p className="mt-2 text-sm text-neutral-300">
+                            {model.bio}
+                            <button className="text-orange-400 ml-1 font-semibold">Ler mais</button>
+                        </p>
 
-        {/* Bio Section */}
-        <section className="mb-10">
-          <Card className="bg-secondary/50 border-border">
-            <CardContent className="p-6">
-              <p className="text-foreground/80 leading-relaxed font-light">
-                {isBioExpanded ? model.bio_long : model.bio_short}
-              </p>
-              <Button variant="link" onClick={() => setIsBioExpanded(!isBioExpanded)} className="px-0 mt-2 text-accent">
-                {isBioExpanded ? 'Ler menos' : 'Ler mais'}
-                {isBioExpanded ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />}
-              </Button>
-            </CardContent>
-          </Card>
-        </section>
+                        <div className="flex items-center gap-3 mt-4">
+                           <a href={model.socials.instagram} target="_blank" rel="noopener noreferrer" className="p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors"><InstagramIcon className="w-5 h-5"/></a>
+                           <a href={model.socials.twitter} target="_blank" rel="noopener noreferrer" className="p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors"><TwitterIcon className="w-5 h-5"/></a>
+                           <a href={model.socials.tiktok} target="_blank" rel="noopener noreferrer" className="p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors"><TikTokIcon className="w-5 h-5"/></a>
+                        </div>
+                    </div>
 
-        {/* Subscription Plans */}
-        <section className="mb-10">
-            <h2 className="text-3xl font-headline font-bold text-center mb-6">Planos de Assinatura</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {model.subscriptionPlans.map((plan, index) => (
-                <Card key={plan.id} className={`flex flex-col border-2 ${index === 1 ? 'border-primary' : 'border-border'} hover:border-primary transition-colors`}>
-                    {plan.discount && (
-                        <Badge variant="default" className="w-fit self-center -mt-3 bg-accent text-accent-foreground">{plan.discount}</Badge>
-                    )}
-                    <CardHeader className="text-center pt-6">
-                        <CardTitle className="text-2xl font-headline font-bold">{plan.name}</CardTitle>
-                        <CardDescription>R$ <span className="text-4xl font-bold text-foreground">{plan.price.split(',')[0]}</span>,{(plan.price.split(',')[1] || '00')}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-grow flex items-end">
-                        <Button asChild className={`w-full ${index === 1 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
-                        <Link href="/pagamento">Assinar Agora</Link>
-                        </Button>
-                    </CardContent>
-                </Card>
-            ))}
-            </div>
-        </section>
-      </main>
-    </div>
-  );
+                    {/* Subscriptions & Promotions */}
+                    <div className="px-4 pb-4 space-y-4">
+                        <div>
+                            <h2 className="text-sm font-semibold text-neutral-400 mb-2">Assinaturas</h2>
+                            {model.subscriptions.map(sub => (
+                                <Button key={sub.id} className="w-full justify-between h-12 text-md font-semibold bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl">
+                                    <span>{sub.name}</span>
+                                    <span>R$ {sub.price}</span>
+                                </Button>
+                            ))}
+                        </div>
+
+                        <Accordion type="single" collapsible defaultValue='item-1' className="w-full">
+                          <AccordionItem value="item-1" className="border-none">
+                            <AccordionTrigger className="text-sm font-semibold text-neutral-400 hover:no-underline [&[data-state=open]>svg]:text-orange-400">
+                              Promoções
+                            </AccordionTrigger>
+                            <AccordionContent className="space-y-2">
+                               {model.promotions.map(promo => (
+                                <Button key={promo.id} variant="secondary" className="w-full justify-between h-12 text-md font-semibold bg-[#27272A] text-white rounded-xl hover:bg-neutral-700">
+                                    <span>{promo.name} ({promo.discount})</span>
+                                    <span>R$ {promo.price}</span>
+                                </Button>
+                               ))}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
 }
