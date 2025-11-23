@@ -35,7 +35,9 @@ function FormattedStat({ value }: { value: number }) {
 
     useEffect(() => {
         // This runs only on the client, after hydration
-        setFormattedValue(value.toLocaleString('pt-BR'));
+        if (typeof value === 'number') {
+            setFormattedValue(value.toLocaleString('pt-BR'));
+        }
     }, [value]);
 
     return <span>{formattedValue}</span>;
