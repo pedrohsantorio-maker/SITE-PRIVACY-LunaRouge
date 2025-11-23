@@ -22,8 +22,8 @@ export default function LandingPage() {
           data-ai-hint={heroImage.imageHint}
         />
       )}
-      <div className="absolute inset-0 bg-black/70" />
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center text-white p-4">
+      <div className="absolute inset-0 bg-black/60" />
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center text-white p-4 fade-in">
         <div className="mb-8">
           <Logo className="text-6xl md:text-8xl font-bold tracking-tighter" />
         </div>
@@ -34,10 +34,10 @@ export default function LandingPage() {
           Acesse o universo privado da sua modelo favorita. Assine agora para ter acesso a fotos, vídeos e atualizações exclusivas.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
-           <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold">
+           <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold transition-transform duration-300 ease-in-out hover:scale-105 active:scale-100">
             <Link href="/signup">Criar Conta</Link>
           </Button>
-          <Button asChild size="lg" variant="secondary" className="text-lg bg-gray-900 text-orange-500 hover:bg-gray-800 font-bold">
+          <Button asChild size="lg" variant="secondary" className="text-lg bg-black/50 text-primary hover:bg-black/80 font-bold transition-colors duration-300">
             <Link href="/login">Acessar Conteúdo</Link>
           </Button>
         </div>

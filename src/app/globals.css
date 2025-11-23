@@ -10,19 +10,19 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 33 100% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 33 100% 50%; /* Orange */
+    --primary-foreground: 240 10% 3.9%; /* Darker for better contrast on orange */
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 33 100% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 33 100% 50%; /* Orange */
+    --accent-foreground: 240 10% 3.9%; /* Darker for better contrast on orange */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 33 100% 50%;
+    --ring: 33 100% 50%; /* Orange */
     --radius: 0.5rem;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -38,19 +38,19 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 33 100% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 33 100% 50%; /* Orange */
+    --primary-foreground: 240 10% 3.9%; /* Darker for better contrast on orange */
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 33 100% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 33 100% 50%; /* Orange */
+    --accent-foreground: 240 10% 3.9%; /* Darker for better contrast on orange */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 33 100% 50%;
+    --ring: 33 100% 50%; /* Orange */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -65,5 +65,18 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 0.8s forwards;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
   }
 }
