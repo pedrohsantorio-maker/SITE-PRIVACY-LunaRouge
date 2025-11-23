@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, MessageSquare } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -96,15 +96,30 @@ function FormattedStat({ value }: { value: number }) {
     return <span>{formattedValue}</span>;
 }
 
-function UrgencyPopup({ count, isVisible, onClose }: { count: number; isVisible: boolean; onClose: () => void; }) {
+function UrgencyPopup({ count, isVisible, onClose, isMinimized }: { count: number; isVisible: boolean; onClose: () => void; isMinimized: boolean; }) {
     if (!isVisible) return null;
 
+    const containerClasses = isMinimized
+        ? "popup-minimized"
+        : "popup-container animate-pulse-popup";
+
+    const contentClasses = isMinimized
+        ? "popup-content-minimized"
+        : "popup-content animate-glow";
+
     return (
-        <div className="popup-container">
-            <div className="popup-content">
-                <span onClick={onClose} className="popup-close">&times;</span>
-                <h2>As assinaturas estão acabando!</h2>
-                <p>Só mais <span id="popup-count">{count}</span> assinaturas com este valor.</p>
+        <div className={containerClasses}>
+            <div className={contentClasses}>
+                {!isMinimized && (
+                    <>
+                        <span onClick={onClose} className="popup-close">&times;</span>
+                        <h2>As assinaturas estão acabando!</h2>
+                        <p>Só mais <span id="popup-count">{count}</span> assinaturas com este valor.</p>
+                    </>
+                )}
+                 {isMinimized && (
+                    <span className="text-2xl animate-pulse">🔥</span>
+                )}
             </div>
         </div>
     );
@@ -114,14 +129,25 @@ function UrgencyPromotion() {
     const [remainingCount, setRemainingCount] = useState(11);
     const [isBlinking, setIsBlinking] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
+    const [isPopupMinimized, setIsPopupMinimized] = useState(false);
 
     useEffect(() => {
+        const hasBeenMinimized = sessionStorage.getItem('popupMinimized') === 'true';
+        if (hasBeenMinimized) {
+            setShowPopup(true);
+            setIsPopupMinimized(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (isPopupMinimized) return; // Stop countdown if minimized
+
         const initialTimeout = setTimeout(() => {
             const interval = setInterval(() => {
                 setRemainingCount(prevCount => {
                     const newCount = prevCount > 4 ? prevCount - 1 : prevCount;
 
-                    if (newCount <= 4) {
+                    if (newCount <= 4 && !sessionStorage.getItem('popupMinimized')) {
                         setShowPopup(true);
                     }
                     
@@ -140,14 +166,20 @@ function UrgencyPromotion() {
         }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
         
         return () => clearTimeout(initialTimeout);
-    }, []);
+    }, [isPopupMinimized]);
+
+    const handleClosePopup = () => {
+        setIsPopupMinimized(true);
+        sessionStorage.setItem('popupMinimized', 'true');
+    };
 
     return (
         <>
             <UrgencyPopup 
                 count={remainingCount} 
                 isVisible={showPopup} 
-                onClose={() => setShowPopup(false)} 
+                onClose={handleClosePopup}
+                isMinimized={isPopupMinimized}
             />
             <p className="text-sm text-neutral-400 mt-1">
                 Só mais <span id="remaining-count" className={isBlinking ? 'animate-blink' : ''}>{remainingCount}</span> assinaturas com este valor.
@@ -346,5 +378,3 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
-
-    
