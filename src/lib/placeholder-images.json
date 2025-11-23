@@ -17,6 +17,12 @@
       "description": "Placeholder PIX QR Code for payment.",
       "imageUrl": "https://images.unsplash.com/photo-1571867424488-4565932edb41?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxxciUyMGNvZGV8ZW58MHx8fHwxNzYzODUyMTM3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "qr code"
+    },
+    {
+      "id": "post-preview-1",
+      "description": "A preview image for a locked post.",
+      "imageUrl": "https://images.unsplash.com/photo-1542282218-831b81203902?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzZW5zdWFsJTIwd29tYW58ZW58MHx8fHwxNzYzODUyMjU3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sensual woman"
     }
   ]
 }

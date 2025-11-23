@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,8 @@ const CommentIcon = (props: React.SVGProps<SVGSVGElement>) => (
 type Post = {
     id: string;
     isLocked: boolean;
+    previewUrl: string;
+    previewHint: string;
     stats: {
         images: number;
         videos: number;
@@ -148,9 +151,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             <div>
                                 <h2 className="text-sm font-semibold text-neutral-400 mb-2">Assinaturas</h2>
                                 {model.subscriptions.map(sub => (
-                                    <Button key={sub.id} className="w-full justify-between h-12 text-md font-semibold bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl">
-                                        <span>{sub.name}</span>
-                                        <span>R$ {sub.price}</span>
+                                    <Button key={sub.id} asChild className="w-full justify-between h-12 text-md font-semibold bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl">
+                                        <Link href="/pagamento">
+                                          <span>{sub.name}</span>
+                                          <span>R$ {sub.price}</span>
+                                        </Link>
                                     </Button>
                                 ))}
                             </div>
@@ -162,9 +167,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 </AccordionTrigger>
                                 <AccordionContent className="space-y-2">
                                    {model.promotions.map(promo => (
-                                    <Button key={promo.id} variant="secondary" className="w-full justify-between h-12 text-md font-semibold bg-[#27272A] text-white rounded-xl hover:bg-neutral-700">
-                                        <span>{promo.name} ({promo.discount})</span>
-                                        <span>R$ {promo.price}</span>
+                                    <Button key={promo.id} asChild variant="secondary" className="w-full justify-between h-12 text-md font-semibold bg-[#27272A] text-white rounded-xl hover:bg-neutral-700">
+                                        <Link href="/pagamento">
+                                          <span>{promo.name} ({promo.discount})</span>
+                                          <span>R$ {promo.price}</span>
+                                        </Link>
                                     </Button>
                                    ))}
                                 </AccordionContent>
@@ -186,47 +193,71 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </TabsList>
                     <TabsContent value="posts">
                         {model.posts.map(post => (
-                        <Card key={post.id} className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800 mt-4">
-                            <CardContent className="p-0">
-                                <div className="p-4 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <Image src={model.avatarUrl} alt={model.avatarHint} width={40} height={40} className="rounded-full"/>
-                                        <div>
-                                            <div className="flex items-center gap-1">
-                                                <p className="font-bold">{model.name}</p>
-                                                 {model.isVerified &&
-                                                    <div className="w-3 h-3 bg-orange-500 rounded-full flex items-center justify-center">
-                                                        <Check size={10} className="text-black" />
-                                                    </div>
-                                                }
-                                            </div>
-                                            <p className="text-xs text-neutral-400">@{model.handle}</p>
-                                        </div>
-                                    </div>
-                                    <MoreVertical className="text-neutral-400"/>
-                                </div>
-                                
-                                {post.isLocked && (
-                                    <div className="bg-[#F3EFEA] aspect-square w-full flex flex-col items-center justify-center text-neutral-500">
-                                        <Lock size={64} className="mb-4"/>
-                                        <div className="flex items-center gap-4 text-sm">
-                                            <div className="flex items-center gap-1"><ImageIcon size={16}/> {post.stats.images}</div>
-                                            <div className="flex items-center gap-1"><Video size={16}/> {post.stats.videos}</div>
-                                            <div className="flex items-center gap-1"><Heart size={16}/> <FormattedStat value={post.stats.likes} /></div>
-                                        </div>
-                                    </div>
-                                )}
+                        <div key={post.id}>
+                          <Card className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800 mt-4">
+                              <CardContent className="p-0">
+                                  <div className="p-4 flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                          <Image src={model.avatarUrl} alt={model.avatarHint} width={40} height={40} className="rounded-full"/>
+                                          <div>
+                                              <div className="flex items-center gap-1">
+                                                  <p className="font-bold">{model.name}</p>
+                                                   {model.isVerified &&
+                                                      <div className="w-3 h-3 bg-orange-500 rounded-full flex items-center justify-center">
+                                                          <Check size={10} className="text-black" />
+                                                      </div>
+                                                  }
+                                              </div>
+                                              <p className="text-xs text-neutral-400">@{model.handle}</p>
+                                          </div>
+                                      </div>
+                                      <MoreVertical className="text-neutral-400"/>
+                                  </div>
+                                  
+                                  {post.isLocked && (
+                                      <div className="bg-[#F3EFEA] aspect-square w-full flex flex-col items-center justify-center text-neutral-500">
+                                          <Lock size={64} className="mb-4"/>
+                                          <div className="flex items-center gap-4 text-sm">
+                                              <div className="flex items-center gap-1"><ImageIcon size={16}/> {post.stats.images}</div>
+                                              <div className="flex items-center gap-1"><Video size={16}/> {post.stats.videos}</div>
+                                              <div className="flex items-center gap-1"><Heart size={16}/> <FormattedStat value={post.stats.likes} /></div>
+                                          </div>
+                                      </div>
+                                  )}
 
-                                <div className="p-4 flex justify-between items-center text-neutral-400">
-                                    <div className="flex items-center gap-4">
-                                        <Heart size={24} />
-                                        <CommentIcon className="w-6 h-6"/>
-                                        <DollarSign size={24} />
-                                    </div>
-                                    <Bookmark size={24}/>
-                                </div>
-                            </CardContent>
-                        </Card>
+                                  <div className="p-4 flex justify-between items-center text-neutral-400">
+                                      <div className="flex items-center gap-4">
+                                          <Heart size={24} />
+                                          <CommentIcon className="w-6 h-6"/>
+                                          <DollarSign size={24} />
+                                      </div>
+                                      <Bookmark size={24}/>
+                                  </div>
+                              </CardContent>
+                          </Card>
+
+                          {post.isLocked && (
+                            <Card className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800 mt-4 p-4 space-y-4">
+                               <div className="group relative aspect-video w-full rounded-lg overflow-hidden">
+                                  <Image 
+                                      src={post.previewUrl} 
+                                      alt={post.previewHint}
+                                      data-ai-hint={post.previewHint}
+                                      fill
+                                      className="object-cover transition-all duration-300 blur-md group-hover:blur-sm"
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4">
+                                    <Lock size={48} className="mb-2"/>
+                                    <p className="font-semibold text-lg">Assine para desbloquear</p>
+                                    <p className="text-sm text-neutral-300 text-center">Acesse este e todo o conteúdo exclusivo.</p>
+                                  </div>
+                               </div>
+                               <Button asChild size="lg" className="w-full h-12 text-md font-bold bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl">
+                                <Link href="/pagamento">Assinar agora</Link>
+                               </Button>
+                            </Card>
+                          )}
+                        </div>
                         ))}
                     </TabsContent>
                     <TabsContent value="media">

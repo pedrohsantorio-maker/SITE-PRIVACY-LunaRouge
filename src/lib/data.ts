@@ -1,6 +1,7 @@
 import { PlaceHolderImages } from "./placeholder-images";
 
 const profileImage = PlaceHolderImages.find(img => img.id === 'model-profile');
+const previewImage = PlaceHolderImages.find(img => img.id === 'post-preview-1');
 
 export const modelData = {
   name: 'Mari Ávila',
@@ -32,6 +33,8 @@ export const modelData = {
       {
           id: 'post1',
           isLocked: true,
+          previewUrl: previewImage?.imageUrl || 'https://picsum.photos/seed/preview1/1080/1080',
+          previewHint: previewImage?.imageHint || 'sensual woman',
           stats: {
               images: 31,
               videos: 94,
