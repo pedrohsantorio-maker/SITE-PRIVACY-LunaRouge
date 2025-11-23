@@ -10,14 +10,6 @@ const schema = z.object({
   password: z.string().min(1, { message: 'Senha é obrigatória' }),
 });
 
-// This action is tricky. It needs to run on the server for the redirect,
-// but signInWithEmailAndPassword sets a client-side cookie that the server action can't access.
-// In a real app, this would be handled differently (e.g., custom token exchange).
-// For now, we keep it as a server action but acknowledge this limitation.
-// We will call the client-side `initializeFirebase` and it will likely fail silently on the server,
-// but the form post to this action is what's important for now. The actual sign-in
-// logic for Firebase auth state is handled client-side by the `useUser` hook.
-// The user will be redirected, and the client-side will pick up the auth state.
 
 export async function loginAction(prevState: any, formData: FormData) {
   const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
@@ -25,31 +17,28 @@ export async function loginAction(prevState: any, formData: FormData) {
   if (!parsed.success) {
     return { message: parsed.error.errors.map((e) => e.message).join(', ') };
   }
-
-  // We are not performing the sign-in here directly because server actions
-  // cannot set the necessary client-side authentication cookies.
-  // The login form itself on the client will handle the sign-in,
-  // and this server action is primarily for form validation and redirection.
-  // A "successful" validation here just means we can redirect.
-  // The client will then determine if the login was truly successful.
   
-  // A better approach in a real-world scenario would be a proper API route
-  // or a library that handles server-side auth cookie management.
+  // This is tricky because server actions can't set client-side cookies
+  // for auth. We perform the check here to validate credentials, but the
+  // actual auth state will be set on the client by the `useUser` hook
+  // after the client-side sign-in call.
+  // This server action essentially validates and provides feedback.
+  try {
+    // We are NOT using firebase-admin here. We are using the client SDK
+    // in a server component. This is not ideal but works for this scenario
+    // as we just want to validate credentials before redirecting.
+    const { auth } = initializeFirebase();
+    // We don't await this on purpose. The client will pick up the state change.
+    // We just want to initiate it. If it fails, the catch block will run.
+     await signInWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
+  } catch (error: any) {
+    if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        return { message: 'Credenciais inválidas. Verifique seu email e senha.' };
+    }
+    // For other errors, you might want to log them or handle them differently
+    console.error('Login error:', error);
+    return { message: 'Ocorreu um erro. Tente novamente.' };
+  }
 
-  // We will just redirect. The client will handle the actual login.
-  // To provide some feedback, we can't easily check credentials here without
-  // more complex setups. Let's assume the client-side will handle the UI
-  // for "invalid credentials" based on the auth state listener.
-  
-  // NOTE: The original code had a flaw where it called a client function
-  // from the server. This is a temporary conceptual fix.
-
-  // A full solution would involve libraries like 'firebase-admin' for server-side
-  // user management and custom token creation, which is beyond the scope of a
-  // simple fix.
-
-  // For now, we'll just redirect and let the client-side auth state do the work.
-  // This means we can't show "Invalid credentials" from the server.
-  
   redirect('/dashboard');
 }

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { Mail, Lock } from 'lucide-react';
-import { useActionState, useEffect, useRef } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
 import { loginAction } from './actions';
 import { useAuth, useUser } from '@/firebase';
-import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -30,22 +29,15 @@ export default function LoginPage() {
         imageHint: "futuristic woman"
     };
 
-    const auth = useAuth();
     const { user, isUserLoading } = useUser();
     const [state, formAction] = useActionState(loginAction, { message: '' });
 
-    const handleClientLogin = (formData: FormData) => {
-        const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
-        if (email && password) {
-            initiateEmailSignIn(auth, email, password);
-        }
-    };
-    
     // Redirect if user is logged in
-    if (user && !isUserLoading) {
-      redirect('/dashboard');
-    }
+    useEffect(() => {
+        if (user && !isUserLoading) {
+            redirect('/dashboard');
+        }
+    }, [user, isUserLoading]);
 
 
   return (
@@ -70,10 +62,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="bg-black/50 backdrop-blur-sm p-8 rounded-lg shadow-2xl shadow-primary/20 space-y-6">
-                  <form action={(formData) => {
-                      handleClientLogin(formData);
-                      formAction(formData);
-                  }}>
+                  <form action={formAction}>
                     <div className="grid gap-6">
                       <div className="grid gap-2">
                         <Label htmlFor="email" className="text-white font-light">Email</Label>
@@ -103,7 +92,7 @@ export default function LoginPage() {
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
                             <Input id="password" name="password" type="password" required className="bg-white/10 text-white border-white/20 pl-10 focus:ring-primary focus:border-primary transition-all duration-300"/>
                         </div>
-                         {state.message && <p className="text-red-500 text-sm mt-2">{state.message}</p>}
+                         {state?.message && <p className="text-red-500 text-sm mt-2">{state.message}</p>}
                       </div>
                       <SubmitButton />
                     </div>
