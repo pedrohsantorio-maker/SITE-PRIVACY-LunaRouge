@@ -10,7 +10,7 @@ export const modelData = {
   isVerified: true,
   avatarUrl: profileImage?.imageUrl || "https://picsum.photos/seed/elena/1080/1350",
   avatarHint: profileImage?.imageHint || "woman portrait",
-  bannerUrl: "https://i.imgur.com/8LrpTTd.jpeg",
+  bannerUrl: "https://imgur.com/2lTvoZw.jpeg",
   bannerHint: "woman taking selfie",
   bio: 'aqui você vai INVESTIR um valor super ACESSÍVEL e vai encontrar mais de 800 VÍDEOS e FOTOS: Dando muuuito minha bucetinha rosinha no pelo com gozada dentro, fazendo oral bem babad...',
   stats: {
@@ -21,8 +21,6 @@ export const modelData = {
   },
   socials: {
       instagram: "#",
-      twitter: "#",
-      tiktok: "#"
   },
   subscriptions: [
     { name: '1 mês', price: '19,99', id: 'monthly' },
