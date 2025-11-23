@@ -9,7 +9,11 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Logo from '@/components/logo';
 
 export default function SignupPage() {
-    const signupImage = PlaceHolderImages.find(img => img.id === 'model-profile');
+    const signupImage = {
+        imageUrl: "https://i.imgur.com/Xwd7qSZ.jpeg",
+        description: "Woman in a futuristic setting",
+        imageHint: "futuristic woman"
+    };
 
     async function signup(formData: FormData) {
         'use server';
