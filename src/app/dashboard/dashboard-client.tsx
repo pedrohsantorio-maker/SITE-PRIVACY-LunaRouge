@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 // Inline SVG for social icons to avoid installing a new library
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -369,6 +369,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-0 max-w-lg w-full">
+                     <DialogTitle className="sr-only">Foto de Perfil de {model.name}</DialogTitle>
                     <div className="relative">
                         <Image
                             src={model.avatarUrl}
