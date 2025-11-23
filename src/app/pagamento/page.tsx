@@ -18,8 +18,8 @@ export default function PagamentoPage() {
             </div>
             <Card className="w-full max-w-md shadow-2xl shadow-primary/10">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-3xl font-bold">Pagamento via Pix</CardTitle>
-                    <CardDescription>Finalize sua assinatura de forma rápida e segura.</CardDescription>
+                    <CardTitle className="text-3xl font-headline font-bold">Pagamento via Pix</CardTitle>
+                    <CardDescription className="font-light">Finalize sua assinatura de forma rápida e segura.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center gap-6">
                     <div className="p-2 bg-white rounded-lg">
@@ -37,7 +37,7 @@ export default function PagamentoPage() {
                     <div className="text-center space-y-2">
                         <p className="font-semibold">1. Abra o app do seu banco e escaneie o QR Code.</p>
                         <p className="font-semibold">2. Confirme o valor e finalize o pagamento.</p>
-                        <p className="text-sm text-muted-foreground">Seu acesso será liberado automaticamente após a confirmação.</p>
+                        <p className="text-sm text-muted-foreground font-light">Seu acesso será liberado automaticamente após a confirmação.</p>
                     </div>
 
                     {/* This button simulates the confirmation and redirects the user */}

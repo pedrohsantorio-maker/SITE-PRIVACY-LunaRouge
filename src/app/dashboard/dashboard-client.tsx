@@ -10,11 +10,8 @@ import { getAiSuggestionsAction } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 type ModelData = {
@@ -84,7 +81,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
 
           <div className="text-center sm:text-left">
-            <h1 className="text-4xl sm:text-5xl font-bold font-headline">{model.name}</h1>
+            <h1 className="text-4xl sm:text-5xl font-headline font-bold">{model.name}</h1>
             <div className="flex justify-center sm:justify-start items-center gap-6 mt-4 text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-accent" />
@@ -106,7 +103,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
         <section className="mb-10">
           <Card className="bg-secondary/50 border-border">
             <CardContent className="p-6">
-              <p className="text-foreground/80 leading-relaxed">
+              <p className="text-foreground/80 leading-relaxed font-light">
                 {isBioExpanded ? model.bio_long : model.bio_short}
               </p>
               <Button variant="link" onClick={() => setIsBioExpanded(!isBioExpanded)} className="px-0 mt-2 text-accent">
@@ -119,7 +116,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
         {/* Subscription Plans */}
         <section className="mb-10">
-            <h2 className="text-3xl font-bold text-center mb-6">Planos de Assinatura</h2>
+            <h2 className="text-3xl font-headline font-bold text-center mb-6">Planos de Assinatura</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {model.subscriptionPlans.map((plan, index) => (
                 <Card key={plan.id} className={`flex flex-col border-2 ${index === 1 ? 'border-primary' : 'border-border'} hover:border-primary transition-colors`}>
@@ -127,7 +124,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         <Badge variant="default" className="w-fit self-center -mt-3 bg-accent text-accent-foreground">{plan.discount}</Badge>
                     )}
                     <CardHeader className="text-center pt-6">
-                        <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                        <CardTitle className="text-2xl font-headline font-bold">{plan.name}</CardTitle>
                         <CardDescription>R$ <span className="text-4xl font-bold text-foreground">{plan.price.split(',')[0]}</span>,{(plan.price.split(',')[1] || '00')}</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-grow flex items-end">
@@ -145,8 +142,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
         {/* AI Profile Optimizer */}
         <section>
           <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold">Otimizador de Perfil com IA</h2>
-            <p className="text-muted-foreground mt-2">Receba sugestões para melhorar seu perfil e atrair mais assinantes.</p>
+            <h2 className="text-3xl font-headline font-bold">Otimizador de Perfil com IA</h2>
+            <p className="text-muted-foreground mt-2 font-light">Receba sugestões para melhorar seu perfil e atrair mais assinantes.</p>
           </div>
           <Card className="bg-secondary/50">
             <CardContent className="p-6">
@@ -157,7 +154,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                  <input type="hidden" name="subscriptionPlans" value={subscriptionPlansAsString} />
 
                 <div className="mb-6">
-                    <p className="text-muted-foreground">Clique no botão abaixo para analisar a descrição, imagem e planos de assinatura atuais e receber sugestões de otimização da nossa IA.</p>
+                    <p className="text-muted-foreground font-light">Clique no botão abaixo para analisar a descrição, imagem e planos de assinatura atuais e receber sugestões de otimização da nossa IA.</p>
                 </div>
 
                 <SubmitButton />
@@ -170,22 +167,22 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     {aiState.descriptionSuggestions && (
                         <Alert>
                             <Wand2 className="h-4 w-4" />
-                            <AlertTitle>Descrição do Perfil</AlertTitle>
-                            <AlertDescription>{aiState.descriptionSuggestions}</AlertDescription>
+                            <AlertTitle className="font-bold">Descrição do Perfil</AlertTitle>
+                            <AlertDescription className="font-light">{aiState.descriptionSuggestions}</AlertDescription>
                         </Alert>
                     )}
                     {aiState.imageSuggestions && (
                         <Alert>
                             <Wand2 className="h-4 w-4" />
-                            <AlertTitle>Imagem do Perfil</AlertTitle>
-                            <AlertDescription>{aiState.imageSuggestions}</AlertDescription>
+                            <AlertTitle className="font-bold">Imagem do Perfil</AlertTitle>
+                            <AlertDescription className="font-light">{aiState.imageSuggestions}</AlertDescription>
                         </Alert>
                     )}
                     {aiState.subscriptionPlanSuggestions && (
                         <Alert>
                             <Wand2 className="h-4 w-4" />
-                            <AlertTitle>Planos de Assinatura</AlertTitle>
-                            <AlertDescription>{aiState.subscriptionPlanSuggestions}</AlertDescription>
+                            <AlertTitle className="font-bold">Planos de Assinatura</AlertTitle>
+                            <AlertDescription className="font-light">{aiState.subscriptionPlanSuggestions}</AlertDescription>
                         </Alert>
                     )}
                 </div>

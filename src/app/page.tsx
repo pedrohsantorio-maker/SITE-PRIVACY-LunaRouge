@@ -27,7 +27,7 @@ export default function LandingPage() {
         <div className="mb-8">
           <Logo className="text-6xl md:text-8xl font-bold tracking-tighter" />
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
+        <h1 className="text-4xl md:text-6xl font-headline font-bold tracking-tight mb-4">
           Conteúdo Exclusivo. Conexão Real.
         </h1>
         <p className="max-w-2xl text-lg md:text-xl font-light mb-8">
