@@ -2,9 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { initializeFirebase } from '@/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { getAdminAuth, getAdminFirestore } from '@/firebase/server';
 
 const schema = z.object({
   name: z.string().min(1, { message: 'Nome é obrigatório' }),
@@ -20,21 +18,25 @@ export async function signupAction(prevState: any, formData: FormData) {
     return { message: parsed.error.errors.map((e) => e.message).join(', ') };
   }
 
-  const { auth, firestore } = initializeFirebase();
+  const auth = getAdminAuth();
+  const firestore = getAdminFirestore();
 
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
-    const user = userCredential.user;
-
-    await setDoc(doc(firestore, 'users', user.uid), {
-      id: user.uid,
+    const userRecord = await auth.createUser({
+        email: parsed.data.email,
+        password: parsed.data.password,
+        displayName: parsed.data.name,
+    });
+    
+    await firestore.collection('users').doc(userRecord.uid).set({
+      id: userRecord.uid,
       name: parsed.data.name,
       email: parsed.data.email,
       age: parsed.data.age,
     });
 
   } catch (error: any) {
-    if (error.code === 'auth/email-already-in-use') {
+    if (error.code === 'auth/email-already-exists') {
         return { message: 'Este email já está em uso.' };
     }
     console.error('Erro ao criar conta:', error);
