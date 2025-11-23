@@ -1,0 +1,227 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the ModelMuse platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "age": {
+          "type": "number",
+          "description": "The user's age."
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "Reference to Subscription. (Relationship: User 1:1 Subscription)"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "age"
+      ]
+    },
+    "ModelProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ModelProfile",
+      "type": "object",
+      "description": "Represents the profile of a model on the platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the model profile entity."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the model, written by the model."
+        },
+        "profileImageUrl": {
+          "type": "string",
+          "description": "URL of the model's profile image.",
+          "format": "uri"
+        },
+        "subscriberCount": {
+          "type": "number",
+          "description": "Number of subscribers to the model's content."
+        },
+        "likeCount": {
+          "type": "number",
+          "description": "Number of likes received by the model's content."
+        },
+        "followerCount": {
+          "type": "number",
+          "description": "Number of followers of the model."
+        }
+      },
+      "required": [
+        "id",
+        "description",
+        "profileImageUrl"
+      ]
+    },
+    "Subscription": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Subscription",
+      "type": "object",
+      "description": "Represents a user's subscription to the ModelMuse platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the subscription entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:1 Subscription)"
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The date when the subscription started.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The date when the subscription ends.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the subscription (e.g., active, inactive, pending)."
+        },
+        "planId": {
+          "type": "string",
+          "description": "Reference to Plan. (Relationship: Subscription 1:1 Plan)"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "startDate",
+        "endDate",
+        "status"
+      ]
+    },
+    "Plan": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Plan",
+      "type": "object",
+      "description": "Represents a subscription plan offered on the platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the plan entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the subscription plan (e.g., monthly, quarterly)."
+        },
+        "price": {
+          "type": "number",
+          "description": "The price of the subscription plan."
+        },
+        "durationMonths": {
+          "type": "number",
+          "description": "The duration of the plan in months."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the subscription plan."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "price",
+        "durationMonths"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile data.  Path-based ownership ensures only the authenticated user can access their data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, matching the Firebase Auth UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/modelProfiles/{modelProfileId}",
+        "definition": {
+          "entityName": "ModelProfile",
+          "schema": {
+            "$ref": "#/backend/entities/ModelProfile"
+          },
+          "description": "Stores the model profile information, including description, profile image URL, subscriber count, like count and follower count.",
+          "params": [
+            {
+              "name": "modelProfileId",
+              "description": "The unique identifier of the model profile."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/subscriptions/{subscriptionId}",
+        "definition": {
+          "entityName": "Subscription",
+          "schema": {
+            "$ref": "#/backend/entities/Subscription"
+          },
+          "description": "Stores subscription details, including userId, startDate, endDate, status, and planId.",
+          "params": [
+            {
+              "name": "subscriptionId",
+              "description": "The unique identifier for the subscription."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/plans/{planId}",
+        "definition": {
+          "entityName": "Plan",
+          "schema": {
+            "$ref": "#/backend/entities/Plan"
+          },
+          "description": "Stores subscription plan information such as name, price, duration, and description. This data is publicly accessible.",
+          "params": [
+            {
+              "name": "planId",
+              "description": "The unique identifier for the subscription plan."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This Firestore structure is designed to support ModelMuse's user authentication, model profile display, subscription management, and content access control features. The structure prioritizes authorization independence, clarity, and scalability. It leverages path-based ownership for user-specific data and employs denormalization to avoid hierarchical authorization dependencies, enabling secure and efficient data access. The segregation of user data into dedicated collections simplifies security rules and ensures consistent access control.\n\nKey features of the structure:\n\n*   **/users/{userId}:** Stores user profile data, including name, email, age, and a reference to their subscription (subscriptionId). This path-based ownership ensures only the authenticated user can access their data.  This collection will store the main user information. In addition the user's subscription id is stored as well.\n*   **/modelProfiles/{modelProfileId}:** Stores model profile information such as description, profile image URL, subscriber count, like count, and follower count. Given that there is only one model, we are opting for a collection instead of a subcollection.\n*   **/subscriptions/{subscriptionId}:** Stores subscription details, including userId, startDate, endDate, status, and planId.  This collection stores subscription details. Access to this data is controlled by the userId and requires that a user is authenticated.\n*   **/plans/{planId}:** Stores subscription plan information such as name, price, duration, and description. This data is public and available to all users.\n\n**Authorization Independence (Denormalization):**\n\n*   The `User` document contains a `subscriptionId` field. This allows you to fetch the subscription details if needed.  The subscription can be looked up separately by `subscription/{subscriptionId}` without requiring access to other user data.\n\n**QAPs (Rules are not Filters):**\n\n*   The structure enables secure `list` operations.  The user profile information is stored in `/users/{userId}` guaranteeing that `list` operations can only be performed by authenticated users.\n*   Subscription plan data stored in `/plans/{planId}` has no restrictions on `list` operations."
+  }
+}
