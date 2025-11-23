@@ -33,14 +33,28 @@ export async function loginAction(prevState: any, formData: FormData) {
     const auth = getAuth(firebaseApp);
     await signInWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
   } catch (error: any) {
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
-        return { message: 'Conta não encontrada. Por favor, crie uma conta.' };
+    console.error("Erro ao realizar login:", error);
+    let errorMessage = "Ocorreu um erro ao tentar fazer login. Tente novamente.";
+    
+    switch (error.code) {
+      case 'auth/user-not-found':
+        errorMessage = "Conta não encontrada. Por favor, verifique o e-mail ou crie uma conta.";
+        break;
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential':
+        errorMessage = "A senha está incorreta. Tente novamente.";
+        break;
+      case 'auth/invalid-email':
+        errorMessage = "O e-mail fornecido é inválido.";
+        break;
+      case 'auth/network-request-failed':
+        errorMessage = "Erro de conexão com a internet. Tente novamente mais tarde.";
+        break;
+      default:
+        // Mantém a mensagem de erro genérica ou a mensagem do próprio erro para outros casos.
+        errorMessage = error.message || errorMessage;
     }
-    if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-        return { message: 'Credenciais inválidas. Verifique seu email e senha.' };
-    }
-    console.error('Login error:', error);
-    return { message: 'Ocorreu um erro. Tente novamente.' };
+    return { message: errorMessage };
   }
 
   redirect('/dashboard');
