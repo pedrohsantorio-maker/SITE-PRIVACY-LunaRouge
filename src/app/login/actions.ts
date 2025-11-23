@@ -2,8 +2,18 @@
 
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { initializeFirebase } from '@/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { firebaseConfig } from '@/firebase/config';
+
+// Helper function to initialize Firebase Admin on the server
+function initializeFirebaseServer() {
+    if (!getApps().length) {
+        return initializeApp(firebaseConfig);
+    }
+    return getApps()[0];
+}
+
 
 const schema = z.object({
   email: z.string().email({ message: 'Email inválido' }),
@@ -19,10 +29,11 @@ export async function loginAction(prevState: any, formData: FormData) {
   }
   
   try {
-    const { auth } = initializeFirebase();
-     await signInWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
+    const firebaseApp = initializeFirebaseServer();
+    const auth = getAuth(firebaseApp);
+    await signInWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
   } catch (error: any) {
-    if (error.code === 'auth/user-not-found') {
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
         return { message: 'Conta não encontrada. Por favor, crie uma conta.' };
     }
     if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {

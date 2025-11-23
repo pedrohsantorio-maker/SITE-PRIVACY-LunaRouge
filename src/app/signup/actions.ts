@@ -2,9 +2,17 @@
 
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { initializeFirebase } from '@/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { firebaseConfig } from '@/firebase/config';
 
+// Helper function to initialize Firebase Admin on the server
+function initializeFirebaseServer() {
+    if (!getApps().length) {
+        return initializeApp(firebaseConfig);
+    }
+    return getApps()[0];
+}
 
 const schema = z.object({
   name: z.string().min(1, { message: 'Nome é obrigatório' }),
@@ -23,7 +31,8 @@ export async function signupAction(prevState: any, formData: FormData) {
   }
 
   try {
-    const { auth } = initializeFirebase();
+    const firebaseApp = initializeFirebaseServer();
+    const auth = getAuth(firebaseApp);
     // This function signs the user in automatically after creation
     await createUserWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
 
