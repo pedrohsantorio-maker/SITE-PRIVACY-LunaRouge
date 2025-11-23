@@ -127,15 +127,16 @@ function UrgencyPromotion() {
                     setRemainingCount(prevCount => {
                         const newCount = prevCount > 4 ? prevCount - 1 : prevCount;
 
-                        if (newCount <= 4 && !isPopupMinimized && !sessionStorage.getItem('popupMinimized')) {
+                        if ((newCount === 4 || newCount === 3) && !isPopupMinimized && !sessionStorage.getItem('popupMinimized')) {
                             setShowPopup(true);
-                            if (newCount <= 3) {
-                                clearInterval(interval);
-                            }
                         }
                         
                         setIsBlinking(true);
                         setTimeout(() => setIsBlinking(false), 1000);
+
+                        if (newCount <= 3) {
+                            clearInterval(interval);
+                        }
 
                         return newCount;
                     });
@@ -200,7 +201,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 data-ai-hint={model.bannerHint}
                                 width={448}
                                 height={150}
-                                className="w-full h-[150px] object-cover"
+                                className="w-full h-[150px] object-cover object-top"
                             />
                             <div className="absolute -bottom-12 left-4">
                                 <button onClick={() => setIsProfileModalOpen(true)} className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-[#121212]">
@@ -369,7 +370,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-0 max-w-lg w-full">
-                     <DialogTitle className="sr-only">Foto de Perfil de {model.name}</DialogTitle>
+                    <DialogTitle className="sr-only">Foto de Perfil de {model.name}</DialogTitle>
                     <div className="relative">
                         <Image
                             src={model.avatarUrl}
