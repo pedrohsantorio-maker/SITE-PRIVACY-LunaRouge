@@ -3,7 +3,7 @@
     {
       "id": "model-profile",
       "description": "Main profile picture for the model Elena.",
-      "imageUrl": "https://images.unsplash.com/photo-1557053910-d9eadeed1c58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2MzgzNjUwNXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://i.imgur.com/Tjbcq1u.jpeg",
       "imageHint": "woman portrait"
     },
     {
@@ -59,12 +59,6 @@
       "imageUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8d29tYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjM4MzY1MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "woman portrait",
       "description": "Gallery preview image 6."
-    },
-    {
-      "id": "gallery-preview-7",
-      "imageUrl": "https://images.unsplash.com/photo-1523398002811-999ca8dec234?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx1cmJhbiUyMGZhc2hpb258ZW58MHx8fHwxNzYzODM4MjgzfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "urban fashion",
-      "description": "Gallery preview image 7."
     }
   ]
 }
