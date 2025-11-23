@@ -65,9 +65,12 @@ export default function SignupPage() {
     
     // This handles redirecting the user if they are already logged in
     // and land on this page.
-    if (user && !isUserLoading) {
-      redirect('/dashboard');
-    }
+    useEffect(() => {
+        if (user && !isUserLoading) {
+            redirect('/dashboard');
+        }
+    }, [user, isUserLoading]);
+
 
   return (
     <div className="w-full min-h-screen relative">
