@@ -28,6 +28,9 @@ export async function signupAction(prevState: any, formData: FormData) {
     await createUserWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
 
   } catch (error: any) {
+    // Log do erro completo no servidor para diagnóstico
+    console.error('Erro ao criar conta:', error);
+
     let errorMessage = 'Ocorreu um erro ao criar a conta. Tente novamente.';
     
     // Verificando o erro e exibindo mensagens mais específicas
@@ -39,14 +42,14 @@ export async function signupAction(prevState: any, formData: FormData) {
         errorMessage = "O e-mail fornecido é inválido.";
         break;
       case 'auth/weak-password':
-        errorMessage = "A senha é muito fraca. Tente uma senha mais forte.";
+        errorMessage = "A senha é muito fraca. Tente uma senha com pelo menos 8 caracteres.";
         break;
       case 'auth/network-request-failed':
         errorMessage = "Erro de conexão. Verifique sua internet e tente novamente.";
         break;
       default:
-        // Para outros erros inesperados, logamos o erro no servidor
-        console.error('Signup error:', error);
+        // Para outros erros inesperados, usamos a mensagem do próprio erro se disponível
+        errorMessage = error.message || errorMessage;
         break;
     }
     return { message: errorMessage };
