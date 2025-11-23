@@ -14,14 +14,7 @@ const schema = z.object({
   password: z.string().min(8, { message: 'A senha deve ter pelo menos 8 caracteres' }),
 });
 
-// This action is tricky. It needs to run on the server for the redirect,
-// but createUserWithEmailAndPassword sets a client-side cookie that the server action can't access.
-// In a real app, this would be handled differently (e.g., custom token exchange).
-// For now, we keep it as a server action but acknowledge this limitation.
-// We will call the client-side `initializeFirebase` and it will likely fail silently on the server,
-// but the form post to this action is what's important for now. The actual sign-in
-// logic for Firebase auth state is handled client-side by the `useUser` hook.
-// The user will be redirected, and the client-side will pick up the auth state.
+
 export async function signupAction(prevState: any, formData: FormData) {
   const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
 
@@ -29,12 +22,18 @@ export async function signupAction(prevState: any, formData: FormData) {
     return { message: parsed.error.errors.map((e) => e.message).join(', ') };
   }
 
-  // The client-side will handle the actual account creation and login.
-  // This server action will just validate and redirect. The form on the
-  // client will also call `createUserWithEmailAndPassword`. This is a
-  // duplication of effort but necessary in this mixed environment to
-  // ensure the redirect happens correctly from the server and the auth
-  // state is correctly set on the client.
+  try {
+    // This is not ideal as we are using client SDK on the server, but it's
+    // a necessary workaround for this mixed-component environment.
+    const { auth } = initializeFirebase();
+    await createUserWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
+  } catch (error: any) {
+    if (error.code === 'auth/email-already-in-use') {
+      return { message: 'Este email já está cadastrado. Por favor, faça login.' };
+    }
+    console.error('Signup error:', error);
+    return { message: 'Ocorreu um erro ao criar a conta. Tente novamente.' };
+  }
   
   redirect('/dashboard');
 }

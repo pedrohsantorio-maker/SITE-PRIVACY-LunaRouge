@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
 import { signupAction } from './actions';
 import { useAuth, useFirestore, useUser } from '@/firebase';
-import { initiateEmailSignUp } from '@/firebase/non-blocking-login';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
 
@@ -41,37 +41,29 @@ export default function SignupPage() {
     const [state, formAction] = useActionState(signupAction, { message: '' });
 
     // This effect handles the client-side user creation and data storing
-    const handleClientSignup = async (formData: FormData) => {
-        const name = formData.get('name') as string;
+    // when using the non-blocking sign-up flow. With the action handling
+    // creation, this becomes primarily for data storage after redirect.
+    const handleClientSignupAndDataSave = async (formData: FormData) => {
         const email = formData.get('email') as string;
         const password = formData.get('password') as string;
-        const age = Number(formData.get('age'));
 
-        if (!email || !password || !name || !age) {
-            // Basic validation, though server action will handle it more robustly
-            return;
-        }
-         if (password.length < 8) {
-            // This should be caught by the server action, but good to have client-side too
-            return;
-        }
+        if (!auth) return;
 
         try {
-            // We'll use the non-blocking sign-up and then listen for the user object to be available
-            // to save their data.
-            initiateEmailSignUp(auth, email, password);
-            
-            // The `useUser` hook will update when the user is created.
-            // A separate effect will handle saving the user data to Firestore.
-
+            // Re-authenticate silently on the client to get the user object for the session
+            // This is necessary because server actions don't set client-side auth state.
+            await createUserWithEmailAndPassword(auth, email, password);
         } catch (error: any) {
-             // This might not catch auth errors if they happen async, but it's here as a fallback.
-             console.error("Erro ao criar conta (cliente):", error);
-             // The server action state will be the primary source for user-facing errors.
+             // This error is expected if the server action already created the user.
+             // We can ignore 'auth/email-already-in-use' on the client side during this flow.
+             if (error.code !== 'auth/email-already-in-use') {
+                console.error("Erro de sincronização do cliente:", error);
+             }
         }
     };
     
     // This effect runs when the user object changes (i.e., after successful signup)
+    // to save the user's data to Firestore.
     useEffect(() => {
         if (user && formRef.current) {
              const formData = new FormData(formRef.current);
@@ -80,14 +72,14 @@ export default function SignupPage() {
              const age = Number(formData.get('age'));
 
             // Check if we have the necessary form data to prevent writing on simple re-logins
-            if (name && email && age) {
+            if (name && email && age && firestore) {
                 const userDocRef = doc(firestore, 'users', user.uid);
                 setDoc(userDocRef, {
                     id: user.uid,
                     name,
                     email,
                     age,
-                }, { merge: true }); // use merge to not overwrite other data on re-login
+                }, { merge: true }).catch(err => console.error("Failed to save user data", err));
             }
         }
     }, [user, firestore]);
@@ -119,8 +111,8 @@ export default function SignupPage() {
 
                 <div className="bg-black/50 backdrop-blur-sm p-8 rounded-lg shadow-2xl shadow-primary/20 space-y-6">
                     <form ref={formRef} action={(formData) => {
-                        handleClientSignup(formData);
                         formAction(formData);
+                        // We no longer initiate signup from the client, the action handles it.
                     }}>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
