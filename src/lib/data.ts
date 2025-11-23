@@ -1,7 +1,8 @@
 import { PlaceHolderImages } from "./placeholder-images";
 
 const profileImage = PlaceHolderImages.find(img => img.id === 'model-profile');
-const previewImage = PlaceHolderImages.find(img => img.id === 'post-preview-1');
+const postPreviewImage = PlaceHolderImages.find(img => img.id === 'post-preview-1');
+const galleryImages = PlaceHolderImages.filter(img => img.id.startsWith('gallery-preview-'));
 
 export const modelData = {
   name: 'Mari Ávila',
@@ -16,7 +17,7 @@ export const modelData = {
     posts: 121,
     media: 125,
     likes: 265800,
-    previews: 1,
+    previews: 8,
   },
   socials: {
       instagram: "#",
@@ -34,15 +35,18 @@ export const modelData = {
       {
           id: 'post1',
           isLocked: true,
-          previewUrl: previewImage?.imageUrl || 'https://picsum.photos/seed/preview1/1080/1080',
-          previewHint: previewImage?.imageHint || 'sensual woman',
           stats: {
               images: 31,
               videos: 94,
               likes: 2200,
           }
       }
-  ]
+  ],
+  previewsGallery: galleryImages.map(img => ({
+    id: img.id,
+    url: img.imageUrl,
+    hint: img.imageHint,
+    width: 600,
+    height: 600,
+  }))
 };
-
-    

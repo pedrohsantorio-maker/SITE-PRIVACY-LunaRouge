@@ -23,6 +23,54 @@
       "description": "A preview image for a locked post.",
       "imageUrl": "https://images.unsplash.com/photo-1542282218-831b81203902?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzZW5zdWFsJTIwd29tYW58ZW58MHx8fHwxNzYzODUyMjU3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "sensual woman"
+    },
+    {
+      "id": "gallery-preview-1",
+      "imageUrl": "https://images.unsplash.com/photo-1599137055962-4342e6069071?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3b21hbiUyMHBvc2luZ3xlbnwwfHx8fDE3NjM5MzE5Mzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman posing",
+      "description": "Gallery preview image 1."
+    },
+    {
+      "id": "gallery-preview-2",
+      "imageUrl": "https://images.unsplash.com/photo-1562572159-4efc207f5aff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmYXNoaW9uJTIwbW9kZWx8ZW58MHx8fHwxNzYzODYzNzExfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fashion model",
+      "description": "Gallery preview image 2."
+    },
+    {
+      "id": "gallery-preview-3",
+      "imageUrl": "https://images.unsplash.com/photo-1711645169736-53327e726205?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx3b21hbiUyMHNtaWxpbmd8ZW58MHx8fHwxNzYzOTE3NjMxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman smiling",
+      "description": "Gallery preview image 3."
+    },
+    {
+      "id": "gallery-preview-4",
+      "imageUrl": "https://images.unsplash.com/photo-1681815835459-c64082a16fca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxiZWFjaCUyMHBob3RvfGVufDB8fHx8MTc2MzkxMzAxMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beach photo",
+      "description": "Gallery preview image 4."
+    },
+    {
+      "id": "gallery-preview-5",
+      "imageUrl": "https://images.unsplash.com/photo-1573911932098-5e3e90f59f15?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxsaWZlc3R5bGUlMjBzZWxmaWV8ZW58MHx8fHwxNzYzOTMxOTM4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "lifestyle selfie",
+      "description": "Gallery preview image 5."
+    },
+    {
+      "id": "gallery-preview-6",
+      "imageUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8d29tYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjM4MzY1MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman portrait",
+      "description": "Gallery preview image 6."
+    },
+    {
+      "id": "gallery-preview-7",
+      "imageUrl": "https://images.unsplash.com/photo-1523398002811-999ca8dec234?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx1cmJhbiUyMGZhc2hpb258ZW58MHx8fHwxNzYzODM4MjgzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "urban fashion",
+      "description": "Gallery preview image 7."
+    },
+    {
+      "id": "gallery-preview-8",
+      "imageUrl": "https://images.unsplash.com/photo-1614200991676-910c80a78ed4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxuYXR1cmFsJTIwbGlnaHR8ZW58MHx8fHwxNzYzODc0OTYxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "natural light",
+      "description": "Gallery preview image 8."
     }
   ]
 }

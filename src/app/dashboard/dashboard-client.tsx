@@ -30,14 +30,20 @@ const CommentIcon = (props: React.SVGProps<SVGSVGElement>) => (
 type Post = {
     id: string;
     isLocked: boolean;
-    previewUrl: string;
-    previewHint: string;
     stats: {
         images: number;
         videos: number;
         likes: number;
     }
 }
+
+type GalleryItem = {
+    id: string;
+    url: string;
+    hint: string;
+    width: number;
+    height: number;
+};
 
 type ModelData = {
     name: string;
@@ -71,6 +77,7 @@ type ModelData = {
         id: string;
     }[];
     posts: Post[];
+    previewsGallery: GalleryItem[];
 };
 
 function FormattedStat({ value }: { value: number }) {
@@ -195,28 +202,22 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             <ImageIcon size={16} /> {model.stats.media} Mídias
                         </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="previews">
-                        {model.posts.filter(p => p.isLocked).map(post => (
-                             <Card key={`preview-${post.id}`} className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800 mt-4 p-4 space-y-4">
-                               <div className="group relative aspect-video w-full rounded-lg overflow-hidden">
-                                  <Image 
-                                      src={post.previewUrl} 
-                                      alt={post.previewHint}
-                                      data-ai-hint={post.previewHint}
-                                      fill
-                                      className="object-cover transition-all duration-300 blur-md group-hover:blur-sm"
-                                  />
-                                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4">
-                                    <Lock size={48} className="mb-2"/>
-                                    <p className="font-semibold text-lg">Assine para desbloquear</p>
-                                    <p className="text-sm text-neutral-300 text-center">Acesse este e todo o conteúdo exclusivo.</p>
-                                  </div>
-                               </div>
-                               <Button asChild size="lg" className="w-full h-12 text-md font-bold bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl">
-                                <Link href="/pagamento">Assinar agora</Link>
-                               </Button>
-                            </Card>
-                        ))}
+                    <TabsContent value="previews" className="mt-4">
+                        <div className="grid grid-cols-2 gap-2">
+                            {model.previewsGallery.map(item => (
+                                <Card key={item.id} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-md aspect-square">
+                                    <div className="relative w-full h-full">
+                                        <Image 
+                                            src={item.url}
+                                            alt={item.hint}
+                                            data-ai-hint={item.hint}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
                     </TabsContent>
                     <TabsContent value="posts">
                         {model.posts.map(post => (
