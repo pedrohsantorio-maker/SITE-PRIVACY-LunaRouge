@@ -9,8 +9,8 @@
     {
       "id": "model-landing-hero",
       "description": "Hero background image for the landing page.",
-      "imageUrl": "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmYXNoaW9uJTIwbW9kZWx8ZW58MHx8fHwxNzYzODYzNzExfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "fashion model"
+      "imageUrl": "https://i.imgur.com/Xwd7qSZ.jpeg",
+      "imageHint": "futuristic woman"
     },
     {
       "id": "payment-qr-code",
