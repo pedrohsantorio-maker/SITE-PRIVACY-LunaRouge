@@ -96,18 +96,37 @@ function FormattedStat({ value }: { value: number }) {
     return <span>{formattedValue}</span>;
 }
 
+function UrgencyPopup({ count, isVisible, onClose }: { count: number; isVisible: boolean; onClose: () => void; }) {
+    if (!isVisible) return null;
+
+    return (
+        <div className="popup-container">
+            <div className="popup-content">
+                <span onClick={onClose} className="popup-close">&times;</span>
+                <h2>As assinaturas estão acabando!</h2>
+                <p>Só mais <span id="popup-count">{count}</span> assinaturas com este valor.</p>
+            </div>
+        </div>
+    );
+}
+
 function UrgencyPromotion() {
     const [remainingCount, setRemainingCount] = useState(11);
     const [isBlinking, setIsBlinking] = useState(false);
+    const [showPopup, setShowPopup] = useState(false);
 
     useEffect(() => {
         const initialTimeout = setTimeout(() => {
             const interval = setInterval(() => {
                 setRemainingCount(prevCount => {
-                    const newCount = prevCount - 1;
+                    const newCount = prevCount > 4 ? prevCount - 1 : prevCount;
+
+                    if (newCount <= 4) {
+                        setShowPopup(true);
+                    }
                     
-                    if (newCount <= 4 && newCount >= 3) {
-                        clearInterval(interval);
+                    if (newCount <= 3) {
+                       clearInterval(interval);
                     }
                     
                     setIsBlinking(true);
@@ -123,11 +142,17 @@ function UrgencyPromotion() {
         return () => clearTimeout(initialTimeout);
     }, []);
 
-
     return (
-         <p className="text-sm text-neutral-400 mt-1">
-            Só mais <span id="remaining-count" className={isBlinking ? 'animate-blink' : ''}>{remainingCount}</span> assinaturas com este valor.
-        </p>
+        <>
+            <UrgencyPopup 
+                count={remainingCount} 
+                isVisible={showPopup} 
+                onClose={() => setShowPopup(false)} 
+            />
+            <p className="text-sm text-neutral-400 mt-1">
+                Só mais <span id="remaining-count" className={isBlinking ? 'animate-blink' : ''}>{remainingCount}</span> assinaturas com este valor.
+            </p>
+        </>
     );
 }
 
@@ -279,7 +304,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                       </div>
                                                   }
                                               </div>
-                                              <p className="text-xs text-neutral-400">@{model.handle}</p>
+                                              <p className="text-sm text-neutral-400">@{model.handle}</p>
                                           </div>
                                       </div>
                                       <MoreVertical className="text-neutral-400"/>
@@ -321,3 +346,5 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
+    
