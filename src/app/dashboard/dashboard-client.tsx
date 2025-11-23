@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 type ModelData = {
     name: string;
@@ -48,7 +48,7 @@ function FormattedStat({ value }: { value: number }) {
 
     useEffect(() => {
         // This runs only on the client, after hydration
-        setFormattedValue(value.toLocaleString());
+        setFormattedValue(value.toLocaleString('pt-BR'));
     }, [value]);
 
     return <span>{formattedValue}</span>;
@@ -80,6 +80,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </div>
                 </DialogTrigger>
                 <DialogContent className="max-w-3xl p-0 border-0">
+                     <DialogTitle className="sr-only">Foto de perfil de {model.name} em tamanho ampliado</DialogTitle>
+                     <DialogDescription className="sr-only">A imagem a seguir é uma versão ampliada da foto de perfil da modelo {model.name}.</DialogDescription>
                      <Image
                         src={model.avatarUrl}
                         alt={`Foto de perfil de ${model.name}`}
