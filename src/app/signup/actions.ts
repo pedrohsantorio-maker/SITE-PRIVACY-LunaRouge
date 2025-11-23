@@ -8,9 +8,9 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 const schema = z.object({
   name: z.string().min(1, { message: 'Nome é obrigatório' }),
-  age: z.coerce.number().int().min(1, { message: 'Idade é obrigatória' }),
-  email: z.string().email({ message: 'Email inválido' }),
-  password: z.string().min(8, { message: 'A senha deve ter pelo menos 8 caracteres' }),
+  age: z.coerce.number().int().min(18, { message: 'Você precisa ter 18 anos ou mais.' }),
+  email: z.string().email({ message: 'O e-mail fornecido é inválido.' }),
+  password: z.string().min(8, { message: 'A senha deve ter pelo menos 8 caracteres.' }),
 });
 
 
@@ -18,7 +18,8 @@ export async function signupAction(prevState: any, formData: FormData) {
   const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!parsed.success) {
-    return { message: parsed.error.errors.map((e) => e.message).join(', ') };
+    // Retorna a primeira mensagem de erro da validação do Zod
+    return { message: parsed.error.errors[0].message };
   }
 
   try {
@@ -27,14 +28,31 @@ export async function signupAction(prevState: any, formData: FormData) {
     await createUserWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
 
   } catch (error: any) {
-    if (error.code === 'auth/email-already-in-use' || error.code === 'auth/email-already-exists') {
-      return { message: 'Este email já está cadastrado. Por favor, faça login.' };
+    let errorMessage = 'Ocorreu um erro ao criar a conta. Tente novamente.';
+    
+    // Verificando o erro e exibindo mensagens mais específicas
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        errorMessage = "Este e-mail já está em uso. Tente outro ou faça login.";
+        break;
+      case 'auth/invalid-email':
+        errorMessage = "O e-mail fornecido é inválido.";
+        break;
+      case 'auth/weak-password':
+        errorMessage = "A senha é muito fraca. Tente uma senha mais forte.";
+        break;
+      case 'auth/network-request-failed':
+        errorMessage = "Erro de conexão. Verifique sua internet e tente novamente.";
+        break;
+      default:
+        // Para outros erros inesperados, logamos o erro no servidor
+        console.error('Signup error:', error);
+        break;
     }
-    console.error('Signup error:', error);
-    return { message: 'Ocorreu um erro ao criar a conta. Tente novamente.' };
+    return { message: errorMessage };
   }
   
-  // We no longer redirect from the server action.
-  // The client will handle redirection after saving data to Firestore.
+  // Apenas retorna uma mensagem vazia em caso de sucesso.
+  // O redirecionamento é tratado no lado do cliente após salvar os dados no Firestore.
   return { message: '' };
 }
