@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -52,6 +52,7 @@ type ModelData = {
         posts: number;
         media: number;
         likes: number;
+        previews: number;
     };
     socials: {
         instagram: string;
@@ -183,12 +184,15 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
                 {/* Posts Section */}
                  <Tabs defaultValue="posts" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 bg-[#121212] rounded-xl h-12">
+                    <TabsList className="grid w-full grid-cols-3 bg-[#121212] rounded-xl h-12">
                         <TabsTrigger value="posts" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                            <Newspaper size={16} /> {model.stats.posts} Postagens
                         </TabsTrigger>
                         <TabsTrigger value="media" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                             <ImageIcon size={16} /> {model.stats.media} Mídias
+                        </TabsTrigger>
+                        <TabsTrigger value="previews" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
+                            <Eye size={16} /> {model.stats.previews} Prévias
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="posts">
@@ -239,6 +243,13 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         ))}
                     </TabsContent>
                     <TabsContent value="media">
+                         <Card className="bg-[#121212] rounded-2xl border-neutral-800 mt-4 h-48 flex items-center justify-center">
+                            <CardContent>
+                                <p className="text-neutral-400">Conteúdo de mídia desbloqueado aqui.</p>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                     <TabsContent value="previews">
                         {model.posts.filter(p => p.isLocked).map(post => (
                              <Card key={`preview-${post.id}`} className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800 mt-4 p-4 space-y-4">
                                <div className="group relative aspect-video w-full rounded-lg overflow-hidden">
@@ -260,14 +271,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                </Button>
                             </Card>
                         ))}
-                         <Card className="bg-[#121212] rounded-2xl border-neutral-800 mt-4 h-48 flex items-center justify-center">
-                            <CardContent>
-                                <p className="text-neutral-400">Mais mídias aqui.</p>
-                            </CardContent>
-                        </Card>
                     </TabsContent>
                 </Tabs>
             </div>
         </div>
     );
 }
+
+    

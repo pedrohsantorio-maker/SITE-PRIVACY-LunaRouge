@@ -16,6 +16,7 @@ export const modelData = {
     posts: 121,
     media: 125,
     likes: 265800,
+    previews: 1,
   },
   socials: {
       instagram: "#",
@@ -43,3 +44,5 @@ export const modelData = {
       }
   ]
 };
+
+    
