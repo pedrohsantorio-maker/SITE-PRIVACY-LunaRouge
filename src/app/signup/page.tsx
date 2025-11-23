@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
+import { Mail, Lock } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Logo from '@/components/logo';
 
 export default function SignupPage() {
@@ -23,64 +23,69 @@ export default function SignupPage() {
     }
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
-      <div className="hidden bg-muted lg:block relative">
-      {signupImage && (
-             <Image
-                src={signupImage.imageUrl}
-                alt={signupImage.description}
-                data-ai-hint={signupImage.imageHint}
-                fill
-                className="object-cover"
-              />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-10 left-10 text-white">
-            <Logo className="text-5xl font-bold font-headline" />
-            <p className="text-lg mt-2">Comece sua jornada exclusiva.</p>
-        </div>
-      </div>
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
-          <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Criar Conta</h1>
-            <p className="text-balance text-muted-foreground">
-              Preencha os campos abaixo para criar sua conta.
-            </p>
-          </div>
-          <form action={signup}>
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="first-name">Nome</Label>
-                <Input id="first-name" name="first-name" placeholder="Max" required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  name="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Senha</Label>
-                <Input id="password" name="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full">
-                Criar Conta
-              </Button>
+    <div className="w-full min-h-screen relative">
+        <Image
+            src={signupImage.imageUrl}
+            alt={signupImage.description}
+            data-ai-hint={signupImage.imageHint}
+            fill
+            className="object-cover"
+        />
+        <div className="absolute inset-0 bg-black/70" />
+
+        <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4">
+            <div className="mx-auto w-full max-w-md space-y-8">
+                <div className="text-center text-white">
+                    <Logo className="text-5xl font-bold inline-block mb-4" />
+                    <h1 className="text-3xl font-bold">Crie sua Conta</h1>
+                    <p className="text-balance font-light mt-2">
+                        Preencha os campos abaixo para criar sua conta.
+                    </p>
+                </div>
+
+                <div className="bg-black/50 backdrop-blur-sm p-8 rounded-lg shadow-2xl space-y-6">
+                    <form action={signup}>
+                        <div className="grid gap-6">
+                            <div className="grid gap-2">
+                                <Label htmlFor="first-name" className="text-white font-light">Nome</Label>
+                                <Input id="first-name" name="first-name" placeholder="Seu nome" required className="bg-white/10 text-white border-white/20 focus:ring-orange-500" />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="email" className="text-white font-light">Email</Label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        placeholder="seu@email.com"
+                                        required
+                                        className="bg-white/10 text-white border-white/20 pl-10 focus:ring-orange-500"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="password" className="text-white font-light">Senha</Label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
+                                    <Input id="password" name="password" type="password" required className="bg-white/10 text-white border-white/20 pl-10 focus:ring-orange-500" />
+                                </div>
+                            </div>
+                            <Button type="submit" className="w-full font-bold text-lg h-12 bg-orange-500 text-white hover:bg-orange-600 transition-colors">
+                                Criar Conta
+                            </Button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div className="mt-4 text-center text-sm text-white">
+                    Já tem uma conta?{' '}
+                    <Link href="/login" className="underline font-bold text-orange-500 hover:text-orange-400">
+                        Login
+                    </Link>
+                </div>
             </div>
-          </form>
-          <div className="mt-4 text-center text-sm">
-            Já tem uma conta?{' '}
-            <Link href="/login" className="underline">
-              Login
-            </Link>
-          </div>
         </div>
-      </div>
     </div>
   );
 }
