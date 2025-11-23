@@ -32,7 +32,10 @@ export async function loginAction(prevState: any, formData: FormData) {
     // We just want to initiate it. If it fails, the catch block will run.
      await signInWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
   } catch (error: any) {
-    if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+    if (error.code === 'auth/user-not-found') {
+        return { message: 'Conta não encontrada. Por favor, crie uma conta.' };
+    }
+    if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
         return { message: 'Credenciais inválidas. Verifique seu email e senha.' };
     }
     // For other errors, you might want to log them or handle them differently
