@@ -403,10 +403,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
                          <div className="relative aspect-video">
                             <video src={playingVideoUrl} controls autoPlay className="w-full h-full rounded-lg" />
                          </div>
-                         <button onClick={() => setPlayingVideoUrl(null)} className="absolute -top-2 -right-2 bg-black/50 rounded-full p-1.5 text-white z-10">
-                            <X size={20} />
-                            <span className="sr-only">Fechar Player</span>
-                        </button>
                     </DialogContent>
                 </Dialog>
             )}
