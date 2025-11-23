@@ -161,7 +161,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                     <div className="w-6 h-6 bg-orange-500/20 rounded-full flex items-center justify-center">
                                      <MessageSquare className="w-4 h-4 text-orange-400" />
                                     </div>
-                                    <h3 className="font-bold text-orange-400 text-lg">Privacy Week</h3>
+                                    <h3 className="font-bold text-orange-400 text-lg animate-pulse-orange">aproveite a oportunidade</h3>
                                 </div>
                                 <p className="text-sm text-neutral-400 mt-1">Só mais 11 assinaturas com este valor.</p>
                             </div>
