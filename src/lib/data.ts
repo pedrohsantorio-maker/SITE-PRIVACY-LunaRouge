@@ -6,7 +6,7 @@ const galleryImages = PlaceHolderImages.filter(img => img.id.startsWith('gallery
 
 export const modelData = {
   name: 'Luna Rouge',
-  handle: 'lunarouge',
+  handle: 'rouge_luna_',
   isVerified: true,
   avatarUrl: profileImage?.imageUrl || "https://picsum.photos/seed/elena/1080/1350",
   avatarHint: profileImage?.imageHint || "woman portrait",
