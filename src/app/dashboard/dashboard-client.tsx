@@ -3,12 +3,13 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 // Inline SVG for social icons to avoid installing a new library
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -54,8 +55,6 @@ type ModelData = {
     };
     socials: {
         instagram: string;
-        twitter: string;
-        tiktok: string;
     };
     subscriptions: {
         name: string;
@@ -123,8 +122,7 @@ function UrgencyPromotion() {
             setShowPopup(true);
             setIsPopupMinimized(true);
         } else {
-             // Only start the countdown if the popup hasn't been minimized in this session
-            const initialTimeout = setTimeout(() => {
+             const initialTimeout = setTimeout(() => {
                 const interval = setInterval(() => {
                     setRemainingCount(prevCount => {
                         const newCount = prevCount > 4 ? prevCount - 1 : prevCount;
@@ -150,7 +148,7 @@ function UrgencyPromotion() {
         }
     }, [isPopupMinimized]);
 
-    const handleCloseOrMinimizePopup = () => {
+    const handleClosePopup = () => {
         if (!isPopupMinimized) {
             setIsPopupMinimized(true);
             sessionStorage.setItem('popupMinimized', 'true');
@@ -169,7 +167,7 @@ function UrgencyPromotion() {
             <UrgencyPopup 
                 count={remainingCount} 
                 isVisible={showPopup} 
-                onClose={handleCloseOrMinimizePopup}
+                onClose={handleClosePopup}
                 onOpen={handleOpenPopup}
                 isMinimized={isPopupMinimized}
             />
@@ -183,6 +181,7 @@ function UrgencyPromotion() {
 
 export function DashboardClient({ model }: { model: ModelData }) {
     const [isBioExpanded, setIsBioExpanded] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
@@ -204,14 +203,16 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 className="w-full h-[150px] object-cover"
                             />
                             <div className="absolute -bottom-12 left-4">
-                                <Image
-                                    src={model.avatarUrl}
-                                    alt={`Foto de perfil de ${model.name}`}
-                                    data-ai-hint={model.avatarHint}
-                                    width={100}
-                                    height={100}
-                                    className="rounded-full border-4 border-[#121212]"
-                                />
+                                <button onClick={() => setIsProfileModalOpen(true)} className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-[#121212]">
+                                    <Image
+                                        src={model.avatarUrl}
+                                        alt={`Foto de perfil de ${model.name}`}
+                                        data-ai-hint={model.avatarHint}
+                                        width={100}
+                                        height={100}
+                                        className="rounded-full border-4 border-[#121212] cursor-pointer"
+                                    />
+                                </button>
                             </div>
                         </div>
 
@@ -365,6 +366,26 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </TabsContent>
                 </Tabs>
             </div>
+
+            <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
+                <DialogContent className="p-0 bg-transparent border-0 max-w-lg w-full">
+                    <div className="relative">
+                        <Image
+                            src={model.avatarUrl}
+                            alt={`Foto de perfil de ${model.name}`}
+                            width={512}
+                            height={512}
+                            className="rounded-lg w-full h-auto"
+                        />
+                         <button onClick={() => setIsProfileModalOpen(false)} className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5 text-white">
+                            <X size={20} />
+                            <span className="sr-only">Fechar</span>
+                        </button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
+
+    
