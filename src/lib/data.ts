@@ -4,10 +4,10 @@ const profileImage = PlaceHolderImages.find(img => img.id === 'model-profile');
 const postPreviewImage = PlaceHolderImages.find(img => img.id === 'post-preview-1');
 const galleryImages = PlaceHolderImages.filter(img => img.id.startsWith('gallery-preview-'));
 
-const videoUrls = [
-  "https://imgur.com/SDWrcl3.jpeg",
-  "https://imgur.com/FpUhVzf.jpeg"
-];
+const videoUrlMap = {
+  "https://i.imgur.com/SDWrcl3.mp4": "https://i.imgur.com/SDWrcl3.jpeg",
+  "https://i.imgur.com/FpUhVzf.mp4": "https://i.imgur.com/FpUhVzf.jpeg"
+};
 
 export const modelData = {
   name: 'Luna Rouge',
@@ -45,12 +45,16 @@ export const modelData = {
           }
       }
   ],
-  previewsGallery: galleryImages.map(img => ({
-    id: img.id,
-    url: img.imageUrl,
-    hint: img.imageHint,
-    width: 600,
-    height: 600,
-    type: videoUrls.includes(img.imageUrl) ? 'video' : 'image',
-  }))
+  previewsGallery: galleryImages.map(img => {
+    const isVideo = Object.keys(videoUrlMap).includes(img.imageUrl);
+    return {
+      id: img.id,
+      url: img.imageUrl,
+      thumbnailUrl: isVideo ? videoUrlMap[img.imageUrl as keyof typeof videoUrlMap] : img.imageUrl,
+      hint: img.imageHint,
+      width: 600,
+      height: 600,
+      type: isVideo ? 'video' : 'image',
+    }
+  })
 };

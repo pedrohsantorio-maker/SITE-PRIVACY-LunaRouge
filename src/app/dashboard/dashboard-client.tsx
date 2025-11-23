@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,6 +33,7 @@ type Post = {
 type GalleryItem = {
     id: string;
     url: string;
+    thumbnailUrl?: string;
     hint: string;
     width: number;
     height: number;
@@ -184,6 +185,7 @@ function UrgencyPromotion() {
 export function DashboardClient({ model }: { model: ModelData }) {
     const [isBioExpanded, setIsBioExpanded] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [playingVideoUrl, setPlayingVideoUrl] = useState<string | null>(null);
 
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
@@ -299,18 +301,18 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     <TabsContent value="previews" className="mt-4">
                         <div className="grid grid-cols-2 gap-2">
                             {model.previewsGallery.map(item => (
-                                <Card key={item.id} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-md aspect-square">
-                                    <div className="relative w-full h-full">
+                                <Card key={item.id} onClick={() => item.type === 'video' && setPlayingVideoUrl(item.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-md aspect-square cursor-pointer">
+                                    <div className="relative w-full h-full group">
                                         <Image 
-                                            src={item.url}
+                                            src={item.type === 'video' ? item.thumbnailUrl! : item.url}
                                             alt={item.hint}
                                             data-ai-hint={item.hint}
                                             fill
                                             className="object-cover"
                                         />
                                         {item.type === 'video' && (
-                                            <div className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
-                                                <Video size={16} className="text-white" />
+                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <PlayCircle size={48} className="text-white" />
                                             </div>
                                         )}
                                     </div>
@@ -393,6 +395,21 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            {playingVideoUrl && (
+                <Dialog open={!!playingVideoUrl} onOpenChange={(isOpen) => !isOpen && setPlayingVideoUrl(null)}>
+                    <DialogContent className="p-0 bg-black border-0 max-w-screen-sm w-full">
+                         <DialogTitle className="sr-only">Player de Vídeo</DialogTitle>
+                         <div className="relative aspect-video">
+                            <video src={playingVideoUrl} controls autoPlay className="w-full h-full rounded-lg" />
+                         </div>
+                         <button onClick={() => setPlayingVideoUrl(null)} className="absolute -top-2 -right-2 bg-black/50 rounded-full p-1.5 text-white z-10">
+                            <X size={20} />
+                            <span className="sr-only">Fechar Player</span>
+                        </button>
+                    </DialogContent>
+                </Dialog>
+            )}
         </div>
     );
 }
