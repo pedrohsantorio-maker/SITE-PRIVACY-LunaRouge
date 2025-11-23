@@ -137,7 +137,7 @@ function UrgencyPromotion() {
                     setRemainingCount(prevCount => {
                         const newCount = prevCount > 4 ? prevCount - 1 : prevCount;
 
-                        if (newCount <= 4) {
+                        if (newCount <= 4 && !isPopupMinimized && !sessionStorage.getItem('popupMinimized')) {
                             setShowPopup(true);
                             if (newCount <= 3) {
                                 clearInterval(interval);
@@ -156,11 +156,15 @@ function UrgencyPromotion() {
             
             return () => clearTimeout(initialTimeout);
         }
-    }, []);
+    }, [isPopupMinimized]);
 
-    const handleClosePopup = () => {
-        setIsPopupMinimized(true);
-        sessionStorage.setItem('popupMinimized', 'true');
+    const handleCloseOrMinimizePopup = () => {
+        if (!isPopupMinimized) {
+            setIsPopupMinimized(true);
+            sessionStorage.setItem('popupMinimized', 'true');
+        } else {
+            setShowPopup(false);
+        }
     };
 
     const handleOpenPopup = () => {
@@ -173,7 +177,7 @@ function UrgencyPromotion() {
             <UrgencyPopup 
                 count={remainingCount} 
                 isVisible={showPopup} 
-                onClose={handleClosePopup}
+                onClose={handleCloseOrMinimizePopup}
                 onOpen={handleOpenPopup}
                 isMinimized={isPopupMinimized}
             />
