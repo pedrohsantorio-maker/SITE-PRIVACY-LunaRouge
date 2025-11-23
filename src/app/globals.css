@@ -160,6 +160,20 @@
   .popup-close {
     @apply absolute right-4 top-2.5 cursor-pointer text-3xl font-bold text-foreground hover:text-primary;
   }
+
+  .popup-minimized-message {
+    @apply fixed bottom-5 right-5 z-50 cursor-pointer rounded-lg border border-primary bg-card p-4 text-center text-sm font-bold text-white shadow-lg;
+    max-width: 300px;
+    width: auto;
+  }
+
+  .popup-button {
+    @apply mt-2.5 rounded-md border-none bg-primary px-2.5 py-2.5 text-sm font-bold text-white;
+  }
+
+  .popup-button:hover {
+    @apply bg-orange-500;
+  }
   
   /* Popup Animations */
   .animate-pulse-popup {

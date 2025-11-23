@@ -16,15 +16,15 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 const TwitterIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 3.3 4.4 3.3 4.4s-1.4 1.4-2.8 2.1c.2 2.2-2.3 4.6-4.2 5.5-1.4.7-4.6 1.4-6.2-1.9-1.4-2.8-2.2-4.2-2.2-4.2s-4.6-.7-6.2-3.4c-1.4-2.8-.7-5.5.7-6.9.7-.7 1.4-1.4 2.8-1.4.7 0 1.4.7 1.4.7s-1.4.7-2.1 2.1c-.7 1.4 0 2.8.7 3.5.7.7 2.1.7 2.1.7s-.7-1.4-.7-2.1c0-1.4.7-2.1 2.1-2.8 1.4-.7 2.8-.7 4.2 0 1.4.7 2.1 2.1 2.1 2.8s.7 2.1 2.1 2.8c1.4.7 2.8 0 3.5-.7.7-.7 1.4-2.1 1.4-2.1s-1.4 0-2.8-.7c-1.4-.7-2.1-2.1-2.1-3.5 0-.7.7-1.4 1.4-1.4h.7z"></path></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 3.3 4.4 3.3 4.4s-1.4 1.4-2.8 2.1c.2 2.2-2.3 4.6-4.2 5.5-1.4.7-4.6 1.4-6.2-1.9-1.4-2.8-2.2-4.2-2.2-4.2s-4.6-.7-6.2-3.4c-1.4-2.8-.7-5.5.7-6.9.7-.7 1.4-1.4 2.8-1.4.7 0 1.4.7 1.4.7s-1.4.7-2.1 2.1c-.7 1.4 0 2.8.7 3.5.7.7 2.1.7 2.1.7s-.7-1.4-.7-2.1c0-1.4.7-2.1 2.1-2.8 1.4-.7 2.8-.7 4.2 0 1.4.7 2.1 2.1 2.1 2.8s.7 2.1 2.1 2.8c1.4.7 2.8 0 3.5-.7.7-.7 1.4-2.1 1.4-2.1s-1.4 0-2.8-.7c-1.4-.7-2.1-2.1-2.1-3.5 0-.7.7-1.4 1.4-1.4h.7z"></path></svg>
 );
 
 const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 12a4 4 0 1 0 4 4V8a8 8 0 1 1-8-8"></path></svg>
+ <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 12a4 4 0 1 0 4 4V8a8 8 0 1 1-8-8"></path></svg>
 );
 
 const CommentIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
 );
 
 type Post = {
@@ -96,30 +96,24 @@ function FormattedStat({ value }: { value: number }) {
     return <span>{formattedValue}</span>;
 }
 
-function UrgencyPopup({ count, isVisible, onClose, isMinimized }: { count: number; isVisible: boolean; onClose: () => void; isMinimized: boolean; }) {
+function UrgencyPopup({ count, isVisible, onClose, onOpen, isMinimized }: { count: number; isVisible: boolean; onClose: () => void; onOpen: () => void; isMinimized: boolean; }) {
     if (!isVisible) return null;
 
-    const containerClasses = isMinimized
-        ? "popup-minimized"
-        : "popup-container animate-pulse-popup";
-
-    const contentClasses = isMinimized
-        ? "popup-content-minimized"
-        : "popup-content animate-glow";
-
+    if (isMinimized) {
+        return (
+            <div className="popup-minimized-message">
+                <p>Aproveite a oportunidade, só mais <span id="remaining-count-minimized">{count}</span> assinaturas!</p>
+                <button onClick={onOpen} className="popup-button">Ver mais</button>
+            </div>
+        );
+    }
+    
     return (
-        <div className={containerClasses}>
-            <div className={contentClasses}>
-                {!isMinimized && (
-                    <>
-                        <span onClick={onClose} className="popup-close">&times;</span>
-                        <h2>As assinaturas estão acabando!</h2>
-                        <p>Só mais <span id="popup-count">{count}</span> assinaturas com este valor.</p>
-                    </>
-                )}
-                 {isMinimized && (
-                    <span className="text-2xl animate-pulse">🔥</span>
-                )}
+        <div className="popup-container animate-pulse-popup">
+            <div className="popup-content animate-glow">
+                <span onClick={onClose} className="popup-close">&times;</span>
+                <h2>As assinaturas estão acabando!</h2>
+                <p>Só mais <span id="popup-count">{count}</span> assinaturas com este valor.</p>
             </div>
         </div>
     );
@@ -136,41 +130,43 @@ function UrgencyPromotion() {
         if (hasBeenMinimized) {
             setShowPopup(true);
             setIsPopupMinimized(true);
+        } else {
+             // Only start the countdown if the popup hasn't been minimized in this session
+            const initialTimeout = setTimeout(() => {
+                const interval = setInterval(() => {
+                    setRemainingCount(prevCount => {
+                        const newCount = prevCount > 4 ? prevCount - 1 : prevCount;
+
+                        if (newCount <= 4) {
+                            setShowPopup(true);
+                            if (newCount <= 3) {
+                                clearInterval(interval);
+                            }
+                        }
+                        
+                        setIsBlinking(true);
+                        setTimeout(() => setIsBlinking(false), 1000);
+
+                        return newCount;
+                    });
+                }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
+
+                return () => clearInterval(interval);
+            }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
+            
+            return () => clearTimeout(initialTimeout);
         }
     }, []);
-
-    useEffect(() => {
-        if (isPopupMinimized) return; // Stop countdown if minimized
-
-        const initialTimeout = setTimeout(() => {
-            const interval = setInterval(() => {
-                setRemainingCount(prevCount => {
-                    const newCount = prevCount > 4 ? prevCount - 1 : prevCount;
-
-                    if (newCount <= 4 && !sessionStorage.getItem('popupMinimized')) {
-                        setShowPopup(true);
-                    }
-                    
-                    if (newCount <= 3) {
-                       clearInterval(interval);
-                    }
-                    
-                    setIsBlinking(true);
-                    setTimeout(() => setIsBlinking(false), 1000);
-
-                    return newCount;
-                });
-            }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
-
-            return () => clearInterval(interval);
-        }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
-        
-        return () => clearTimeout(initialTimeout);
-    }, [isPopupMinimized]);
 
     const handleClosePopup = () => {
         setIsPopupMinimized(true);
         sessionStorage.setItem('popupMinimized', 'true');
+    };
+
+    const handleOpenPopup = () => {
+        setIsPopupMinimized(false);
+        // We remove the item so if they close it again, it re-minimizes
+        sessionStorage.removeItem('popupMinimized'); 
     };
 
     return (
@@ -179,6 +175,7 @@ function UrgencyPromotion() {
                 count={remainingCount} 
                 isVisible={showPopup} 
                 onClose={handleClosePopup}
+                onOpen={handleOpenPopup}
                 isMinimized={isPopupMinimized}
             />
             <p className="text-sm text-neutral-400 mt-1">
