@@ -235,9 +235,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                   </div>
                               </CardContent>
                           </Card>
-
-                          {post.isLocked && (
-                            <Card className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800 mt-4 p-4 space-y-4">
+                        </div>
+                        ))}
+                    </TabsContent>
+                    <TabsContent value="media">
+                        {model.posts.filter(p => p.isLocked).map(post => (
+                             <Card key={`preview-${post.id}`} className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800 mt-4 p-4 space-y-4">
                                <div className="group relative aspect-video w-full rounded-lg overflow-hidden">
                                   <Image 
                                       src={post.previewUrl} 
@@ -256,14 +259,10 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 <Link href="/pagamento">Assinar agora</Link>
                                </Button>
                             </Card>
-                          )}
-                        </div>
                         ))}
-                    </TabsContent>
-                    <TabsContent value="media">
-                        <Card className="bg-[#121212] rounded-2xl border-neutral-800 mt-4 h-48 flex items-center justify-center">
+                         <Card className="bg-[#121212] rounded-2xl border-neutral-800 mt-4 h-48 flex items-center justify-center">
                             <CardContent>
-                                <p className="text-neutral-400">Mídias aqui.</p>
+                                <p className="text-neutral-400">Mais mídias aqui.</p>
                             </CardContent>
                         </Card>
                     </TabsContent>
