@@ -1,12 +1,17 @@
+'use client';
+
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
-import { Mail, Lock, User } from 'lucide-react';
+import { Mail, Lock, User, Calendar } from 'lucide-react';
+import { useFormState } from 'react-dom';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
+import { signupAction } from './actions';
+
 
 export default function SignupPage() {
     const signupImage = {
@@ -15,12 +20,8 @@ export default function SignupPage() {
         imageHint: "futuristic woman"
     };
 
-    async function signup(formData: FormData) {
-        'use server';
-        // Here you would implement your actual Firebase signup logic
-        // For now, we'll just redirect to the dashboard
-        redirect('/dashboard');
-    }
+    const [state, formAction] = useFormState(signupAction, { message: '' });
+
 
   return (
     <div className="w-full min-h-screen relative">
@@ -44,13 +45,20 @@ export default function SignupPage() {
                 </div>
 
                 <div className="bg-black/50 backdrop-blur-sm p-8 rounded-lg shadow-2xl shadow-primary/20 space-y-6">
-                    <form action={signup}>
+                    <form action={formAction}>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="first-name" className="text-white font-light">Nome</Label>
+                                <Label htmlFor="name" className="text-white font-light">Nome</Label>
                                 <div className="relative">
                                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
-                                    <Input id="first-name" name="first-name" placeholder="Seu nome" required className="bg-white/10 text-white border-white/20 pl-10 focus:ring-primary focus:border-primary transition-all duration-300" />
+                                    <Input id="name" name="name" placeholder="Seu nome" required className="bg-white/10 text-white border-white/20 pl-10 focus:ring-primary focus:border-primary transition-all duration-300" />
+                                </div>
+                            </div>
+                             <div className="grid gap-2">
+                                <Label htmlFor="age" className="text-white font-light">Idade</Label>
+                                <div className="relative">
+                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
+                                    <Input id="age" name="age" type="number" placeholder="Sua idade" required className="bg-white/10 text-white border-white/20 pl-10 focus:ring-primary focus:border-primary transition-all duration-300" />
                                 </div>
                             </div>
                             <div className="grid gap-2">
@@ -73,6 +81,7 @@ export default function SignupPage() {
                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
                                     <Input id="password" name="password" type="password" required className="bg-white/10 text-white border-white/20 pl-10 focus:ring-primary focus:border-primary transition-all duration-300" />
                                 </div>
+                                {state.message && <p className="text-red-500 text-sm mt-2">{state.message}</p>}
                             </div>
                             <Button type="submit" className="w-full font-bold text-lg h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-transform duration-300 ease-in-out hover:scale-105 active:scale-100">
                                 Criar Conta

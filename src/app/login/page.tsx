@@ -1,12 +1,15 @@
+'use client';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { Mail, Lock } from 'lucide-react';
+import { useFormState } from 'react-dom';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
+import { loginAction } from './actions';
 
 export default function LoginPage() {
     const loginImage = {
@@ -15,12 +18,7 @@ export default function LoginPage() {
         imageHint: "futuristic woman"
     };
 
-  async function login(formData: FormData) {
-    'use server';
-    // Here you would implement your actual Firebase login logic
-    // For now, we'll just redirect to the dashboard
-    redirect('/dashboard');
-  }
+    const [state, formAction] = useFormState(loginAction, { message: '' });
 
   return (
      <div className="w-full min-h-screen relative">
@@ -44,7 +42,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="bg-black/50 backdrop-blur-sm p-8 rounded-lg shadow-2xl shadow-primary/20 space-y-6">
-                  <form action={login}>
+                  <form action={formAction}>
                     <div className="grid gap-6">
                       <div className="grid gap-2">
                         <Label htmlFor="email" className="text-white font-light">Email</Label>
@@ -74,6 +72,7 @@ export default function LoginPage() {
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
                             <Input id="password" name="password" type="password" required className="bg-white/10 text-white border-white/20 pl-10 focus:ring-primary focus:border-primary transition-all duration-300"/>
                         </div>
+                         {state.message && <p className="text-red-500 text-sm mt-2">{state.message}</p>}
                       </div>
                       <Button type="submit" className="w-full font-bold text-lg h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-transform duration-300 ease-in-out hover:scale-105 active:scale-100">
                         Login
