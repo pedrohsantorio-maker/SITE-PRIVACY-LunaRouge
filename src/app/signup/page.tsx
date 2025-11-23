@@ -12,8 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
 import { signupAction } from './actions';
-import { useAuth, useFirestore, useUser } from '@/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useFirestore, useUser } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 
 
@@ -33,34 +32,11 @@ export default function SignupPage() {
         imageHint: "futuristic woman"
     };
 
-    const auth = useAuth();
     const firestore = useFirestore();
     const { user, isUserLoading } = useUser();
     const formRef = useRef<HTMLFormElement>(null);
 
     const [state, formAction] = useActionState(signupAction, { message: '' });
-
-    // This effect handles the client-side user creation and data storing
-    // when using the non-blocking sign-up flow. With the action handling
-    // creation, this becomes primarily for data storage after redirect.
-    const handleClientSignupAndDataSave = async (formData: FormData) => {
-        const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
-
-        if (!auth) return;
-
-        try {
-            // Re-authenticate silently on the client to get the user object for the session
-            // This is necessary because server actions don't set client-side auth state.
-            await createUserWithEmailAndPassword(auth, email, password);
-        } catch (error: any) {
-             // This error is expected if the server action already created the user.
-             // We can ignore 'auth/email-already-in-use' on the client side during this flow.
-             if (error.code !== 'auth/email-already-in-use') {
-                console.error("Erro de sincronização do cliente:", error);
-             }
-        }
-    };
     
     // This effect runs when the user object changes (i.e., after successful signup)
     // to save the user's data to Firestore.
@@ -79,11 +55,16 @@ export default function SignupPage() {
                     name,
                     email,
                     age,
-                }, { merge: true }).catch(err => console.error("Failed to save user data", err));
+                }, { merge: true }).catch(err => {
+                    // This error is okay to console.error, it's a developer error if it happens.
+                    console.error("Failed to save user data", err)
+                });
             }
         }
     }, [user, firestore]);
     
+    // This handles redirecting the user if they are already logged in
+    // and land on this page.
     if (user && !isUserLoading) {
       redirect('/dashboard');
     }
@@ -110,10 +91,7 @@ export default function SignupPage() {
                 </div>
 
                 <div className="bg-black/50 backdrop-blur-sm p-8 rounded-lg shadow-2xl shadow-primary/20 space-y-6">
-                    <form ref={formRef} action={(formData) => {
-                        formAction(formData);
-                        // We no longer initiate signup from the client, the action handles it.
-                    }}>
+                    <form ref={formRef} action={formAction}>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="name" className="text-white font-light">Nome</Label>
