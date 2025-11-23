@@ -201,7 +201,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 data-ai-hint={model.bannerHint}
                                 width={448}
                                 height={150}
-                                className="w-full h-[150px] object-cover object-bottom"
+                                className="w-full h-[150px] object-cover object-center"
                             />
                             <div className="absolute -bottom-12 left-4">
                                 <button onClick={() => setIsProfileModalOpen(true)} className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-[#121212]">
