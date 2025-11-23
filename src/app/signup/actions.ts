@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { initializeFirebase } from '@/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
 
 
 const schema = z.object({
@@ -23,8 +22,6 @@ export async function signupAction(prevState: any, formData: FormData) {
   }
 
   try {
-    // This is not ideal as we are using client SDK on the server, but it's
-    // a necessary workaround for this mixed-component environment.
     const { auth } = initializeFirebase();
     await createUserWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
   } catch (error: any) {
