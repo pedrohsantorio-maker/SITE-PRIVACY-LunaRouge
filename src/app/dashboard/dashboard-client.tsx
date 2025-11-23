@@ -96,6 +96,42 @@ function FormattedStat({ value }: { value: number }) {
     return <span>{formattedValue}</span>;
 }
 
+function UrgencyPromotion() {
+    const [remainingCount, setRemainingCount] = useState(11);
+    const [isBlinking, setIsBlinking] = useState(false);
+
+    useEffect(() => {
+        const initialTimeout = setTimeout(() => {
+            const interval = setInterval(() => {
+                setRemainingCount(prevCount => {
+                    const newCount = prevCount - 1;
+                    
+                    if (newCount <= 4 && newCount >= 3) {
+                        clearInterval(interval);
+                    }
+                    
+                    setIsBlinking(true);
+                    setTimeout(() => setIsBlinking(false), 1000);
+
+                    return newCount;
+                });
+            }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
+
+            return () => clearInterval(interval);
+        }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
+        
+        return () => clearTimeout(initialTimeout);
+    }, []);
+
+
+    return (
+         <p className="text-sm text-neutral-400 mt-1">
+            Só mais <span id="remaining-count" className={isBlinking ? 'animate-blink' : ''}>{remainingCount}</span> assinaturas com este valor.
+        </p>
+    );
+}
+
+
 export function DashboardClient({ model }: { model: ModelData }) {
     const [isBioExpanded, setIsBioExpanded] = useState(false);
 
@@ -160,7 +196,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 <div className="flex items-center gap-2">
                                     <h3 className="font-bold text-orange-400 text-lg animate-pulse-orange uppercase">aproveite a oportunidade</h3>
                                 </div>
-                                <p className="text-sm text-neutral-400 mt-1">Só mais 11 assinaturas com este valor.</p>
+                                <UrgencyPromotion />
                             </div>
 
                             <div>
