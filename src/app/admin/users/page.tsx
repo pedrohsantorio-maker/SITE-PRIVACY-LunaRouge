@@ -44,7 +44,7 @@ function LeadRow({ lead }: { lead: Lead }) {
             <TableCell>
                 <div className="font-medium">{lead.name}</div>
                 <div className="text-sm text-muted-foreground">{lead.email}</div>
-                <div className="text-sm text-muted-foreground">{lead.age} anos</div>
+                {lead.age && <div className="text-sm text-muted-foreground">{lead.age} anos</div>}
             </TableCell>
             <TableCell>
                 <Badge variant={lead.status === 'paid' ? 'default' : 'secondary'} className={lead.status === 'paid' ? 'bg-green-600' : ''}>
