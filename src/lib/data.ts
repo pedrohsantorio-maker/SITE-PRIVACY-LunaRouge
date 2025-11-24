@@ -74,7 +74,7 @@ export const modelData = {
   ],
   promotions: [
     { name: '3 meses', price: '47,98', discount: '20% off', id: 'quarterly', paymentUrl: 'https://multi.paradisepags.com/p/pix_d57164164cd3' },
-    { name: '6 meses', price: '95,95', discount: '20% off', id: 'biannual', paymentUrl: 'https://multi.paradisepags.com/p/pix_39d333f3064a' },
+    { name: '6 meses', price: '95,95', discount: '20% off', id: 'biannual', paymentUrl: 'https://multi.paradisepags.com/p/pix_832fe38e897c' },
   ],
   photos: photoLinks.map((url, index) => ({
       id: `photo-${index + 1}`,
