@@ -70,6 +70,7 @@ type ModelData = {
         name: string;
         price: string;
         id: string;
+        paymentUrl?: string;
     }[];
     promotions: {
         name: string;
@@ -300,7 +301,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 <h2 className="text-sm font-semibold text-neutral-400 mb-2">Assinaturas</h2>
                                 {model.subscriptions.map(sub => (
                                     <Button key={sub.id} asChild className="w-full justify-between h-12 text-md font-semibold bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl">
-                                        <Link href="/pagamento">
+                                        <Link href={sub.paymentUrl || "/pagamento"} target={sub.paymentUrl ? "_blank" : "_self"}>
                                           <span>{sub.name}</span>
                                           <span>R$ {sub.price}</span>
                                         </Link>

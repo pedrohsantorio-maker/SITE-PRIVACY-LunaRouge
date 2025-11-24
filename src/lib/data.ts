@@ -69,7 +69,7 @@ export const modelData = {
       instagram: "#",
   },
   subscriptions: [
-    { name: '1 mês', price: '19,99', id: 'monthly' },
+    { name: '1 mês', price: '19,99', id: 'monthly', paymentUrl: 'https://multi.paradisepags.com/p/pix_39d333f3064a' },
   ],
   promotions: [
     { name: '3 meses', price: '47,98', discount: '20% off', id: 'quarterly' },
