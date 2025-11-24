@@ -186,6 +186,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [playingVideoUrl, setPlayingVideoUrl] = useState<string | null>(null);
     const [revealedPreviews, setRevealedPreviews] = useState<string[]>([]);
+    const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
     
     const overlayTexts = [
         "Um gostinho do que você vai receber...",
@@ -356,7 +357,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     <TabsContent value="photos" className="mt-4">
                         <div className="grid grid-cols-2 gap-4">
                             {model.photos.map(photo => (
-                                <Card key={photo.id} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg">
+                                <Card key={photo.id} onClick={() => setSelectedPhotoUrl(photo.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-transform hover:scale-105">
                                     <div className="relative">
                                         <Image 
                                             src={photo.url}
@@ -406,6 +407,23 @@ export function DashboardClient({ model }: { model: ModelData }) {
                          <DialogTitle className="sr-only">Player de Vídeo</DialogTitle>
                          <div className="relative aspect-video">
                             <video src={playingVideoUrl} controls autoPlay className="w-full h-full rounded-lg" />
+                         </div>
+                    </DialogContent>
+                </Dialog>
+            )}
+
+            {selectedPhotoUrl && (
+                 <Dialog open={!!selectedPhotoUrl} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoUrl(null)}>
+                    <DialogContent className="p-0 bg-transparent border-0 max-w-lg w-full">
+                         <DialogTitle className="sr-only">Visualizador de Foto</DialogTitle>
+                         <div className="relative">
+                            <Image
+                                src={selectedPhotoUrl}
+                                alt="Foto em tamanho real"
+                                width={800}
+                                height={1000}
+                                className="rounded-lg w-full h-auto object-contain"
+                            />
                          </div>
                     </DialogContent>
                 </Dialog>
