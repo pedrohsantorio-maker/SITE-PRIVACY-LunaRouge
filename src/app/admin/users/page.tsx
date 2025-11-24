@@ -20,6 +20,7 @@ interface Lead {
   status: 'paid' | 'not_paid';
   plan: string;
   lastActive: { seconds: number; nanoseconds: number };
+  endDate?: { seconds: number; nanoseconds: number } | string;
 }
 
 const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
@@ -27,6 +28,16 @@ const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
 function LeadRow({ lead }: { lead: Lead }) {
     const isOnline = lead.lastActive && (Date.now() - new Date(lead.lastActive.seconds * 1000).getTime()) < FIVE_MINUTES_IN_MS;
     const createdAtDate = lead.createdAt ? new Date(lead.createdAt.seconds * 1000) : new Date();
+    
+    let endDateText = 'N/A';
+    if (lead.endDate) {
+      if (typeof lead.endDate === 'string') {
+        endDateText = format(new Date(lead.endDate), "dd/MM/yyyy", { locale: ptBR });
+      } else if (lead.endDate.seconds) {
+        endDateText = format(new Date(lead.endDate.seconds * 1000), "dd/MM/yyyy", { locale: ptBR });
+      }
+    }
+
 
     return (
         <TableRow>
@@ -41,6 +52,7 @@ function LeadRow({ lead }: { lead: Lead }) {
             </TableCell>
             <TableCell className="capitalize">{lead.plan || 'N/A'}</TableCell>
             <TableCell>{format(createdAtDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</TableCell>
+            <TableCell>{endDateText}</TableCell>
             <TableCell>
                 <div className="flex items-center gap-2">
                     <div className={`h-2 w-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
@@ -108,6 +120,7 @@ export default function AllLeadsPage() {
                                 <TableHead>Status</TableHead>
                                 <TableHead>Plano</TableHead>
                                 <TableHead>Data de Criação</TableHead>
+                                <TableHead>Vencimento do Plano</TableHead>
                                 <TableHead>Atividade</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -115,14 +128,14 @@ export default function AllLeadsPage() {
                             {isLoading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <TableRow key={i}>
-                                        <TableCell colSpan={5}><Skeleton className="h-10 w-full" /></TableCell>
+                                        <TableCell colSpan={6}><Skeleton className="h-10 w-full" /></TableCell>
                                     </TableRow>
                                 ))
                             ) : filteredLeads.length > 0 ? (
                                 filteredLeads.map(lead => <LeadRow key={lead.id} lead={lead} />)
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center">Nenhum lead encontrado.</TableCell>
+                                    <TableCell colSpan={6} className="text-center">Nenhum lead encontrado.</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
