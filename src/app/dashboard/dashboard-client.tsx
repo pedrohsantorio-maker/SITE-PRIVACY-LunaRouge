@@ -126,12 +126,14 @@ function UrgencyPromotion() {
     const [isBlinking, setIsBlinking] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
     const [isPopupMinimized, setIsPopupMinimized] = useState(false);
-    const hasBeenMinimizedRef = useRef(sessionStorage.getItem('popupMinimized') === 'true');
+    const hasBeenMinimizedRef = useRef(false);
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
         setIsMounted(true);
-        if (hasBeenMinimizedRef.current) {
+        const popupWasMinimized = sessionStorage.getItem('popupMinimized') === 'true';
+        if (popupWasMinimized) {
+            hasBeenMinimizedRef.current = true;
             setShowPopup(true);
             setIsPopupMinimized(true);
         }
@@ -328,7 +330,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </Card>
 
                 {/* Tabs Section */}
-                 <Tabs defaultValue="previews" className="w-full">
+                 <Tabs defaultValue="videos" className="w-full">
                     <TabsList className="grid w-full grid-cols-3 bg-[#121212] rounded-xl h-12">
                         <TabsTrigger value="previews" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                             <Eye size={16} /> {model.stats.previews} Prévias
