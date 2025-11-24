@@ -204,7 +204,7 @@ function UrgencyPromotion() {
 export function DashboardClient({ model }: { model: ModelData }) {
     const [isBioExpanded, setIsBioExpanded] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-    const [playingVideoUrl, setPlayingVideoUrl] = useState<string | null>(null);
+    const [playingVideo, setPlayingVideo] = useState<VideoItem | GalleryItem | null>(null);
     const [revealedPreviews, setRevealedPreviews] = useState<string[]>([]);
     const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
     
@@ -223,7 +223,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const handlePreviewClick = (item: GalleryItem) => {
         if (revealedPreviews.includes(item.id)) {
             if (item.type === 'video') {
-                setPlayingVideoUrl(item.url);
+                setPlayingVideo(item);
             }
         } else {
             setRevealedPreviews(prev => [...prev, item.id]);
@@ -395,7 +395,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     <TabsContent value="videos" className="mt-4">
                         <div className="grid grid-cols-2 gap-4">
                             {model.videos.map(video => (
-                                <Card key={video.id} onClick={() => setPlayingVideoUrl(video.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
+                                <Card key={video.id} onClick={() => setPlayingVideo(video)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
                                     <div className="relative group">
                                         <Image 
                                             src={video.thumbnailUrl}
@@ -435,12 +435,20 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </DialogContent>
             </Dialog>
 
-            {playingVideoUrl && (
-                <Dialog open={!!playingVideoUrl} onOpenChange={(isOpen) => !isOpen && setPlayingVideoUrl(null)}>
-                    <DialogContent className="p-0 bg-black border-0 max-w-screen-sm w-full">
+            {playingVideo && (
+                <Dialog open={!!playingVideo} onOpenChange={(isOpen) => !isOpen && setPlayingVideo(null)}>
+                    <DialogContent className="p-0 bg-black border-0 max-w-[90vw] sm:max-w-lg md:max-w-2xl lg:max-w-4xl w-auto h-auto max-h-[90vh]">
                          <DialogTitle className="sr-only">Player de Vídeo</DialogTitle>
-                         <div className="relative aspect-video">
-                            <video src={playingVideoUrl} controls autoPlay className="w-full h-full rounded-lg" />
+                         <div className="relative flex items-center justify-center">
+                            <video 
+                                src={playingVideo.url} 
+                                controls 
+                                autoPlay 
+                                className="w-full h-auto max-h-[90vh] object-contain rounded-lg"
+                                style={{
+                                    aspectRatio: `${playingVideo.width}/${playingVideo.height}`
+                                }}
+                            />
                          </div>
                     </DialogContent>
                 </Dialog>
