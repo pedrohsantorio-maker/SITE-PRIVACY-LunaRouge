@@ -40,7 +40,7 @@ export default function DashboardPage() {
             </Popover>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
             <StatCard title="Leads Totais" value={stats.totalLeads} icon={Users} isLoading={isLoading} />
             <StatCard title="Leads na Data" value={stats.leadsOnDate} icon={UserCheck} isLoading={isLoading} />
             <StatCard title="Leads Pagos" value={stats.leadsPaid} icon={UserCheck} isLoading={isLoading} />
