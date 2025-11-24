@@ -52,16 +52,16 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-black/60" />
 
         <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4">
-            <div className="mx-auto w-full max-w-md space-y-8 fade-in">
+            <div className="mx-auto w-full max-w-md space-y-6 sm:space-y-8 fade-in">
                 <div className="text-center text-white">
                     <Logo className="text-5xl font-bold inline-block mb-4" />
                     <h1 className="text-3xl font-headline font-bold">Acessar Conteúdo</h1>
-                    <p className="text-balance font-light mt-2">
+                    <p className="text-balance font-light mt-2 text-sm sm:text-base">
                       Entre com seu email para acessar o conteúdo exclusivo.
                     </p>
                 </div>
 
-                <div className="bg-black/50 backdrop-blur-sm p-8 rounded-lg shadow-2xl shadow-primary/20 space-y-6">
+                <div className="bg-black/50 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-2xl shadow-primary/20 space-y-6">
                   <form action={formAction}>
                     <div className="grid gap-6">
                       <div className="grid gap-2">

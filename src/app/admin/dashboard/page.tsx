@@ -19,7 +19,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8 py-8 px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <h1 className="text-3xl font-bold">Dashboard de Monitoramento</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">Dashboard de Monitoramento</h1>
             <Popover>
                 <PopoverTrigger asChild>
                 <Button
@@ -41,7 +41,7 @@ export default function DashboardPage() {
             </Popover>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <StatCard title="Leads Totais" value={stats.totalLeads} icon={Users} isLoading={isLoading} />
             <StatCard title="Leads na Data" value={stats.leadsOnDate} icon={UserCheck} isLoading={isLoading} />
             <StatCard title="Leads Pagos" value={stats.leadsPaid} icon={UserCheck} isLoading={isLoading} />
@@ -52,9 +52,9 @@ export default function DashboardPage() {
         </div>
         
         <div className="space-y-4">
-            <div className='flex justify-between items-center'>
-              <h2 className="text-2xl font-bold">Leads do Dia</h2>
-              <Button asChild variant="outline">
+            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2'>
+              <h2 className="text-xl sm:text-2xl font-bold">Leads do Dia</h2>
+              <Button asChild variant="outline" size="sm">
                 <Link href="/admin/users">Ver todos os leads</Link>
               </Button>
             </div>

@@ -15,7 +15,7 @@ import { doc, DocumentData } from 'firebase/firestore';
 
 // Inline SVG for social icons to avoid installing a new library
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
 );
 
 const CommentIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -275,10 +275,10 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
 
     return (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+        <div className="min-h-screen bg-black text-white flex items-center justify-center p-0 sm:p-4">
             <div className="w-full max-w-md space-y-4">
                 <div ref={pageTopRef} />
-                <Card className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800">
+                <Card className="bg-[#121212] rounded-none sm:rounded-2xl overflow-hidden border-none sm:border-neutral-800">
                     <CardContent className="p-0">
                         {/* Header with Banner */}
                         <div className="relative">
@@ -374,22 +374,22 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </Card>
 
                 {/* Tabs Section */}
-                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full px-4 sm:px-0">
                     <TabsList className="grid w-full grid-cols-3 bg-[#121212] rounded-xl h-12">
-                        <TabsTrigger value="previews" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
+                        <TabsTrigger value="previews" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400 text-xs sm:text-sm">
                             <Eye size={16} /> {model.stats.previews} Prévias
                         </TabsTrigger>
-                        <TabsTrigger value="photos" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
+                        <TabsTrigger value="photos" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400 text-xs sm:text-sm">
                            <Camera size={16} /> {model.stats.photos} Fotos
                            {!isSubscribed && <Lock className="w-3 h-3 ml-1" />}
                         </TabsTrigger>
-                        <TabsTrigger value="videos" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
+                        <TabsTrigger value="videos" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400 text-xs sm:text-sm">
                             <Video size={16} /> {model.stats.videos} Vídeos
                              {!isSubscribed && <Lock className="w-3 h-3 ml-1" />}
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="previews" className="mt-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-2 sm:gap-4">
                              {model.previewsGallery.map(item => {
                                 const isRevealed = revealedPreviews.includes(item.id);
                                 return (
@@ -401,11 +401,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 data-ai-hint={item.hint}
                                                 width={item.width}
                                                 height={item.height}
-                                                className={`object-cover w-full h-auto transition-all duration-500 ${!isRevealed ? 'blur-lg' : 'blur-none'}`}
+                                                className={`object-cover w-full h-auto aspect-square transition-all duration-500 ${!isRevealed ? 'blur-lg' : 'blur-none'}`}
                                             />
                                             {!isRevealed && (
-                                                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center p-4 transition-opacity duration-300">
-                                                    <p className="text-white font-semibold text-sm">{getOverlayText(item.id)}</p>
+                                                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center p-2 sm:p-4 transition-opacity duration-300">
+                                                    <p className="text-white font-semibold text-xs sm:text-sm">{getOverlayText(item.id)}</p>
                                                     <p className="text-primary font-bold text-xs mt-2 uppercase animate-pulse-reveal">Clique para revelar</p>
                                                 </div>
                                             )}
@@ -424,7 +424,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         {isLoadingSubscription ? (
                             <div className="flex items-center justify-center p-8"><p>Verificando assinatura...</p></div>
                         ) : isSubscribed ? (
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                                 {model.photos.map(photo => (
                                     <Card key={photo.id} onClick={() => setSelectedPhotoUrl(photo.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-transform hover:scale-105">
                                         <div className="relative">
@@ -434,7 +434,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 data-ai-hint={photo.hint}
                                                 width={photo.width}
                                                 height={photo.height}
-                                                className="object-cover w-full h-auto"
+                                                className="object-cover w-full h-auto aspect-square"
                                             />
                                         </div>
                                     </Card>
@@ -448,7 +448,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                          {isLoadingSubscription ? (
                             <div className="flex items-center justify-center p-8"><p>Verificando assinatura...</p></div>
                         ) : isSubscribed ? (
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                                 {model.videos.map(video => (
                                     <Card key={video.id} onClick={() => setPlayingVideo(video)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
                                         <div className="relative group">
@@ -458,7 +458,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 data-ai-hint={video.hint}
                                                 width={video.width}
                                                 height={video.height}
-                                                className="object-cover w-full h-auto"
+                                                className="object-cover w-full h-auto aspect-square"
                                             />
                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <PlayCircle size={48} className="text-white" />
@@ -495,7 +495,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
             {playingVideo && (
                 <Dialog open={!!playingVideo} onOpenChange={(isOpen) => !isOpen && setPlayingVideo(null)}>
-                    <DialogContent className="p-0 bg-black border-0 max-w-[90vw] sm:max-w-lg md:max-w-2xl lg:max-w-4xl w-auto h-auto max-h-[90vh]">
+                    <DialogContent className="p-0 bg-black border-0 max-w-[95vw] sm:max-w-lg md:max-w-2xl lg:max-w-4xl w-auto h-auto max-h-[90vh]">
                          <DialogTitle className="sr-only">Player de Vídeo</DialogTitle>
                          <div className="relative flex items-center justify-center">
                             <video 
@@ -522,7 +522,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 alt="Foto em tamanho real"
                                 width={800}
                                 height={1000}
-                                className="rounded-lg w-full h-auto object-contain"
+                                className="rounded-lg w-full h-auto object-contain max-h-[90vh]"
                             />
                          </div>
                     </DialogContent>
