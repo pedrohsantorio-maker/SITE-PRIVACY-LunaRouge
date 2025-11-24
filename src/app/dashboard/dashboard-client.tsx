@@ -77,6 +77,7 @@ type ModelData = {
         price: string;
         discount: string;
         id: string;
+        paymentUrl?: string;
     }[];
     photos: Photo[];
     previewsGallery: GalleryItem[];
@@ -317,7 +318,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 <AccordionContent className="space-y-2">
                                    {model.promotions.map(promo => (
                                     <Button key={promo.id} asChild variant="secondary" className="w-full justify-between h-12 text-md font-semibold bg-[#27272A] text-white rounded-xl hover:bg-neutral-700">
-                                        <Link href="/pagamento">
+                                        <Link href={promo.paymentUrl || "/pagamento"} target={promo.paymentUrl ? "_blank" : "_self"}>
                                           <span>{promo.name} ({promo.discount})</span>
                                           <span>R$ {promo.price}</span>
                                         </Link>
