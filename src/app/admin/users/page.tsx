@@ -39,7 +39,7 @@ function LeadRow({ lead }: { lead: Lead }) {
                     {lead.status === 'paid' ? 'Pago' : 'Não Pago'}
                 </Badge>
             </TableCell>
-            <TableCell>{lead.plan || 'N/A'}</TableCell>
+            <TableCell className="capitalize">{lead.plan || 'N/A'}</TableCell>
             <TableCell>{format(createdAtDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</TableCell>
             <TableCell>
                 <div className="flex items-center gap-2">
@@ -60,6 +60,8 @@ export default function AllLeadsPage() {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
+        if (!firestore) return;
+        
         const leadsRef = collection(firestore, 'users');
         const q = query(leadsRef);
 

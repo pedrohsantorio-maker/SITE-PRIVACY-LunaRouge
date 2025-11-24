@@ -96,7 +96,7 @@ export function UsersTable({ date }: UsersTableProps) {
                            {lead.status === 'paid' ? 'Pago' : 'Não Pago'}
                         </Badge>
                     </TableCell>
-                    <TableCell>{lead.plan || 'N/A'}</TableCell>
+                    <TableCell className="capitalize">{lead.plan || 'N/A'}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <div className={`h-2 w-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />

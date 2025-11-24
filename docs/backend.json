@@ -42,6 +42,11 @@
           "type": "string",
           "format": "date-time",
           "description": "O último registro de atividade do usuário."
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "A data em que a assinatura do usuário expira."
         }
       },
       "required": [
