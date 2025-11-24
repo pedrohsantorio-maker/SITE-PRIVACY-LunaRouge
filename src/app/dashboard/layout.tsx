@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -8,12 +9,12 @@ import { cn } from '@/lib/utils';
 import Logo from '@/components/logo';
 
 const navItems = [
-  { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/admin/users', icon: Users, label: 'Leads' },
-  { href: '/admin/access-logs', icon: Eye, label: 'Acessos' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/users', icon: Users, label: 'Leads' },
+  { href: '/access-logs', icon: Eye, label: 'Acessos' },
 ];
 
-export default function AdminLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
