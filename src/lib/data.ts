@@ -30,6 +30,25 @@ const photoLinks = [
     "https://imgur.com/4jqr1Hs.jpeg"
 ];
 
+const videoLinks = [
+    { url: "https://imgur.com/5aQcNxC.mp4", thumb: "https://imgur.com/5aQcNxC.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/FtqlSjE.mp4", thumb: "https://imgur.com/FtqlSjE.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/hYBO3Tc.mp4", thumb: "https://imgur.com/hYBO3Tc.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/KYuBB3L.mp4", thumb: "https://imgur.com/KYuBB3L.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/I0bj21v.mp4", thumb: "https://imgur.com/I0bj21v.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/tJsiuSK.mp4", thumb: "https://imgur.com/tJsiuSK.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/QhVLxjA.mp4", thumb: "https://imgur.com/QhVLxjA.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/hDuogvW.mp4", thumb: "https://imgur.com/hDuogvW.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/WQm1Aic.mp4", thumb: "https://imgur.com/WQm1Aic.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/VlneEoh.mp4", thumb: "https://imgur.com/VlneEoh.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/8yU3iRE.mp4", thumb: "https://imgur.com/8yU3iRE.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/7FImUoW.mp4", thumb: "https://imgur.com/7FImUoW.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/PZSiU0z.mp4", thumb: "https://imgur.com/PZSiU0z.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/Elx61bq.mp4", thumb: "https://imgur.com/Elx61bq.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/qnFXjmc.mp4", thumb: "https://imgur.com/qnFXjmc.jpeg", hint: "sensual video" },
+    { url: "https://imgur.com/hZNMe94.mp4", thumb: "https://imgur.com/hZNMe94.jpeg", hint: "sensual video" }
+];
+
 export const modelData = {
   name: 'Luna Rouge',
   handle: 'rouge_luna_',
@@ -41,7 +60,7 @@ export const modelData = {
   bio: 'aqui você vai INVESTIR um valor super ACESSÍVEL e vai encontrar mais de 800 VÍDEOS e FOTOS: Dando muuuito minha bucetinha rosinha no pelo com gozada dentro, fazendo oral bem babad...',
   stats: {
     posts: 121,
-    media: 125,
+    videos: videoLinks.length,
     likes: 265800,
     previews: 7,
     photos: photoLinks.length,
@@ -74,5 +93,13 @@ export const modelData = {
       height: 600,
       type: isVideo ? 'video' : 'image',
     }
-  })
+  }),
+  videos: videoLinks.map((video, index) => ({
+      id: `video-${index + 1}`,
+      url: video.url,
+      thumbnailUrl: video.thumb,
+      hint: video.hint,
+      width: 600,
+      height: 800,
+  })),
 };

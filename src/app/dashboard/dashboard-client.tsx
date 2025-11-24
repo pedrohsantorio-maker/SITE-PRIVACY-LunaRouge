@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera } from 'lucide-react';
 
@@ -28,6 +28,15 @@ type Photo = {
     height: number;
 }
 
+type VideoItem = {
+    id: string;
+    url: string;
+    thumbnailUrl: string;
+    hint: string;
+    width: number;
+    height: number;
+};
+
 type GalleryItem = {
     id: string;
     url: string;
@@ -49,7 +58,7 @@ type ModelData = {
     bio: string;
     stats: {
         posts: number;
-        media: number;
+        videos: number;
         likes: number;
         previews: number;
         photos: number;
@@ -70,6 +79,7 @@ type ModelData = {
     }[];
     photos: Photo[];
     previewsGallery: GalleryItem[];
+    videos: VideoItem[];
 };
 
 function FormattedStat({ value }: { value: number }) {
@@ -116,44 +126,51 @@ function UrgencyPromotion() {
     const [isBlinking, setIsBlinking] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
     const [isPopupMinimized, setIsPopupMinimized] = useState(false);
+    const hasBeenMinimizedRef = useRef(sessionStorage.getItem('popupMinimized') === 'true');
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-        const hasBeenMinimized = sessionStorage.getItem('popupMinimized') === 'true';
-        if (hasBeenMinimized) {
+        setIsMounted(true);
+        if (hasBeenMinimizedRef.current) {
             setShowPopup(true);
             setIsPopupMinimized(true);
-        } else {
-             const initialTimeout = setTimeout(() => {
-                const interval = setInterval(() => {
-                    setRemainingCount(prevCount => {
-                        const newCount = prevCount > 4 ? prevCount - 1 : prevCount;
-
-                        if ((newCount === 4 || newCount === 3) && !isPopupMinimized && !sessionStorage.getItem('popupMinimized')) {
-                            setShowPopup(true);
-                        }
-                        
-                        setIsBlinking(true);
-                        setTimeout(() => setIsBlinking(false), 1000);
-
-                        if (newCount <= 3) {
-                            clearInterval(interval);
-                        }
-
-                        return newCount;
-                    });
-                }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
-
-                return () => clearInterval(interval);
-            }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
-            
-            return () => clearTimeout(initialTimeout);
         }
-    }, [isPopupMinimized]);
+    }, []);
+
+    useEffect(() => {
+        if (!isMounted || hasBeenMinimizedRef.current) return;
+
+        const initialTimeout = setTimeout(() => {
+            const interval = setInterval(() => {
+                setRemainingCount(prevCount => {
+                    const newCount = prevCount > 4 ? prevCount - 1 : prevCount;
+
+                    if ((newCount === 4 || newCount === 3) && !isPopupMinimized && !sessionStorage.getItem('popupMinimized')) {
+                        setShowPopup(true);
+                    }
+                    
+                    setIsBlinking(true);
+                    setTimeout(() => setIsBlinking(false), 1000);
+
+                    if (newCount <= 3) {
+                        clearInterval(interval);
+                    }
+
+                    return newCount;
+                });
+            }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
+
+            return () => clearInterval(interval);
+        }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
+        
+        return () => clearTimeout(initialTimeout);
+    }, [isMounted, isPopupMinimized]);
 
     const handleClosePopup = () => {
         if (!isPopupMinimized) {
             setIsPopupMinimized(true);
             sessionStorage.setItem('popupMinimized', 'true');
+            hasBeenMinimizedRef.current = true;
         } else {
             setShowPopup(false);
         }
@@ -162,6 +179,7 @@ function UrgencyPromotion() {
     const handleOpenPopup = () => {
         setIsPopupMinimized(false);
         sessionStorage.removeItem('popupMinimized'); 
+        hasBeenMinimizedRef.current = false;
     };
 
     return (
@@ -318,8 +336,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         <TabsTrigger value="photos" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                            <Camera size={16} /> {model.stats.photos} Fotos
                         </TabsTrigger>
-                        <TabsTrigger value="media" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
-                            <ImageIcon size={16} /> {model.stats.media} Mídias
+                        <TabsTrigger value="videos" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
+                            <Video size={16} /> {model.stats.videos} Vídeos
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="previews" className="mt-4">
@@ -372,12 +390,26 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             ))}
                         </div>
                     </TabsContent>
-                    <TabsContent value="media">
-                         <Card className="bg-[#121212] rounded-2xl border-neutral-800 mt-4 h-48 flex items-center justify-center">
-                            <CardContent>
-                                <p className="text-neutral-400">Conteúdo de mídia desbloqueado aqui.</p>
-                            </CardContent>
-                        </Card>
+                    <TabsContent value="videos" className="mt-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            {model.videos.map(video => (
+                                <Card key={video.id} onClick={() => setPlayingVideoUrl(video.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
+                                    <div className="relative group">
+                                        <Image 
+                                            src={video.thumbnailUrl}
+                                            alt={video.hint}
+                                            data-ai-hint={video.hint}
+                                            width={video.width}
+                                            height={video.height}
+                                            className="object-cover w-full h-auto"
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <PlayCircle size={48} className="text-white" />
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
                     </TabsContent>
                 </Tabs>
             </div>
