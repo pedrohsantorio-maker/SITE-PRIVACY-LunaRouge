@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, UserCheck, UserX, Target, Percent, Calendar as CalendarIcon, Eye } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 import { UsersTable } from '@/components/admin/users-table';

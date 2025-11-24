@@ -1,7 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, where, Timestamp } from 'firebase/firestore';
+import { collection, onSnapshot, query, Timestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
+import { FirestorePermissionError } from '@/firebase/errors';
+import { errorEmitter } from '@/firebase/error-emitter';
 
 interface Stats {
   totalLeads: number;
@@ -37,10 +39,6 @@ export function useDashboardStats(date: Date) {
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
     
-    const startTimestamp = Timestamp.fromDate(startOfDay);
-    const endTimestamp = Timestamp.fromDate(endOfDay);
-    const fiveMinutesAgoTimestamp = Timestamp.fromMillis(Date.now() - 5 * 60 * 1000);
-
     const usersRef = collection(firestore, 'users');
     const accessLogsRef = collection(firestore, 'site_access_logs');
 
@@ -50,6 +48,7 @@ export function useDashboardStats(date: Date) {
       const totalLeadsCount = allLeads.length;
 
       const leadsOnDate = allLeads.filter(lead => {
+        if (!lead.createdAt) return false;
         const createdAt = lead.createdAt.toDate();
         return createdAt >= startOfDay && createdAt <= endOfDay;
       }).length;
@@ -67,14 +66,24 @@ export function useDashboardStats(date: Date) {
       }));
       setIsLoading(false);
     }, (error) => {
-      console.error("Error fetching user stats:", error);
+      const contextualError = new FirestorePermissionError({
+        path: 'users',
+        operation: 'list',
+      });
+      console.error("Error fetching user stats:", error, contextualError);
+      errorEmitter.emit('permission-error', contextualError);
       setIsLoading(false);
     });
     
     const unsubscribeAccess = onSnapshot(query(accessLogsRef), (snapshot) => {
         setStats(prev => ({ ...prev, siteAccesses: snapshot.size }));
     }, (error) => {
-        console.error("Error fetching site access stats:", error);
+        const contextualError = new FirestorePermissionError({
+            path: 'site_access_logs',
+            operation: 'list',
+        });
+        console.error("Error fetching site access stats:", error, contextualError);
+        errorEmitter.emit('permission-error', contextualError);
     });
 
 

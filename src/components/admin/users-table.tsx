@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, where, Timestamp, DocumentData } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, Timestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FirestorePermissionError } from '@/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
 
 interface UsersTableProps {
   date: Date;
@@ -49,8 +51,13 @@ export function UsersTable({ date }: UsersTableProps) {
       setDailyLeads(leadsData);
       setIsLoading(false);
     }, (error) => {
-      console.error("Error fetching daily leads:", error);
-      setIsLoading(false);
+        const contextualError = new FirestorePermissionError({
+          path: 'users',
+          operation: 'list',
+        });
+        console.error("Error fetching daily leads:", error, contextualError);
+        errorEmitter.emit('permission-error', contextualError);
+        setIsLoading(false);
     });
 
     return () => unsubscribe();
@@ -58,7 +65,7 @@ export function UsersTable({ date }: UsersTableProps) {
 
   return (
     <Card>
-      <CardContent>
+      <CardContent className="pt-6">
         <Table>
           <TableHeader>
             <TableRow>

@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy, DocumentData } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { FirestorePermissionError } from '@/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
 
 interface AccessLog {
   id: string;
@@ -33,7 +35,12 @@ export function AccessTable() {
       setLogs(logsData);
       setIsLoading(false);
     }, (error) => {
-      console.error("Error fetching access logs:", error);
+      const contextualError = new FirestorePermissionError({
+        path: 'site_access_logs',
+        operation: 'list',
+      });
+      console.error("Error fetching access logs:", error, contextualError);
+      errorEmitter.emit('permission-error', contextualError);
       setIsLoading(false);
     });
 
@@ -69,7 +76,7 @@ export function AccessTable() {
                   <TableCell>{log.userId || 'Visitante'}</TableCell>
                   <TableCell>{log.page}</TableCell>
                   <TableCell>{log.ip || 'N/A'}</TableCell>
-                  <TableCell>{format(new Date(log.accessTime.seconds * 1000), "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })}</TableCell>
+                  <TableCell>{log.accessTime ? format(new Date(log.accessTime.seconds * 1000), "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR }) : 'N/A'}</TableCell>
                 </TableRow>
               ))
             ) : (

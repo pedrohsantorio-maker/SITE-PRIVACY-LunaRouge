@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Users, BarChart, Eye, LayoutDashboard } from 'lucide-react';
+import { Users, Eye, LayoutDashboard } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/logo';
@@ -26,7 +26,7 @@ export default function AdminLayout({
         <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
           <Link href="/dashboard" className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base">
             <Logo className="h-4 w-4 text-primary-foreground" />
-            <span className="sr-only">ModelMuse Admin</span>
+            <span className="sr-only">Admin Panel</span>
           </Link>
           <TooltipProvider>
             {navItems.map(item => (
