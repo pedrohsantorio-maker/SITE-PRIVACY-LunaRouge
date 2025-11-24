@@ -42,8 +42,9 @@ function LeadRow({ lead }: { lead: Lead }) {
     return (
         <TableRow>
             <TableCell>
-                <div className="font-medium">{lead.name}, {lead.age}</div>
+                <div className="font-medium">{lead.name}</div>
                 <div className="text-sm text-muted-foreground">{lead.email}</div>
+                <div className="text-sm text-muted-foreground">{lead.age} anos</div>
             </TableCell>
             <TableCell>
                 <Badge variant={lead.status === 'paid' ? 'default' : 'secondary'} className={lead.status === 'paid' ? 'bg-green-600' : ''}>
