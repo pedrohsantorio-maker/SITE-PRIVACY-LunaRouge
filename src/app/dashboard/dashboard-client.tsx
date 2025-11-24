@@ -191,7 +191,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const overlayTexts = [
         "Um gostinho do que você vai receber...",
         "Se aqui já está assim, imagina no conteúdo exclusivo!",
-        "Curioso(a)? Assine para ver tudo.",
+        "Curioso? assine para ver mais",
         "Isso é só o começo. O melhor está lá dentro.",
     ];
 
