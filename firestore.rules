@@ -1,134 +1,44 @@
-/**
- * # Firestore Security Rules
- *
- * ## Core Philosophy
- * This ruleset enforces a strict user-ownership model for sensitive data while allowing public access to non-sensitive information like subscription plans. The primary goal is to ensure that users can only access and manage their own data, preventing unauthorized access or modification.
- *
- * ## Data Structure
- * The data is organized into four top-level collections:
- * - `/users/{userId}`: Contains private user profile information. Access is restricted to the document owner.
- * - `/modelProfiles/{modelProfileId}`: Stores public-facing model profiles. This collection is readable by anyone but write access is disabled for clients.
- * - `/subscriptions/{subscriptionId}`: Holds user subscription details. Access is granted based on a `userId` field within the document, linking it to its owner.
- * - `/plans/{planId}`: Contains details about available subscription plans, which are publicly readable by all users.
- *
- * ## Key Security Decisions
- * - **Strict Ownership**: All user-specific data (in `/users` and `/subscriptions`) is protected, ensuring a user can only interact with their own documents.
- * - **Public Read-Only Data**: Collections like `/plans` are configured to be publicly readable but are protected from client-side writes to maintain data integrity.
- * - **Default Deny**: Any operation not explicitly granted is denied. Write access to collections without a clear ownership model (like `/modelProfiles`) is disabled by default for security.
- * - **No User Listing**: The rules do not permit listing all documents in the `/users` collection to protect user privacy.
- *
- * ## Denormalization for Authorization
- * To ensure fast and secure authorization checks, this ruleset relies on denormalized data. For example, each document in the `/subscriptions` collection contains a `userId` field. This allows the rules to verify ownership directly from the document being accessed without needing slow and costly `get()` calls to other documents.
- *
- * ## Structural Segregation
- * This ruleset uses separate top-level collections to segregate data with different security requirements (e.g., private `/users` data vs. public `/plans` data). This is a more secure and performant approach than mixing public and private documents in the same collection.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // -------------------------------------------------------------------------
-    // Helper Functions
-    // -------------------------------------------------------------------------
-
-    /**
-     * Checks if the user is authenticated.
-     */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * Checks if the authenticated user's UID matches the provided userId.
-     * Used for path-based ownership checks.
-     */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /**
-     * Checks for ownership and ensures the document already exists.
-     * Used for safe update and delete operations.
-     */
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
-    }
-
-    /**
-     * Validates that the user is the owner of a document by checking a 'userId'
-     * field within the document's data.
-     * Used for collections where ownership is not defined by the path.
-     */
-    function isDocumentOwner(doc) {
-      return isSignedIn() && request.auth.uid == doc.data.userId;
-    }
-
-    // -------------------------------------------------------------------------
-    // Collection Rules
-    // -------------------------------------------------------------------------
-
-    /**
-     * @description Controls access to user profile documents.
-     * @path /users/{userId}
-     * @allow (create) A new user signing up for the first time.
-     *   auth: { uid: 'user_abc' }
-     * @deny (get) A user trying to read another user's profile.
-     *   auth: { uid: 'user_xyz' } trying to read /users/user_abc
-     * @principle Restricts access to a user's own data tree.
-     */
+    // Usuários (Leads)
+    // Permite leitura pública para o painel de admin, mas escrita restrita ao dono.
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
+      allow read, list: if true;
+      allow create, update, delete: if isOwner(userId);
+    }
+    
+    // Logs de Acesso ao Site
+    // Permite leitura pública para o painel e qualquer um pode escrever um log.
+    match /site_access_logs/{logId} {
+        allow read, list: if true;
+        allow create: if true;
+        allow update, delete: if false; // Logs não devem ser alterados
     }
 
-    /**
-     * @description Controls access to model profiles, which are public.
-     * @path /modelProfiles/{modelProfileId}
-     * @allow (get) Any user, signed in or not, reading a model profile.
-     *   auth: null
-     * @deny (create) Any user trying to create a new model profile.
-     *   auth: { uid: 'user_abc' }
-     * @principle Data is public-read, but writes are disabled for clients to protect data integrity.
-     */
+    // REGRAS PARA O APP MODELMUSE (NÃO RELACIONADAS AO ADMIN)
     match /modelProfiles/{modelProfileId} {
       allow get: if true;
       allow list: if true;
-      // CRITICAL: Cannot implement owner-only writes. The 'ModelProfile' entity is missing an 'ownerId' or 'authorId' field.
-      // Client-side writes are disabled until the schema is updated.
-      allow create: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
-      allow update: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
-      allow delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
-    /**
-     * @description Controls access to user subscription documents.
-     * @path /subscriptions/{subscriptionId}
-     * @allow (get) An authenticated user reading their own subscription details.
-     *   auth: { uid: 'user_abc' } reading a doc where `userId` field is 'user_abc'
-     * @deny (get) An authenticated user trying to read someone else's subscription.
-     *   auth: { uid: 'user_xyz' } reading a doc where `userId` field is 'user_abc'
-     * @principle Enforces document ownership for reads and writes based on a 'userId' field.
-     */
     match /subscriptions/{subscriptionId} {
-      allow get: if isDocumentOwner(resource);
-      allow list: if isSignedIn();
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if resource != null && isDocumentOwner(resource) && request.resource.data.userId == resource.data.userId;
-      allow delete: if resource != null && isDocumentOwner(resource);
+      allow read, list: if true;
+      allow create, update, delete: if isSignedIn() && request.auth.uid == request.resource.data.userId;
     }
 
-    /**
-     * @description Controls access to subscription plans, which are public.
-     * @path /plans/{planId}
-     * @allow (list) Any user, signed in or not, listing all available plans.
-     *   auth: null
-     * @deny (create) Any user trying to create a new subscription plan.
-     *   auth: { uid: 'user_abc' }
-     * @principle Data is public-read, but writes are disabled for clients to protect data integrity.
-     */
     match /plans/{planId} {
       allow get: if true;
       allow list: if true;
