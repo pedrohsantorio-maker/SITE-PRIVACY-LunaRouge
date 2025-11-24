@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,14 +20,12 @@ const CommentIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
 );
 
-type Post = {
+type Photo = {
     id: string;
-    isLocked: boolean;
-    stats: {
-        images: number;
-        videos: number;
-        likes: number;
-    }
+    url: string;
+    hint: string;
+    width: number;
+    height: number;
 }
 
 type GalleryItem = {
@@ -54,6 +52,7 @@ type ModelData = {
         media: number;
         likes: number;
         previews: number;
+        photos: number;
     };
     socials: {
         instagram: string;
@@ -69,7 +68,7 @@ type ModelData = {
         discount: string;
         id: string;
     }[];
-    posts: Post[];
+    photos: Photo[];
     previewsGallery: GalleryItem[];
 };
 
@@ -309,14 +308,14 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </CardContent>
                 </Card>
 
-                {/* Posts Section */}
+                {/* Tabs Section */}
                  <Tabs defaultValue="previews" className="w-full">
                     <TabsList className="grid w-full grid-cols-3 bg-[#121212] rounded-xl h-12">
                         <TabsTrigger value="previews" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                             <Eye size={16} /> {model.stats.previews} Prévias
                         </TabsTrigger>
-                        <TabsTrigger value="posts" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
-                           <Newspaper size={16} /> {model.stats.posts} Postagens
+                        <TabsTrigger value="photos" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
+                           <Camera size={16} /> {model.stats.photos} Fotos
                         </TabsTrigger>
                         <TabsTrigger value="media" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                             <ImageIcon size={16} /> {model.stats.media} Mídias
@@ -354,52 +353,23 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             })}
                         </div>
                     </TabsContent>
-                    <TabsContent value="posts">
-                        {model.posts.map(post => (
-                        <div key={post.id}>
-                          <Card className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800 mt-4">
-                              <CardContent className="p-0">
-                                  <div className="p-4 flex items-center justify-between">
-                                      <div className="flex items-center gap-3">
-                                          <Image src={model.avatarUrl} alt={model.avatarHint} width={40} height={40} className="rounded-full"/>
-                                          <div>
-                                              <div className="flex items-center gap-1">
-                                                  <p className="font-bold">{model.name}</p>
-                                                   {model.isVerified &&
-                                                      <div className="w-3 h-3 bg-orange-500 rounded-full flex items-center justify-center">
-                                                          <Check size={10} className="text-black" />
-                                                      </div>
-                                                  }
-                                              </div>
-                                              <p className="text-sm text-neutral-400">@{model.handle}</p>
-                                          </div>
-                                      </div>
-                                      <MoreVertical className="text-neutral-400"/>
-                                  </div>
-                                  
-                                  {post.isLocked && (
-                                      <div className="bg-[#F3EFEA] aspect-square w-full flex flex-col items-center justify-center text-neutral-500">
-                                          <Lock size={64} className="mb-4"/>
-                                          <div className="flex items-center gap-4 text-sm">
-                                              <div className="flex items-center gap-1"><ImageIcon size={16}/> {post.stats.images}</div>
-                                              <div className="flex items-center gap-1"><Video size={16}/> {post.stats.videos}</div>
-                                              <div className="flex items-center gap-1"><Heart size={16}/> <FormattedStat value={post.stats.likes} /></div>
-                                          </div>
-                                      </div>
-                                  )}
-
-                                  <div className="p-4 flex justify-between items-center text-neutral-400">
-                                      <div className="flex items-center gap-4">
-                                          <Heart size={24} />
-                                          <CommentIcon className="w-6 h-6"/>
-                                          <DollarSign size={24} />
-                                      </div>
-                                      <Bookmark size={24}/>
-                                  </div>
-                              </CardContent>
-                          </Card>
+                    <TabsContent value="photos" className="mt-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            {model.photos.map(photo => (
+                                <Card key={photo.id} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg">
+                                    <div className="relative">
+                                        <Image 
+                                            src={photo.url}
+                                            alt={photo.hint}
+                                            data-ai-hint={photo.hint}
+                                            width={photo.width}
+                                            height={photo.height}
+                                            className="object-cover w-full h-auto"
+                                        />
+                                    </div>
+                                </Card>
+                            ))}
                         </div>
-                        ))}
                     </TabsContent>
                     <TabsContent value="media">
                          <Card className="bg-[#121212] rounded-2xl border-neutral-800 mt-4 h-48 flex items-center justify-center">
