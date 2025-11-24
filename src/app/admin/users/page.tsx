@@ -14,6 +14,7 @@ import { ptBR } from 'date-fns/locale';
 interface Lead {
   id: string;
   name: string;
+  age: number;
   email: string;
   createdAt: { seconds: number; nanoseconds: number };
   status: 'paid' | 'not_paid';
@@ -30,7 +31,7 @@ function LeadRow({ lead }: { lead: Lead }) {
     return (
         <TableRow>
             <TableCell>
-                <div className="font-medium">{lead.name}</div>
+                <div className="font-medium">{lead.name}, {lead.age}</div>
                 <div className="text-sm text-muted-foreground">{lead.email}</div>
             </TableCell>
             <TableCell>
