@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, doc, setDoc, collection } from 'firebase/firestore';
 import { firebaseConfig } from '@/firebase/config';
 
 // Helper function to initialize Firebase Admin on the server
@@ -30,11 +31,12 @@ export async function signupAction(prevState: any, formData: FormData) {
     return { message: parsed.error.errors[0].message };
   }
 
+  let userCredential;
   try {
     const firebaseApp = initializeFirebaseServer();
     const auth = getAuth(firebaseApp);
     // This function signs the user in automatically after creation
-    await createUserWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
+    userCredential = await createUserWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
 
   } catch (error: any) {
     // Log do erro completo no servidor para diagnóstico
@@ -63,8 +65,40 @@ export async function signupAction(prevState: any, formData: FormData) {
     }
     return { message: errorMessage };
   }
+
+  // --- Save user data to Firestore ---
+  try {
+     const firebaseApp = initializeFirebaseServer();
+     const firestore = getFirestore(firebaseApp);
+     const user = userCredential.user;
+
+     // Create a new subscription document for the user
+     const subscriptionRef = doc(collection(firestore, 'subscriptions'));
+     await setDoc(subscriptionRef, {
+        id: subscriptionRef.id,
+        userId: user.uid,
+        status: 'inactive', // Default status
+        planId: null,
+        startDate: null,
+        endDate: null
+     });
+
+     // Create the user document with the subscriptionId
+     const userDocRef = doc(firestore, 'users', user.uid);
+     await setDoc(userDocRef, {
+        id: user.uid,
+        name: parsed.data.name,
+        email: parsed.data.email,
+        age: parsed.data.age,
+        subscriptionId: subscriptionRef.id // Link user to their subscription
+     }, { merge: true });
+
+  } catch (dbError: any) {
+      console.error("Failed to save user data to Firestore", dbError);
+      // Even if DB write fails, auth account was created.
+      // You might want to handle this case, e.g., by queueing the DB write.
+      return { message: "Sua conta foi criada, mas houve um erro ao salvar seus dados. Por favor, contate o suporte." };
+  }
   
-  // Apenas retorna uma mensagem vazia em caso de sucesso.
-  // O redirecionamento é tratado no lado do cliente após salvar os dados no Firestore.
-  return { message: '' };
+  redirect('/dashboard');
 }

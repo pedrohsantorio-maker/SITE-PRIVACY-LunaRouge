@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { Mail, Lock, User, Calendar } from 'lucide-react';
-import { useActionState, useEffect, useRef } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { Button } from '@/components/ui/button';
@@ -12,8 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
 import { signupAction } from './actions';
-import { useFirestore, useUser } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { useUser } from '@/firebase';
 
 
 function SubmitButton() {
@@ -32,62 +31,14 @@ export default function SignupPage() {
         imageHint: "futuristic woman"
     };
 
-    const firestore = useFirestore();
     const { user, isUserLoading } = useUser();
-    const formRef = useRef<HTMLFormElement>(null);
-
-    // This tracks if we have already attempted to save to Firestore
-    const isDataSaved = useRef(false);
-
     const [state, formAction] = useActionState(signupAction, { message: '' });
-    
-    // This effect runs when the user object changes (i.e., after successful signup)
-    // to save the user's data to Firestore.
-    useEffect(() => {
-        // Only run if we have a user, a valid form, and haven't saved data yet.
-        if (user && formRef.current && !isDataSaved.current) {
-             const formData = new FormData(formRef.current);
-             const name = formData.get('name') as string;
-             const email = formData.get('email') as string;
-             const age = Number(formData.get('age'));
-
-            // Check if we have the necessary form data to prevent writing on simple re-logins
-            if (name && email && age && firestore) {
-                isDataSaved.current = true; // Mark as saved immediately
-                const userDocRef = doc(firestore, 'users', user.uid);
-                
-                setDoc(userDocRef, {
-                    id: user.uid,
-                    name,
-                    email,
-                    age,
-                }, { merge: true })
-                .then(() => {
-                    // Once data is successfully saved, then redirect.
-                    redirect('/dashboard');
-                })
-                .catch(err => {
-                    // This error is okay to console.error, it's a developer error if it happens.
-                    console.error("Failed to save user data", err)
-                });
-            }
-        }
-    }, [user, firestore]);
-    
 
     // This handles redirecting the user if they are ALREADY logged in
     // and just navigate to the signup page.
     useEffect(() => {
         if (user && !isUserLoading) {
-             // A small delay to ensure Firestore write has a chance to complete
-             // if triggered by a new signup.
-             setTimeout(() => {
-                // Check if data has been saved before redirecting
-                // This prevents premature redirection if the user is just re-visiting the page
-                 if (isDataSaved.current) {
-                    redirect('/dashboard');
-                }
-             }, 500);
+             redirect('/dashboard');
         }
     }, [user, isUserLoading]);
 
@@ -114,7 +65,7 @@ export default function SignupPage() {
                 </div>
 
                 <div className="bg-black/50 backdrop-blur-sm p-8 rounded-lg shadow-2xl shadow-primary/20 space-y-6">
-                    <form ref={formRef} action={formAction}>
+                    <form action={formAction}>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="name" className="text-white font-light">Nome</Label>

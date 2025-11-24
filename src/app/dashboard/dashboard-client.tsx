@@ -10,6 +10,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc, DocumentData } from 'firebase/firestore';
 
 // Inline SVG for social icons to avoid installing a new library
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -202,6 +204,17 @@ function UrgencyPromotion() {
     );
 }
 
+const LockedContent = ({ onUnlockClick }: { onUnlockClick: () => void }) => (
+    <div className="flex flex-col items-center justify-center text-center p-8 bg-[#18181B] rounded-lg mt-4">
+        <Lock className="w-12 h-12 text-primary" />
+        <h3 className="mt-4 text-xl font-bold">Conteúdo Exclusivo</h3>
+        <p className="mt-2 text-muted-foreground">Assine um de nossos planos para desbloquear fotos e vídeos exclusivos.</p>
+        <Button onClick={onUnlockClick} className="mt-6 font-bold">
+            Ver Planos de Assinatura
+        </Button>
+    </div>
+);
+
 
 export function DashboardClient({ model }: { model: ModelData }) {
     const [isBioExpanded, setIsBioExpanded] = useState(false);
@@ -209,7 +222,35 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [playingVideo, setPlayingVideo] = useState<VideoItem | GalleryItem | null>(null);
     const [revealedPreviews, setRevealedPreviews] = useState<string[]>([]);
     const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState('previews');
+    const pageTopRef = useRef<HTMLDivElement>(null);
+
+    // --- Subscription Logic ---
+    const firestore = useFirestore();
+    const { user, isUserLoading } = useUser();
+
+    // Get user data to find the subscriptionId
+    const userDocRef = useMemoFirebase(() => {
+        if (!firestore || !user) return null;
+        return doc(firestore, 'users', user.uid);
+    }, [firestore, user]);
+    const { data: userData, isLoading: isUserDocLoading } = useDoc(userDocRef);
+
+    // Get subscription data using the subscriptionId from the user data
+    const subscriptionDocRef = useMemoFirebase(() => {
+        if (!firestore || !userData?.subscriptionId) return null;
+        return doc(firestore, 'subscriptions', userData.subscriptionId);
+    }, [firestore, userData]);
+    const { data: subscriptionData, isLoading: isSubLoading } = useDoc(subscriptionDocRef);
     
+    const isSubscribed = subscriptionData?.status === 'active';
+    const isLoadingSubscription = isUserLoading || isUserDocLoading || isSubLoading;
+    // --- End Subscription Logic ---
+
+    const handleUnlockClick = () => {
+        pageTopRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     const overlayTexts = [
         "Um gostinho do que você vai receber...",
         "Se aqui já está assim, imagina no conteúdo exclusivo!",
@@ -236,6 +277,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
             <div className="w-full max-w-md space-y-4">
+                <div ref={pageTopRef} />
                 <Card className="bg-[#121212] rounded-2xl overflow-hidden border-neutral-800">
                     <CardContent className="p-0">
                         {/* Header with Banner */}
@@ -332,16 +374,18 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </Card>
 
                 {/* Tabs Section */}
-                 <Tabs defaultValue="videos" className="w-full">
+                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-3 bg-[#121212] rounded-xl h-12">
                         <TabsTrigger value="previews" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                             <Eye size={16} /> {model.stats.previews} Prévias
                         </TabsTrigger>
                         <TabsTrigger value="photos" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                            <Camera size={16} /> {model.stats.photos} Fotos
+                           {!isSubscribed && <Lock className="w-3 h-3 ml-1" />}
                         </TabsTrigger>
                         <TabsTrigger value="videos" className="flex items-center gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400">
                             <Video size={16} /> {model.stats.videos} Vídeos
+                             {!isSubscribed && <Lock className="w-3 h-3 ml-1" />}
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="previews" className="mt-4">
@@ -377,43 +421,55 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </div>
                     </TabsContent>
                     <TabsContent value="photos" className="mt-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            {model.photos.map(photo => (
-                                <Card key={photo.id} onClick={() => setSelectedPhotoUrl(photo.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-transform hover:scale-105">
-                                    <div className="relative">
-                                        <Image 
-                                            src={photo.url}
-                                            alt={photo.hint}
-                                            data-ai-hint={photo.hint}
-                                            width={photo.width}
-                                            height={photo.height}
-                                            className="object-cover w-full h-auto"
-                                        />
-                                    </div>
-                                </Card>
-                            ))}
-                        </div>
+                        {isLoadingSubscription ? (
+                            <div className="flex items-center justify-center p-8"><p>Verificando assinatura...</p></div>
+                        ) : isSubscribed ? (
+                            <div className="grid grid-cols-2 gap-4">
+                                {model.photos.map(photo => (
+                                    <Card key={photo.id} onClick={() => setSelectedPhotoUrl(photo.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-transform hover:scale-105">
+                                        <div className="relative">
+                                            <Image 
+                                                src={photo.url}
+                                                alt={photo.hint}
+                                                data-ai-hint={photo.hint}
+                                                width={photo.width}
+                                                height={photo.height}
+                                                className="object-cover w-full h-auto"
+                                            />
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        ) : (
+                            <LockedContent onUnlockClick={handleUnlockClick} />
+                        )}
                     </TabsContent>
                     <TabsContent value="videos" className="mt-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            {model.videos.map(video => (
-                                <Card key={video.id} onClick={() => setPlayingVideo(video)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
-                                    <div className="relative group">
-                                        <Image 
-                                            src={video.thumbnailUrl}
-                                            alt={video.hint}
-                                            data-ai-hint={video.hint}
-                                            width={video.width}
-                                            height={video.height}
-                                            className="object-cover w-full h-auto"
-                                        />
-                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <PlayCircle size={48} className="text-white" />
+                         {isLoadingSubscription ? (
+                            <div className="flex items-center justify-center p-8"><p>Verificando assinatura...</p></div>
+                        ) : isSubscribed ? (
+                            <div className="grid grid-cols-2 gap-4">
+                                {model.videos.map(video => (
+                                    <Card key={video.id} onClick={() => setPlayingVideo(video)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
+                                        <div className="relative group">
+                                            <Image 
+                                                src={video.thumbnailUrl}
+                                                alt={video.hint}
+                                                data-ai-hint={video.hint}
+                                                width={video.width}
+                                                height={video.height}
+                                                className="object-cover w-full h-auto"
+                                            />
+                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <PlayCircle size={48} className="text-white" />
+                                            </div>
                                         </div>
-                                    </div>
-                                </Card>
-                            ))}
-                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        ) : (
+                             <LockedContent onUnlockClick={handleUnlockClick} />
+                        )}
                     </TabsContent>
                 </Tabs>
             </div>
