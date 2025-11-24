@@ -1,3 +1,4 @@
+
 import { PlaceHolderImages } from "./placeholder-images";
 
 const profileImage = PlaceHolderImages.find(img => img.id === 'model-profile');
@@ -73,7 +74,7 @@ export const modelData = {
   ],
   promotions: [
     { name: '3 meses', price: '47,98', discount: '20% off', id: 'quarterly', paymentUrl: 'https://multi.paradisepags.com/p/pix_d57164164cd3' },
-    { name: '6 meses', price: '95,95', discount: '20% off', id: 'biannual' },
+    { name: '6 meses', price: '95,95', discount: '20% off', id: 'biannual', paymentUrl: 'https://multi.paradisepags.com/p/pix_39d333f3064a' },
   ],
   photos: photoLinks.map((url, index) => ({
       id: `photo-${index + 1}`,
@@ -103,3 +104,5 @@ export const modelData = {
       height: 800,
   })),
 };
+
+    
