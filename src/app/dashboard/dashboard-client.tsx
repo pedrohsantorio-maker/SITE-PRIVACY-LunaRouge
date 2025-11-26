@@ -291,23 +291,23 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </div>
 
                         {/* Subscriptions & Promotions */}
-                         <div className="px-4 pb-6 space-y-6">
+                        <div className="px-4 pb-6 space-y-8">
                            <div className="space-y-2">
                                 <h3 className="font-bold text-orange-400 text-lg animate-pulse-orange uppercase tracking-wider" style={{textShadow: '0 0 5px hsla(var(--primary), 0.7)'}}>Oferta Limitada</h3>
                                 <UrgencyPromotion />
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 {model.subscriptions.map(sub => (
                                     <div key={sub.id}>
-                                        <Button asChild className="w-full h-auto text-left p-4 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl shadow-lg transition-transform hover:scale-105">
+                                        <Button asChild className="w-full h-auto text-left p-4 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl shadow-lg transition-transform hover:scale-[1.03] hover:shadow-primary/40">
                                             <Link href={sub.paymentUrl || "/pagamento"} target={sub.paymentUrl ? "_blank" : "_self"}>
                                                 <div className="flex-grow">
-                                                    <p className="font-semibold" style={{textShadow: '0 1px 2px rgba(0,0,0,0.2)'}}>Desbloqueie Agora</p>
+                                                    <p className="text-lg font-semibold" style={{textShadow: '0 1px 2px rgba(0,0,0,0.2)'}}>Desbloqueie Agora</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="font-headline text-3xl font-bold">R$ {sub.price}</p>
-                                                    <p className="text-xs font-light -mt-1">por mês</p>
+                                                    <p className="font-headline text-4xl font-bold">R$ {sub.price}</p>
+                                                    <p className="text-xs font-light -mt-1 opacity-90">por mês</p>
                                                 </div>
                                             </Link>
                                         </Button>
@@ -320,27 +320,27 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                     <AccordionTrigger className="text-sm font-semibold text-neutral-400 hover:no-underline [&[data-state=open]>svg]:text-orange-400 pt-0">
                                     Ver Pacotes com Desconto
                                     </AccordionTrigger>
-                                    <AccordionContent className="space-y-4 pt-4">
+                                    <AccordionContent className="space-y-6 pt-4">
                                     {model.promotions.map(promo => (
                                         <div key={promo.id}>
-                                            <Button asChild variant="secondary" className="w-full h-auto text-left p-4 bg-[#27272A] text-white rounded-xl hover:bg-neutral-700 shadow-md transition-transform hover:scale-105">
+                                            <Button asChild variant="secondary" className="w-full h-auto text-left p-4 bg-[#27272A] text-white rounded-xl hover:bg-neutral-700 shadow-md transition-transform hover:scale-[1.03] hover:shadow-lg">
                                                 <Link href={promo.paymentUrl || "/pagamento"} target={promo.paymentUrl ? "_blank" : "_self"}>
-                                                    <div className="flex-grow">
-                                                        <p className="font-semibold">Economize Agora</p>
+                                                    <div className="flex-grow space-y-1">
+                                                        <p className="font-semibold text-lg">Garanta seu Desconto</p>
                                                          {promo.name.includes('Popular') && (
-                                                            <span className="text-xs font-bold bg-orange-500 text-black rounded-full px-2 py-0.5 mt-1 inline-block">MAIS POPULAR</span>
+                                                            <span className="text-xs font-bold bg-orange-500 text-black rounded-full px-2 py-0.5 inline-block uppercase">Mais Popular</span>
                                                         )}
                                                          {promo.name.includes('Super') && (
-                                                            <span className="text-xs font-bold bg-orange-500 text-black rounded-full px-2 py-0.5 mt-1 inline-block">MELHOR VALOR</span>
+                                                            <span className="text-xs font-bold bg-orange-500 text-black rounded-full px-2 py-0.5 inline-block uppercase">Melhor Valor</span>
                                                         )}
                                                     </div>
                                                     <div className="text-right">
-                                                        <p className="font-headline text-3xl font-bold">R$ {promo.price}</p>
-                                                        <p className="text-xs font-light -mt-1">pagamento único</p>
+                                                        <p className="font-headline text-4xl font-bold">R$ {promo.price}</p>
+                                                        <p className="text-sm font-semibold text-green-400 -mt-1">{promo.discount}</p>
                                                     </div>
                                                 </Link>
                                             </Button>
-                                             <p className="text-xs text-neutral-500 mt-2 text-center uppercase tracking-wide">{promo.name} ({promo.discount})</p>
+                                             <p className="text-xs text-neutral-500 mt-2 text-center uppercase tracking-wide">{promo.name}</p>
                                         </div>
                                     ))}
                                     </AccordionContent>
@@ -509,3 +509,4 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
