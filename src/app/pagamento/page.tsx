@@ -7,25 +7,28 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { CheckCircle } from 'lucide-react';
 import Logo from '@/components/logo';
 import { useFirestore, useUser } from '@/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useEffect } from 'react';
 
 export default function PagamentoPage() {
     const qrCodeImage = PlaceHolderImages.find(img => img.id === 'payment-qr-code');
     const firestore = useFirestore();
     const { user } = useUser();
 
-    // This function will be called when the user clicks a payment link.
-    // For this simulation, we'll call it when the payment page loads.
+    // This function will be called when the user visits the payment page.
     const handlePixGenerated = async () => {
         if (user && firestore) {
             try {
                 const userRef = doc(firestore, 'users', user.uid);
-                // We only update the status if it's currently 'not_paid'
+                const userDoc = await getDoc(userRef);
+
+                // We only update the status if it's currently 'not_paid'.
                 // This prevents overwriting a 'paid' status if the user re-visits the page.
-                // In a real scenario, you would have more robust logic.
-                await updateDoc(userRef, {
-                    status: 'pix_generated'
-                });
+                if (userDoc.exists() && userDoc.data().status === 'not_paid') {
+                    await updateDoc(userRef, {
+                        status: 'pix_generated'
+                    });
+                }
             } catch (error) {
                 console.error("Error updating user status to pix_generated:", error);
             }
@@ -39,7 +42,7 @@ export default function PagamentoPage() {
         if (user) {
             handlePixGenerated();
         }
-    }, [user]); // This effect runs when the user object becomes available.
+    }, [user, firestore]);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
