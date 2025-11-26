@@ -35,11 +35,9 @@ export default function PagamentoPage() {
         }
     };
 
-    // Simulate the user generating a PIX code just by visiting the page.
-    // We use a useEffect with an empty dependency array to run this only once.
-    // The `user` object might not be available on the first render, so we check for it.
+    // This useEffect will run when `user` or `firestore` objects are available.
     useEffect(() => {
-        if (user) {
+        if (user && firestore) {
             handlePixGenerated();
         }
     }, [user, firestore]);

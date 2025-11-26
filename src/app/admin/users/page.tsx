@@ -28,9 +28,9 @@ const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
 function StatusBadge({ status }: { status: Lead['status'] }) {
     switch (status) {
         case 'paid':
-            return <Badge className="bg-green-600">Pago</Badge>;
+            return <Badge className="bg-green-600 hover:bg-green-700">Pago</Badge>;
         case 'pix_generated':
-            return <Badge className="bg-yellow-500 text-black">Gerou PIX</Badge>;
+            return <Badge className="bg-yellow-500 hover:bg-yellow-600 text-black">Gerou PIX</Badge>;
         case 'not_paid':
         default:
             return <Badge variant="secondary">Não Pago</Badge>;
