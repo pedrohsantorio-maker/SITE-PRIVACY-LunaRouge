@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, setDoc, collection } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { firebaseConfig } from '@/firebase/config';
 
 // Helper function to initialize Firebase Admin on the server
@@ -90,7 +90,10 @@ export async function signupAction(prevState: any, formData: FormData) {
         name: parsed.data.name,
         email: parsed.data.email,
         age: parsed.data.age,
-        subscriptionId: subscriptionRef.id // Link user to their subscription
+        subscriptionId: subscriptionRef.id, // Link user to their subscription
+        status: 'not_paid', // Set initial status
+        createdAt: serverTimestamp(),
+        lastActive: serverTimestamp()
      }, { merge: true });
 
   } catch (dbError: any) {

@@ -1,0 +1,126 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Representa um usuário (lead) da plataforma.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "O nome completo do usuário."
+        },
+        "email": {
+          "type": "string",
+          "description": "O endereço de e-mail do usuário.",
+          "format": "email"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "A data e hora em que a conta do usuário foi criada."
+        },
+        "utm": {
+            "type": "string",
+            "description": "Parâmetros UTM de origem do lead."
+        },
+        "origin": {
+            "type": "string",
+            "description": "Página de origem onde o lead foi capturado."
+        },
+        "status": {
+          "type": "string",
+          "description": "O status de pagamento da assinatura do usuário.",
+          "enum": ["paid", "not_paid", "pix_generated"]
+        },
+        "plan": {
+          "type": "string",
+          "description": "O plano de assinatura adquirido pelo usuário.",
+          "enum": ["starter", "professional", "enterprise"]
+        },
+        "lastActive": {
+          "type": "string",
+          "format": "date-time",
+          "description": "O último registro de atividade do usuário."
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "A data em que a assinatura do usuário expira."
+        }
+      },
+      "required": [
+        "name",
+        "email",
+        "createdAt",
+        "status",
+        "lastActive"
+      ]
+    },
+    "SiteAccessLog": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "SiteAccessLog",
+        "type": "object",
+        "description": "Registra um acesso ao site.",
+        "properties": {
+            "userId": {
+                "type": "string",
+                "description": "O ID do usuário que acessou, se estiver logado."
+            },
+            "accessTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "O momento em que o acesso ocorreu."
+            },
+            "ip": {
+                "type": "string",
+                "description": "O endereço IP de origem do acesso."
+            },
+            "page": {
+                "type": "string",
+                "description": "A página que foi acessada."
+            }
+        },
+        "required": ["accessTime", "page"]
+    }
+  },
+  "auth": {
+    "providers": []
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/entities/User"
+          },
+          "description": "Armazena os dados do perfil do usuário (lead).",
+          "params": [
+            {
+              "name": "userId",
+              "description": "O identificador único do usuário, correspondente ao UID do Firebase Auth."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/site_access_logs/{logId}",
+        "definition": {
+            "entityName": "SiteAccessLog",
+            "schema": {
+                "$ref": "#/entities/SiteAccessLog"
+            },
+            "description": "Armazena logs de acesso ao site para monitoramento.",
+            "params": [
+                {
+                    "name": "logId",
+                    "description": "O identificador único do log de acesso."
+                }
+            ]
+        }
+      }
+    ]
+  }
+}

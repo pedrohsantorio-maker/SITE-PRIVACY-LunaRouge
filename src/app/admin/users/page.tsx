@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query } from 'firebase/firestore';
+import { collection, onSnapshot, query, doc, updateDoc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,13 +17,26 @@ interface Lead {
   age: number;
   email: string;
   createdAt: { seconds: number; nanoseconds: number };
-  status: 'paid' | 'not_paid';
+  status: 'paid' | 'not_paid' | 'pix_generated';
   plan: string;
   lastActive: { seconds: number; nanoseconds: number };
   endDate?: { seconds: number; nanoseconds: number } | string;
 }
 
 const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
+
+function StatusBadge({ status }: { status: Lead['status'] }) {
+    switch (status) {
+        case 'paid':
+            return <Badge className="bg-green-600">Pago</Badge>;
+        case 'pix_generated':
+            return <Badge className="bg-yellow-500 text-black">Gerou PIX</Badge>;
+        case 'not_paid':
+        default:
+            return <Badge variant="secondary">Não Pago</Badge>;
+    }
+}
+
 
 function LeadRow({ lead }: { lead: Lead }) {
     const isOnline = lead.lastActive && (Date.now() - new Date(lead.lastActive.seconds * 1000).getTime()) < FIVE_MINUTES_IN_MS;
@@ -38,7 +51,6 @@ function LeadRow({ lead }: { lead: Lead }) {
       }
     }
 
-
     return (
         <TableRow>
             <TableCell>
@@ -47,9 +59,7 @@ function LeadRow({ lead }: { lead: Lead }) {
                 {lead.age && <div className="text-sm text-muted-foreground">{lead.age} anos</div>}
             </TableCell>
             <TableCell>
-                <Badge variant={lead.status === 'paid' ? 'default' : 'secondary'} className={lead.status === 'paid' ? 'bg-green-600' : ''}>
-                    {lead.status === 'paid' ? 'Pago' : 'Não Pago'}
-                </Badge>
+                <StatusBadge status={lead.status} />
             </TableCell>
             <TableCell className="capitalize">{lead.plan || 'N/A'}</TableCell>
             <TableCell>{format(createdAtDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</TableCell>
