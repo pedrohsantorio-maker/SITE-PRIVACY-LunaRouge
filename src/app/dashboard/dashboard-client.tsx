@@ -332,7 +332,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </div>
 
                         {/* Subscriptions & Promotions */}
-                        <div className="px-4 pb-4 space-y-4">
+                        <div className="px-4 pb-4 space-y-6">
                             <div className="mb-4">
                                 <div className="flex items-center gap-2">
                                     <h3 className="font-bold text-orange-400 text-lg animate-pulse-orange uppercase">aproveite a oportunidade</h3>
@@ -340,35 +340,55 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 <UrgencyPromotion />
                             </div>
 
-                            <div>
-                                <h2 className="text-sm font-semibold text-neutral-400 mb-2">Assinaturas</h2>
-                                {model.subscriptions.map(sub => (
-                                    <Button key={sub.id} asChild className="w-full justify-between h-12 text-md font-semibold bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl">
-                                        <Link href={sub.paymentUrl || "/pagamento"} target={sub.paymentUrl ? "_blank" : "_self"}>
-                                          <span>{sub.name}</span>
-                                          <span>R$ {sub.price}</span>
-                                        </Link>
-                                    </Button>
-                                ))}
+                            <div className="space-y-4">
+                                <div>
+                                    <h2 className="text-sm font-semibold text-neutral-400 mb-2">Assinaturas</h2>
+                                    {model.subscriptions.map(sub => (
+                                        <div key={sub.id} className="text-center">
+                                            <Button asChild className="w-full h-auto text-left p-3 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl shadow-lg">
+                                                <Link href={sub.paymentUrl || "/pagamento"} target={sub.paymentUrl ? "_blank" : "_self"}>
+                                                    <div className="flex-grow">
+                                                        <p className="text-sm font-bold uppercase">Assine Agora</p>
+                                                        <p className="text-xs">Acesso Imediato</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="font-headline text-2xl font-bold">R$ {sub.price}</p>
+                                                        <p className="text-xs font-light">por mês</p>
+                                                    </div>
+                                                </Link>
+                                            </Button>
+                                            <p className="text-xs text-neutral-500 mt-2">ACESSO IMEDIATO (1 MÊS)</p>
+                                        </div>
+                                    ))}
+                                </div>
+                                
+                                <Accordion type="single" collapsible defaultValue='item-1' className="w-full">
+                                <AccordionItem value="item-1" className="border-none">
+                                    <AccordionTrigger className="text-sm font-semibold text-neutral-400 hover:no-underline [&[data-state=open]>svg]:text-orange-400">
+                                    Promoções
+                                    </AccordionTrigger>
+                                    <AccordionContent className="space-y-4 pt-2">
+                                    {model.promotions.map(promo => (
+                                        <div key={promo.id} className="text-center">
+                                            <Button asChild variant="secondary" className="w-full h-auto text-left p-3 bg-[#27272A] text-white rounded-xl hover:bg-neutral-700 shadow-md">
+                                                <Link href={promo.paymentUrl || "/pagamento"} target={promo.paymentUrl ? "_blank" : "_self"}>
+                                                    <div className="flex-grow">
+                                                        <p className="text-sm font-bold uppercase">Assine Agora</p>
+                                                        <p className="text-xs">{promo.name.includes('Popular') ? 'MAIS POPULAR' : 'MELHOR VALOR'}</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="font-headline text-2xl font-bold">R$ {promo.price}</p>
+                                                        <p className="text-xs font-light">pagamento único</p>
+                                                    </div>
+                                                </Link>
+                                            </Button>
+                                             <p className="text-xs text-neutral-500 mt-2 uppercase">{promo.name} ({promo.discount})</p>
+                                        </div>
+                                    ))}
+                                    </AccordionContent>
+                                </AccordionItem>
+                                </Accordion>
                             </div>
-
-                            <Accordion type="single" collapsible defaultValue='item-1' className="w-full">
-                              <AccordionItem value="item-1" className="border-none">
-                                <AccordionTrigger className="text-sm font-semibold text-neutral-400 hover:no-underline [&[data-state=open]>svg]:text-orange-400">
-                                  Promoções
-                                </AccordionTrigger>
-                                <AccordionContent className="space-y-2">
-                                   {model.promotions.map(promo => (
-                                    <Button key={promo.id} asChild variant="secondary" className="w-full justify-between h-12 text-md font-semibold bg-[#27272A] text-white rounded-xl hover:bg-neutral-700">
-                                        <Link href={promo.paymentUrl || "/pagamento"} target={promo.paymentUrl ? "_blank" : "_self"}>
-                                          <span>{promo.name} ({promo.discount})</span>
-                                          <span>R$ {promo.price}</span>
-                                        </Link>
-                                    </Button>
-                                   ))}
-                                </AccordionContent>
-                              </AccordionItem>
-                            </Accordion>
                         </div>
                     </CardContent>
                 </Card>
@@ -531,3 +551,5 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
+    
