@@ -349,7 +349,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 <Link href={sub.paymentUrl || "/pagamento"} target={sub.paymentUrl ? "_blank" : "_self"}>
                                                     <div className="flex-grow">
                                                         <p className="text-sm font-bold uppercase">Assine Agora</p>
-                                                        <p className="text-xs">Acesso Imediato</p>
+                                                        <p className="text-xs">acesso imediato ao conteúdo pago!</p>
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="font-headline text-2xl font-bold">R$ {sub.price}</p>
