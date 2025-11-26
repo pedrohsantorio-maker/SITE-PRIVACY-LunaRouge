@@ -336,7 +336,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="font-headline text-4xl font-bold">R$ {promo.price}</p>
-                                                        <p className="text-sm font-semibold text-green-400 -mt-1">{promo.discount}</p>
+                                                        <p className="text-sm font-semibold bg-green-500 text-green-950 rounded-md px-2 py-0.5 inline-block -mt-1">{promo.discount}</p>
                                                     </div>
                                                 </Link>
                                             </Button>
