@@ -52,7 +52,7 @@ const videoLinks = [
 
 export const modelData = {
   name: 'Luna Rouge',
-  handle: 'rouge_luna_',
+  handle: 'luna__vipp',
   isVerified: true,
   avatarUrl: profileImage?.imageUrl || "https://picsum.photos/seed/elena/1080/1350",
   avatarHint: profileImage?.imageHint || "woman portrait",
