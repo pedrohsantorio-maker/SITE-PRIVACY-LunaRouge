@@ -291,13 +291,13 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </div>
 
                         {/* Subscriptions & Promotions */}
-                        <div className="px-4 pb-6 space-y-6">
+                         <div className="px-4 pb-6 space-y-6">
                            <div className="space-y-2">
                                 <h3 className="font-bold text-orange-400 text-lg animate-pulse-orange uppercase tracking-wider" style={{textShadow: '0 0 5px hsla(var(--primary), 0.7)'}}>Oferta Limitada</h3>
                                 <UrgencyPromotion />
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                                 {model.subscriptions.map(sub => (
                                     <div key={sub.id}>
                                         <Button asChild className="w-full h-auto text-left p-4 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl shadow-lg transition-transform hover:scale-105">
@@ -317,7 +317,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 
                                 <Accordion type="single" collapsible defaultValue='item-1' className="w-full">
                                 <AccordionItem value="item-1" className="border-none">
-                                    <AccordionTrigger className="text-sm font-semibold text-neutral-400 hover:no-underline [&[data-state=open]>svg]:text-orange-400">
+                                    <AccordionTrigger className="text-sm font-semibold text-neutral-400 hover:no-underline [&[data-state=open]>svg]:text-orange-400 pt-0">
                                     Ver Pacotes com Desconto
                                     </AccordionTrigger>
                                     <AccordionContent className="space-y-4 pt-4">
