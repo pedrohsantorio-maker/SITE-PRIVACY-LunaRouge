@@ -102,17 +102,8 @@ function FormattedStat({ value }: { value: number }) {
     return <span>{formattedValue}</span>;
 }
 
-function UrgencyPopup({ count, isVisible, onClose, onOpen, isMinimized }: { count: number; isVisible: boolean; onClose: () => void; onOpen: () => void; isMinimized: boolean; }) {
+function UrgencyPopup({ count, isVisible, onClose }: { count: number; isVisible: boolean; onClose: () => void; }) {
     if (!isVisible) return null;
-
-    if (isMinimized) {
-        return (
-            <div className="popup-minimized-message">
-                <p>Aproveite a oportunidade, só mais <span id="remaining-count-minimized">{count}</span> assinaturas!</p>
-                <button onClick={onClose} className="popup-button">Fechar</button>
-            </div>
-        );
-    }
     
     return (
         <div className="popup-container animate-pulse-popup">
@@ -129,63 +120,33 @@ function UrgencyPromotion() {
     const [remainingCount, setRemainingCount] = useState(11);
     const [isBlinking, setIsBlinking] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
-    const [isPopupMinimized, setIsPopupMinimized] = useState(false);
-    const hasBeenMinimizedRef = useRef(false);
-    const [isMounted, setIsMounted] = useState(false);
+    const hasShownPopupRef = useRef(false);
 
     useEffect(() => {
-        setIsMounted(true);
-        const popupWasMinimized = sessionStorage.getItem('popupMinimized') === 'true';
-        if (popupWasMinimized) {
-            hasBeenMinimizedRef.current = true;
-            setShowPopup(true);
-            setIsPopupMinimized(true);
-        }
+        const interval = setInterval(() => {
+            setRemainingCount(prevCount => {
+                const newCount = prevCount > 2 ? prevCount - 1 : prevCount;
+
+                if (newCount <= 4 && !hasShownPopupRef.current) {
+                    setShowPopup(true);
+                    hasShownPopupRef.current = true;
+                }
+                
+                setIsBlinking(true);
+                setTimeout(() => setIsBlinking(false), 1000);
+
+                if (newCount <= 2) {
+                    clearInterval(interval);
+                }
+                return newCount;
+            });
+        }, Math.floor(Math.random() * (7000 - 4000 + 1)) + 4000); // Between 4-7 seconds
+
+        return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        if (!isMounted || hasBeenMinimizedRef.current) return;
-
-        const initialTimeout = setTimeout(() => {
-            const interval = setInterval(() => {
-                setRemainingCount(prevCount => {
-                    const newCount = prevCount > 4 ? prevCount - 1 : prevCount;
-
-                    if ((newCount === 4 || newCount === 3) && !isPopupMinimized && !sessionStorage.getItem('popupMinimized')) {
-                        setShowPopup(true);
-                    }
-                    
-                    setIsBlinking(true);
-                    setTimeout(() => setIsBlinking(false), 1000);
-
-                    if (newCount <= 3) {
-                        clearInterval(interval);
-                    }
-
-                    return newCount;
-                });
-            }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
-
-            return () => clearInterval(interval);
-        }, Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000);
-        
-        return () => clearTimeout(initialTimeout);
-    }, [isMounted, isPopupMinimized]);
-
     const handleClosePopup = () => {
-        if (!isPopupMinimized) {
-            setIsPopupMinimized(true);
-            sessionStorage.setItem('popupMinimized', 'true');
-            hasBeenMinimizedRef.current = true;
-        } else {
-            setShowPopup(false);
-        }
-    };
-
-    const handleOpenPopup = () => {
-        setIsPopupMinimized(false);
-        sessionStorage.removeItem('popupMinimized'); 
-        hasBeenMinimizedRef.current = false;
+        setShowPopup(false);
     };
 
     return (
@@ -194,10 +155,8 @@ function UrgencyPromotion() {
                 count={remainingCount} 
                 isVisible={showPopup} 
                 onClose={handleClosePopup}
-                onOpen={handleOpenPopup}
-                isMinimized={isPopupMinimized}
             />
-            <p className="text-sm text-neutral-400 mt-1">
+            <p className="text-sm font-semibold text-neutral-300 mt-1">
                 Só mais <span id="remaining-count" className={isBlinking ? 'animate-blink' : ''}>{remainingCount}</span> assinaturas com este valor.
             </p>
         </>
@@ -332,13 +291,13 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </div>
 
                         {/* Subscriptions & Promotions */}
-                        <div className="px-4 pb-6 space-y-6">
-                            <div className="mb-4">
+                        <div className="px-4 pb-6 space-y-8">
+                           <div className="space-y-2">
                                 <h3 className="font-bold text-orange-400 text-lg animate-pulse-orange uppercase tracking-wider" style={{textShadow: '0 0 5px hsla(var(--primary), 0.7)'}}>Oferta Limitada</h3>
                                 <UrgencyPromotion />
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                                 {model.subscriptions.map(sub => (
                                     <div key={sub.id}>
                                         <Button asChild className="w-full h-auto text-left p-4 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl shadow-lg transition-transform hover:scale-105">
@@ -356,7 +315,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                     </div>
                                 ))}
                                 
-                                <Accordion type="single" collapsible defaultValue='item-1' className="w-full pt-4">
+                                <Accordion type="single" collapsible defaultValue='item-1' className="w-full">
                                 <AccordionItem value="item-1" className="border-none">
                                     <AccordionTrigger className="text-sm font-semibold text-neutral-400 hover:no-underline [&[data-state=open]>svg]:text-orange-400">
                                     Ver Pacotes com Desconto

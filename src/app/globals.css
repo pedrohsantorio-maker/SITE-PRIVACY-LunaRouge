@@ -132,37 +132,27 @@
 
 
   .animate-blink {
-    animation: blink 1s ease;
+    animation: blink 1s ease-in-out;
   }
 
   @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.2; transform: scale(1.05); }
   }
 
   #remaining-count {
     font-weight: bold;
     color: hsl(var(--primary));
+    display: inline-block;
   }
 
   /* Popup Styles */
   .popup-container {
-    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/80;
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm;
   }
 
-  .popup-minimized {
-    @apply fixed bottom-5 right-5 z-50 flex h-16 w-16 cursor-pointer items-center justify-center rounded-full border border-primary bg-card shadow-lg;
-    transition: all 0.3s ease-in-out;
-  }
-  
   .popup-content {
-    @apply relative flex flex-col items-center justify-center rounded-lg border bg-card p-8 text-center text-card-foreground shadow-2xl;
-    max-width: 400px;
-    width: 90%;
-  }
-
-  .popup-content-minimized {
-    @apply flex h-full w-full items-center justify-center rounded-full;
+    @apply relative flex w-11/12 max-w-sm flex-col items-center justify-center rounded-2xl border-2 border-primary bg-card p-8 text-center text-card-foreground shadow-2xl;
   }
 
   .popup-content h2 {
@@ -176,54 +166,36 @@
   .popup-close {
     @apply absolute right-4 top-2.5 cursor-pointer text-3xl font-bold text-foreground hover:text-primary;
   }
-
-  .popup-minimized-message {
-    @apply fixed bottom-5 right-5 z-50 cursor-pointer rounded-lg border border-primary bg-card p-4 text-center text-sm font-bold text-white shadow-lg;
-    max-width: 300px;
-    width: auto;
-  }
-
-  .popup-button {
-    @apply mt-2.5 rounded-md border-none bg-primary px-2.5 py-2.5 text-sm font-bold text-white;
-  }
-
-  .popup-button:hover {
-    @apply bg-orange-500;
-  }
   
   /* Popup Animations */
   .animate-pulse-popup {
-    animation: pulse 1.5s infinite;
+    animation: pulse-popup-animation 1.5s infinite;
   }
 
   .animate-glow {
-    animation: glow 1.5s infinite;
+    animation: glow-animation 1.5s infinite alternate;
   }
 
-  @keyframes pulse {
+  @keyframes pulse-popup-animation {
     0% {
       transform: scale(1);
-      box-shadow: 0 0 5px 5px hsla(var(--primary), 0.7);
     }
     50% {
       transform: scale(1.02);
-      box-shadow: 0 0 15px 10px hsla(var(--primary), 0.7);
     }
     100% {
       transform: scale(1);
-      box-shadow: 0 0 5px 5px hsla(var(--primary), 0.7);
     }
   }
 
-  @keyframes glow {
-    0% {
-      text-shadow: 0 0 5px hsla(var(--primary), 0.7), 0 0 10px hsla(var(--primary), 0.5);
+  @keyframes glow-animation {
+    from {
+      box-shadow: 0 0 10px hsla(var(--primary), 0.5), 0 0 20px hsla(var(--primary), 0.3);
+      text-shadow: 0 0 5px hsla(var(--primary), 0.5);
     }
-    50% {
-      text-shadow: 0 0 15px hsla(var(--primary), 1), 0 0 25px hsla(var(--primary), 0.8);
-    }
-    100% {
-      text-shadow: 0 0 5px hsla(var(--primary), 0.7), 0 0 10px hsla(var(--primary), 0.5);
+    to {
+      box-shadow: 0 0 20px hsla(var(--primary), 0.7), 0 0 30px hsla(var(--primary), 0.5);
+       text-shadow: 0 0 10px hsla(var(--primary), 0.7);
     }
   }
 }

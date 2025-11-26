@@ -70,11 +70,11 @@ export const modelData = {
       instagram: "https://www.instagram.com/luna__vipp?igsh=MTA0dmFxdnE3bncwcQ%3D%3D&utm_source=qr",
   },
   subscriptions: [
-    { name: 'Acesso Imediato (1 mês)', price: '19,99', id: 'monthly', paymentUrl: 'https://multi.paradisepags.com/p/pix_39d333f3064a' },
+    { name: 'Acesso Imediato', price: '19,99', id: 'monthly', paymentUrl: 'https://multi.paradisepags.com/p/pix_39d333f3064a' },
   ],
   promotions: [
-    { name: 'Mais Popular (3 meses)', price: '47,98', discount: 'Economize 20%', id: 'quarterly', paymentUrl: 'https://multi.paradisepags.com/p/pix_d57164164cd3' },
-    { name: 'Super Desconto (6 meses)', price: '95,95', discount: 'Melhor Valor!', id: 'biannual', paymentUrl: 'https://multi.paradisepags.com/p/pix_832fe38e897c' },
+    { name: 'Plano 3 meses', price: '47,98', discount: 'Economize 20%', id: 'quarterly', paymentUrl: 'https://multi.paradisepags.com/p/pix_d57164164cd3' },
+    { name: 'Plano 6 meses', price: '95,95', discount: 'Super Desconto!', id: 'biannual', paymentUrl: 'https://multi.paradisepags.com/p/pix_832fe38e897c' },
   ],
   photos: photoLinks.map((url, index) => ({
       id: `photo-${index + 1}`,
@@ -104,5 +104,3 @@ export const modelData = {
       height: 800,
   })),
 };
-
-    
