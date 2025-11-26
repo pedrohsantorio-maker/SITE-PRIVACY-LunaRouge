@@ -67,7 +67,7 @@ export const modelData = {
     photos: photoLinks.length,
   },
   socials: {
-      instagram: "#",
+      instagram: "https://www.instagram.com/luna__vipp?igsh=MTA0dmFxdnE3bncwcQ%3D%3D&utm_source=qr",
   },
   subscriptions: [
     { name: '1 mês', price: '19,99', id: 'monthly', paymentUrl: 'https://multi.paradisepags.com/p/pix_39d333f3064a' },
