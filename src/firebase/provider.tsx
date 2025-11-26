@@ -2,7 +2,7 @@
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
-import { Firestore } from 'firebase/firestore';
+import { Firestore, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 
@@ -88,6 +88,40 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     );
     return () => unsubscribe(); // Cleanup
   }, [auth]); // Depends on the auth instance
+
+
+  // Effect to update user's lastActive timestamp
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    const updateUserActivity = async () => {
+      if (userAuthState.user && firestore) {
+        const userRef = doc(firestore, 'users', userAuthState.user.uid);
+        try {
+          // Use serverTimestamp for consistency
+          await updateDoc(userRef, { lastActive: serverTimestamp() });
+        } catch (error) {
+          // Don't log this error as it's not critical and can be noisy
+          // console.error("Failed to update lastActive timestamp:", error);
+        }
+      }
+    };
+    
+    // Set up an interval to update activity every 30 seconds
+    if (userAuthState.user && firestore) {
+        // Run it once immediately
+        updateUserActivity();
+        intervalId = setInterval(updateUserActivity, 30000); // 30 seconds
+    }
+
+    // Clean up interval on component unmount or when user logs out
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [userAuthState.user, firestore]);
+
 
   // Memoize the context value
   const contextValue = useMemo((): FirebaseContextState => {
