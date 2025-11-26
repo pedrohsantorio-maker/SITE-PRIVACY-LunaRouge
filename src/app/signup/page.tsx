@@ -19,7 +19,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full font-bold text-lg h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-transform duration-300 ease-in-out hover:scale-105 active:scale-100">
-      {pending ? 'Criando conta...' : 'Criar Conta'}
+      {pending ? 'Criando conta...' : 'Criar Conta e Desbloquear'}
     </Button>
   );
 }
@@ -58,9 +58,9 @@ export default function SignupPage() {
             <div className="mx-auto w-full max-w-md space-y-6 sm:space-y-8 fade-in">
                 <div className="text-center text-white">
                     <Logo className="text-5xl font-bold inline-block mb-4" />
-                    <h1 className="text-3xl font-headline font-bold">Crie sua Conta</h1>
+                    <h1 className="text-3xl font-headline font-bold">Desbloqueie o Conteúdo</h1>
                     <p className="text-balance font-light mt-2 text-sm sm:text-base">
-                        Preencha os campos abaixo para criar sua conta.
+                        Acesso instantâneo ao universo privado da sua modelo favorita. Sem complicações!
                     </p>
                 </div>
 
@@ -111,7 +111,7 @@ export default function SignupPage() {
                 <div className="mt-4 text-center text-sm text-white">
                     Já tem uma conta?{' '}
                     <Link href="/login" className="underline font-bold text-primary hover:text-primary/80">
-                        Login
+                        Faça Login
                     </Link>
                 </div>
             </div>

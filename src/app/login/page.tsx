@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
 import { loginAction } from './actions';
-import { useAuth, useUser } from '@/firebase';
+import { useUser } from '@/firebase';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -55,9 +55,9 @@ export default function LoginPage() {
             <div className="mx-auto w-full max-w-md space-y-6 sm:space-y-8 fade-in">
                 <div className="text-center text-white">
                     <Logo className="text-5xl font-bold inline-block mb-4" />
-                    <h1 className="text-3xl font-headline font-bold">Acessar Conteúdo</h1>
+                    <h1 className="text-3xl font-headline font-bold">Acesse Seu Universo</h1>
                     <p className="text-balance font-light mt-2 text-sm sm:text-base">
-                      Entre com seu email para acessar o conteúdo exclusivo.
+                      Acesso instantâneo ao universo privado da sua modelo favorita.
                     </p>
                 </div>
 
