@@ -88,7 +88,7 @@ export const modelData = {
       paymentUrl: 'https://multi.paradisepags.com/p/pix_d57164164cd3',
       duration: '3 meses',
       equivalentPrice: 'Igual a R$17,90 por mês',
-      discountTag: 'ECONOMIZE',
+      discountTag: 'OTIMA OPÇÃO',
       isFeatured: false,
     },
     { 
