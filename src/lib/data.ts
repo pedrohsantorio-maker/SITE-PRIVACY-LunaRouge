@@ -82,7 +82,7 @@ export const modelData = {
   promotions: [
     { 
       name: 'Plano 3 meses', 
-      price: '47,98', 
+      price: '53,70', 
       discount: 'Economize 20%', 
       id: 'quarterly', 
       paymentUrl: 'https://multi.paradisepags.com/p/pix_d57164164cd3',
