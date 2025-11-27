@@ -219,11 +219,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
     // Get subscription data using the subscriptionId from the user data
     const subscriptionDocRef = useMemoFirebase(() => {
-        if (!firestore || !userData?.subscriptionId) return null;
-        // Handle the placeholder 'null' case for anonymous users
-        if (userData.subscriptionId === 'null') return null;
+        if (!firestore || !userData?.subscriptionId || userData.subscriptionId === 'null') {
+            return null;
+        }
         return doc(firestore, 'subscriptions', userData.subscriptionId);
     }, [firestore, userData]);
+
     const { data: subscriptionData, isLoading: isSubLoading } = useDoc(subscriptionDocRef);
     
     const isSubscribed = subscriptionData?.status === 'active';
@@ -233,6 +234,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const handleUnlockClick = () => {
         pageTopRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
+
+
 
     const overlayTexts = [
         "Um gostinho do que você vai receber...",
@@ -339,7 +342,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                     </div>
                                 ))}
                                 
-                                <Accordion type="single" collapsible defaultValue='item-1' className="w-full">
+                                <Accordion type="single" collapsible defaultValue='item-1' className="w-full pt-4">
                                 <AccordionItem value="item-1" className="border-none">
                                     <AccordionTrigger className="text-sm font-semibold text-neutral-400 hover:no-underline [&[data-state=open]>svg]:text-orange-400 pt-0">
                                     Ver Pacotes com Desconto
