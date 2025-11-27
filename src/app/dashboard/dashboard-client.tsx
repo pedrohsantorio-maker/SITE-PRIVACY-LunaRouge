@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, DocumentData, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 // Inline SVG for social icons to avoid installing a new library
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -120,10 +121,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [playingVideo, setPlayingVideo] = useState<VideoItem | GalleryItem | null>(null);
     const [revealedPreviews, setRevealedPreviews] = useState<string[]>([]);
+    const [watchedPreviews, setWatchedPreviews] = useState<string[]>([]);
     const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState('previews');
     const pageTopRef = useRef<HTMLDivElement>(null);
     const subscriptionsRef = useRef<HTMLDivElement>(null);
+    const { toast } = useToast();
 
 
     // --- Subscription Logic ---
@@ -188,6 +191,15 @@ export function DashboardClient({ model }: { model: ModelData }) {
     };
 
     const handlePreviewClick = (item: GalleryItem) => {
+        if (item.type === 'video' && watchedPreviews.includes(item.id)) {
+            toast({
+                title: "Prévia já assistida!",
+                description: "Assine um plano para ver este e outros vídeos quantas vezes quiser.",
+                variant: "destructive"
+            });
+            return;
+        }
+
         if (revealedPreviews.includes(item.id)) {
             if (item.type === 'video') {
                 setPlayingVideo(item);
@@ -196,6 +208,14 @@ export function DashboardClient({ model }: { model: ModelData }) {
             setRevealedPreviews(prev => [...prev, item.id]);
         }
     };
+
+    const handleVideoEnded = (item: GalleryItem | VideoItem | null) => {
+        if (item && item.id.startsWith('gallery-preview-')) {
+            setWatchedPreviews(prev => [...prev, item.id]);
+        }
+        setPlayingVideo(null); // Close player
+    };
+
 
     const allPlans = [...model.subscriptions, ...model.promotions];
     const durationMap: { [key: string]: number } = { '1 mês': 1, '3 meses': 3, '6 meses': 6 };
@@ -261,7 +281,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </CardContent>
                 </Card>
 
-                {/* Tabs Section */}
+                 {/* Tabs Section */}
                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full px-4 sm:px-0">
                     <TabsList className="grid w-full grid-cols-3 bg-card rounded-xl h-12">
                         <TabsTrigger value="previews" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400 text-xs sm:text-sm">
@@ -280,6 +300,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         <div className="grid grid-cols-2 gap-2 sm:gap-4">
                              {model.previewsGallery.map(item => {
                                 const isRevealed = revealedPreviews.includes(item.id);
+                                const isWatched = item.type === 'video' && watchedPreviews.includes(item.id);
                                 return (
                                     <Card key={item.id} onClick={() => handlePreviewClick(item)} className="bg-card rounded-xl overflow-hidden border-border shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
                                         <div className="relative group">
@@ -289,17 +310,30 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 data-ai-hint={item.hint}
                                                 width={item.width}
                                                 height={item.height}
-                                                className={`object-cover w-full h-auto aspect-square transition-all duration-500 ${!isRevealed ? 'blur-lg' : 'blur-none'}`}
+                                                className={cn(
+                                                    'object-cover w-full h-auto aspect-square transition-all duration-500',
+                                                    !isRevealed ? 'blur-lg' : 'blur-none',
+                                                    isWatched ? 'grayscale' : ''
+                                                )}
                                             />
+                                            {/* Not Revealed Overlay */}
                                             {!isRevealed && (
                                                 <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center p-2 sm:p-4 transition-opacity duration-300">
                                                     <p className="text-white font-semibold text-xs sm:text-sm">{getOverlayText(item.id)}</p>
                                                     <p className="text-primary font-bold text-xs mt-2 uppercase animate-pulse-reveal">Clique para revelar</p>
                                                 </div>
                                             )}
-                                            {isRevealed && item.type === 'video' && (
+                                            {/* Revealed Video - Not Watched */}
+                                            {isRevealed && !isWatched && item.type === 'video' && (
                                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <PlayCircle size={48} className="text-white" />
+                                                </div>
+                                            )}
+                                             {/* Watched Video Overlay */}
+                                            {isWatched && (
+                                                 <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-center p-4">
+                                                    <Lock className="w-10 h-10 text-primary" />
+                                                    <p className="text-white font-bold text-sm mt-2">Assine para ver mais</p>
                                                 </div>
                                             )}
                                         </div>
@@ -429,6 +463,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 src={playingVideo.url} 
                                 controls 
                                 autoPlay 
+                                onEnded={() => handleVideoEnded(playingVideo)}
                                 className="w-full h-auto max-h-[90vh] object-contain rounded-lg"
                                 style={{
                                     aspectRatio: `${playingVideo.width}/${playingVideo.height}`
