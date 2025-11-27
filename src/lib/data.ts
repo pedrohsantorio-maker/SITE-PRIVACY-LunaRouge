@@ -57,7 +57,7 @@ export const modelData = {
   avatarHint: profileImage?.imageHint || "woman portrait",
   bannerUrl: "https://imgur.com/2lTvoZw.jpeg",
   bannerHint: "woman taking selfie",
-  bio: 'aqui você vai INVESTIR um valor super ACESSÍVEL e vai encontrar mais de 800 VÍDEOS e FOTOS: Dando muuuito minha bucetinha rosinha no pelo com gozada dentro, fazendo oral bem babad...',
+  bio: 'Oi, meu amor! 🔥💦 Sou a Duda, e hoje vou revelar um lado meu que vai te deixar sem fôlego… vídeos gozando com meus ficantes, trisal com amigas safadas e momentos íntimos onde me entrego de corpo e alma. 😏 Cada centímetro do meu corpo é pura tentação e minhas fotos peladas são um convite exclusivo para você explorar seus desejos mais secretos tudo sem censura! Se você tem coragem de se perder nessa paixão sem limites, vem comigo... Estou te esperando para uma experiência única e irresistível.😈',
   stats: {
     posts: 121,
     videos: videoLinks.length,

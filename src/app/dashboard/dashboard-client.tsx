@@ -257,6 +257,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
     
     const mainPlan = model.subscriptions.find(p => p.isFeatured);
 
+    const bioShort = model.bio.substring(0, 150) + '...';
+
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center p-0 sm:p-4">
             <div className="w-full max-w-2xl space-y-4">
@@ -305,8 +307,10 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             <p className="text-sm text-neutral-400">@{model.handle}</p>
                             
                             <p className="mt-2 text-sm text-neutral-300">
-                                {model.bio}
-                                <button className="text-primary ml-1 font-semibold">Ler mais</button>
+                                {isBioExpanded ? model.bio : bioShort}
+                                <button onClick={() => setIsBioExpanded(!isBioExpanded)} className="text-primary ml-1 font-semibold">
+                                    {isBioExpanded ? 'Ler menos' : 'Ler mais'}
+                                </button>
                             </p>
 
                             <div className="flex items-center gap-3 mt-4">
