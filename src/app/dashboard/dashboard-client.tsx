@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -51,15 +51,14 @@ type GalleryItem = {
     type: 'image' | 'video';
 };
 
-type SubscriptionPlan = {
+type Plan = {
+  id: string;
   name: string;
   price: string;
-  id: string;
   paymentUrl?: string;
-  duration: string;
-  equivalentPrice?: string;
-  discountTag?: string;
+  tags?: string[];
   isFeatured?: boolean;
+  icon?: string;
 }
 
 type ModelData = {
@@ -81,8 +80,8 @@ type ModelData = {
     socials: {
         instagram: string;
     };
-    subscriptions: SubscriptionPlan[];
-    promotions: SubscriptionPlan[];
+    subscriptions: Plan[];
+    promotions: Plan[];
     photos: Photo[];
     videos: VideoItem[];
     previewsGallery: GalleryItem[];
@@ -115,6 +114,18 @@ const LockedContent = ({ onUnlockClick }: { onUnlockClick: () => void }) => (
     </div>
 );
 
+const getTagClass = (tag: string) => {
+    switch (tag.toLowerCase()) {
+        case 'mais popular':
+            return 'tag-hot';
+        case 'melhor oferta':
+            return 'tag-best';
+        case 'exclusivo':
+            return 'tag-exclusive';
+        default:
+            return 'tag-promo';
+    }
+};
 
 export function DashboardClient({ model }: { model: ModelData }) {
     const [isBioExpanded, setIsBioExpanded] = useState(false);
@@ -216,11 +227,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
         setPlayingVideo(null); // Close player
     };
 
-
-    const allPlans = [...model.subscriptions, ...model.promotions];
-    const durationMap: { [key: string]: number } = { '1 mês': 1, '3 meses': 3, '6 meses': 6 };
-
-
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center p-0 sm:p-4">
             <div className="w-full max-w-2xl space-y-4">
@@ -280,6 +286,76 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
                     </CardContent>
                 </Card>
+                
+                 {/* Subscriptions & Promotions */}
+                <div ref={subscriptionsRef} className="px-4 sm:px-0 py-4">
+                   <Card className="bg-card border-none p-6 rounded-2xl">
+                        <h2 className="text-xl font-bold mb-4">Assinaturas</h2>
+                        <div className="flex flex-wrap items-center gap-2 mb-4">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                                VEJA TUDO AGORA 🔥🔥
+                            </span>
+                            <span className="tag-promo">Promocional</span>
+                        </div>
+                        {model.subscriptions.filter(p => p.isFeatured).map(plan => (
+                            <div key={plan.id}>
+                                <Button asChild className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg">
+                                    <Link href={plan.paymentUrl || "#"} target="_blank">
+                                        <span className="text-lg font-bold">{plan.name}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xl font-bold">R$ {plan.price}</span>
+                                            <ArrowRight className="h-5 w-5" />
+                                        </div>
+                                    </Link>
+                                </Button>
+                                {plan.tags?.map(tag => (
+                                <div key={tag} className="inline-flex items-center gap-1.5 rounded-full bg-primary/20 text-primary-foreground px-3 py-1 text-xs font-bold mb-4">
+                                    {tag}
+                                </div>
+                                ))}
+                            </div>
+                        ))}
+
+                        <div className="flex items-center justify-around text-xs text-muted-foreground mt-2 mb-6">
+                            <div className="flex items-center gap-2">
+                                <Lock size={14} className="text-green-500" />
+                                <span>Pagamento 100% seguro</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Sparkles size={14} className="text-green-500" />
+                                <span>Acesso imediato</span>
+                            </div>
+                        </div>
+
+                        <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+                            <AccordionItem value="item-1" className="border-b-0">
+                                <AccordionTrigger className="font-bold text-lg py-2 hover:no-underline">
+                                    Promoções
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="flex flex-col gap-3 pt-2">
+                                    {model.promotions.map(plan => (
+                                        <Button key={plan.id} asChild variant="outline" className="w-full h-auto justify-between p-3 rounded-lg border border-primary/50 bg-card hover:bg-primary/10">
+                                            <Link href={plan.paymentUrl || "#"} target="_blank">
+                                                <div className="flex items-center gap-2">
+                                                    {plan.icon === 'Crown' && <Crown className="h-5 w-5 text-yellow-400" />}
+                                                    <span className="font-bold">{plan.name}</span>
+                                                    {plan.tags?.map(tag => (
+                                                        <span key={tag} className={cn('text-xs font-semibold px-2 py-0.5 rounded-full', getTagClass(tag))}>
+                                                            {tag} {tag === 'Mais popular' && '🔥'}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                                <span className="font-bold text-lg">R$ {plan.price}</span>
+                                            </Link>
+                                        </Button>
+                                    ))}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </Card>
+                </div>
 
                  {/* Tabs Section */}
                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full px-4 sm:px-0">
@@ -395,44 +471,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </TabsContent>
                 </Tabs>
                 
-                {/* Subscriptions & Promotions */}
-                <div ref={subscriptionsRef} className="px-4 sm:px-0 py-8">
-                  <Card className="bg-card border-border p-6 rounded-2xl">
-                      <h2 className="text-xl font-bold text-center mb-2">OFERTA LIMITADA</h2>
-                      <p className="text-center text-muted-foreground mb-6">Acesso imediato ao conteúdo pago!</p>
-                      <div className="flex flex-col gap-4">
-                          {allPlans.sort((a,b) => durationMap[a.duration] - durationMap[b.duration]).map(plan => (
-                              <div 
-                                  key={plan.id}
-                                  className={cn(
-                                      "relative bg-[#1c1c1c] rounded-xl p-4 text-center border transition-all duration-300",
-                                      plan.isFeatured ? "border-primary shadow-lg shadow-primary/20" : "border-neutral-800"
-                                  )}
-                              >
-                                  {plan.discountTag && (
-                                      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                                          <div className="bg-primary text-primary-foreground text-xs font-bold uppercase px-3 py-1 rounded-full">
-                                              {plan.discountTag}
-                                          </div>
-                                      </div>
-                                  )}
-                                  <p className="font-semibold text-base mb-1">{plan.duration}</p>
-                                  <p className="text-3xl font-bold mb-1">
-                                      R$ {plan.price}
-                                  </p>
-                                  {plan.equivalentPrice && (
-                                    <p className="text-muted-foreground text-xs mb-4">{plan.equivalentPrice}</p>
-                                  )}
-                                  <Button asChild className="w-full font-bold btn-glow" size="lg">
-                                     <Link href={plan.paymentUrl || "/pagamento"} target={plan.paymentUrl ? "_blank" : "_self"}>
-                                        Escolha o Plano
-                                     </Link>
-                                  </Button>
-                              </div>
-                          ))}
-                      </div>
-                  </Card>
-                </div>
             </div>
 
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>

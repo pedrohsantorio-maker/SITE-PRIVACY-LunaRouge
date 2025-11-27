@@ -1,4 +1,3 @@
-
 import { PlaceHolderImages } from "./placeholder-images";
 
 const profileImage = PlaceHolderImages.find(img => img.id === 'model-profile');
@@ -70,37 +69,37 @@ export const modelData = {
       instagram: "https://www.instagram.com/luna__vipp?igsh=MTA0dmFxdnE3bncwcQ%3D%3D&utm_source=qr",
   },
   subscriptions: [
-    { 
-      name: 'Acesso Mensal', 
-      price: '19,99', 
-      id: 'monthly', 
+    {
+      id: 'monthly',
+      name: '30 Dias',
+      price: '14,90',
       paymentUrl: 'https://compraseguraonline.org.ua/c/013c371992',
-      duration: '1 mês',
-      isFeatured: false,
+      tags: ['+ CHAMADA DE VÍDEO COMIGO HOJE!'],
+      isFeatured: true,
     },
   ],
   promotions: [
-    { 
-      name: 'Plano 3 meses', 
-      price: '53,70', 
-      discount: 'Economize 20%', 
-      id: 'quarterly', 
+    {
+      id: 'quarterly',
+      name: '3 Meses',
+      price: '19,90',
       paymentUrl: 'https://compraseguraonline.org.ua/c/691c74249a',
-      duration: '3 meses',
-      equivalentPrice: 'Igual a R$17,90 por mês',
-      discountTag: 'OTIMA OPÇÃO',
-      isFeatured: false,
+      tags: ['Mais popular'],
+      icon: 'Crown',
     },
-    { 
-      name: 'Plano 6 meses', 
-      price: '95,95', 
-      discount: 'Super Desconto!', 
-      id: 'biannual', 
+    {
+      id: 'annual',
+      name: '1 Ano',
+      price: '49,90',
       paymentUrl: 'https://compraseguraonline.org.ua/c/c7b830c4cd',
-      duration: '6 meses',
-      equivalentPrice: 'Igual a R$15,99 por mês',
-      discountTag: 'MELHOR VALOR',
-      isFeatured: true,
+      tags: ['Melhor oferta'],
+    },
+    {
+      id: 'lifetime',
+      name: 'Vitalício',
+      price: '89,90',
+      paymentUrl: 'https://compraseguraonline.org.ua/c/c7b830c4cd', // Assuming same link for now
+      tags: ['Exclusivo'],
     },
   ],
   photos: photoLinks.map((url, index) => ({

@@ -206,4 +206,17 @@
   .btn-glow:hover {
     @apply shadow-[0_0_20px_hsl(var(--primary)/0.8)];
   }
+
+  .tag-promo {
+    @apply bg-teal-100 text-teal-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full dark:bg-teal-900 dark:text-teal-300;
+  }
+  .tag-hot {
+    @apply bg-orange-100 text-orange-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full dark:bg-orange-900 dark:text-orange-300;
+  }
+  .tag-exclusive {
+      @apply bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300;
+  }
+   .tag-best {
+      @apply bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300;
+  }
 }
