@@ -87,6 +87,34 @@ type ModelData = {
     previewsGallery: GalleryItem[];
 };
 
+const faqData = [
+    {
+        question: "É sigiloso? Vai aparecer na fatura?",
+        answer: "Sim, 100% sigiloso. A cobrança virá em sua fatura com um nome discreto relacionado a serviços digitais, sem nenhuma menção ao conteúdo."
+    },
+    {
+        question: "Quando tenho acesso depois do pagamento?",
+        answer: "O acesso é imediato! Assim que seu pagamento for confirmado (o que geralmente leva segundos), todo o conteúdo exclusivo já estará liberado para você."
+    },
+    {
+        question: "Posso cancelar quando quiser? A assinatura renova?",
+        answer: "Fique tranquilo, o pagamento é único e não há renovação automática. Você paga uma vez e tem acesso pelo período escolhido, sem surpresas ou cobranças futuras."
+    },
+    {
+        question: "Tem reembolso?",
+        answer: "Devido à natureza do conteúdo digital, que é consumido instantaneamente, não oferecemos reembolso. Garantimos a qualidade e o acesso imediato a todo o material prometido."
+    },
+    {
+        question: "Como funciona a 'chamada de vídeo'?",
+        answer: "A chamada de vídeo é um bônus especial para quem adquire o plano principal. É um evento exclusivo e agendado onde você poderá interagir em uma sala de vídeo. As datas e horários são divulgados com antecedência para os assinantes."
+    },
+    {
+        question: "Posso pedir conteúdo personalizado?",
+        answer: "No momento, não trabalhamos com pedidos de conteúdo personalizado. No entanto, o acervo é atualizado com frequência com novidades exclusivas para os assinantes."
+    }
+];
+
+
 function FormattedStat({ value }: { value: number }) {
     const [formattedValue, setFormattedValue] = useState<string | number>(value);
 
@@ -226,6 +254,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
         }
         setPlayingVideo(null); // Close player
     };
+    
+    const mainPlan = model.subscriptions.find(p => p.isFeatured);
 
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center p-0 sm:p-4">
@@ -471,6 +501,36 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </TabsContent>
                 </Tabs>
                 
+                 {/* FAQ Section */}
+                <div className="px-4 sm:px-0 py-8">
+                    <h2 className="text-3xl font-bold text-center mb-8 text-primary">Perguntas Frequentes</h2>
+                    <Accordion type="single" collapsible className="w-full space-y-4">
+                        {faqData.map((faq, index) => (
+                            <AccordionItem key={index} value={`item-${index+1}`} className="bg-card rounded-lg border-border">
+                                <AccordionTrigger className="text-left font-semibold p-4 hover:no-underline">
+                                    {faq.question}
+                                </AccordionTrigger>
+                                <AccordionContent className="p-4 pt-0">
+                                    <p className="text-muted-foreground">{faq.answer}</p>
+                                </AccordionContent>
+                            </AccordionItem>
+                        ))}
+                    </Accordion>
+                     {mainPlan && (
+                        <div className="mt-8">
+                            <Button asChild className="w-full h-auto text-left justify-center p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg btn-glow" size="lg">
+                                <Link href={mainPlan.paymentUrl || "#"} target="_blank">
+                                    <div className="flex flex-col items-center">
+                                      <span className="text-sm font-normal">Veja tudo por apenas</span>
+                                      <span className="text-xl font-bold">R$ {mainPlan.price}</span>
+                                    </div>
+                                    <ArrowRight className="h-5 w-5 ml-4" />
+                                </Link>
+                            </Button>
+                        </div>
+                    )}
+                </div>
+
             </div>
 
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
