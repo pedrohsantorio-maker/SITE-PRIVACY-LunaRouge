@@ -195,12 +195,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
             getDoc(userDocRef).then(async (docSnap) => {
                 if (!docSnap.exists()) {
                     // Create a user document for the anonymous user
-                    const subscriptionRef = doc(doc(firestore, 'subscriptions', 'null')); // Placeholder
                     await setDoc(userDocRef, {
                         id: user.uid,
                         name: 'Visitante',
                         email: `${user.uid}@anon.com`, // Placeholder email
-                        subscriptionId: subscriptionRef.id,
+                        subscriptionId: 'null', // Start with a null subscription
                         status: 'not_paid',
                         createdAt: serverTimestamp(),
                         lastActive: serverTimestamp()
@@ -536,3 +535,5 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
+    
