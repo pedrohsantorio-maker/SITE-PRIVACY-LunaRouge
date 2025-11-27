@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Users, Eye, LayoutDashboard, PanelLeft } from 'lucide-react';
+import { Users, Eye, LayoutDashboard, PanelLeft, GalleryVertical } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/logo';
@@ -14,6 +14,7 @@ const navItems = [
   { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/admin/users', icon: Users, label: 'Leads' },
   { href: '/admin/access-logs', icon: Eye, label: 'Acessos' },
+  { href: '/admin/content', icon: GalleryVertical, label: 'Conteúdo' },
 ];
 
 export default function AdminLayout({
