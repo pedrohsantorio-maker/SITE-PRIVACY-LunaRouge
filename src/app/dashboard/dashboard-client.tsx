@@ -11,7 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc, DocumentData } from 'firebase/firestore';
+import { doc, DocumentData, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 // Inline SVG for social icons to avoid installing a new library
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -188,6 +188,28 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const firestore = useFirestore();
     const { user, isUserLoading } = useUser();
 
+    // Anonymous User Handling
+    useEffect(() => {
+        if (!isUserLoading && user && user.isAnonymous && firestore) {
+            const userDocRef = doc(firestore, 'users', user.uid);
+            getDoc(userDocRef).then(async (docSnap) => {
+                if (!docSnap.exists()) {
+                    // Create a user document for the anonymous user
+                    const subscriptionRef = doc(doc(firestore, 'subscriptions', 'null')); // Placeholder
+                    await setDoc(userDocRef, {
+                        id: user.uid,
+                        name: 'Visitante',
+                        email: `${user.uid}@anon.com`, // Placeholder email
+                        subscriptionId: subscriptionRef.id,
+                        status: 'not_paid',
+                        createdAt: serverTimestamp(),
+                        lastActive: serverTimestamp()
+                    }, { merge: true });
+                }
+            });
+        }
+    }, [isUserLoading, user, firestore]);
+
     // Get user data to find the subscriptionId
     const userDocRef = useMemoFirebase(() => {
         if (!firestore || !user) return null;
@@ -198,6 +220,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
     // Get subscription data using the subscriptionId from the user data
     const subscriptionDocRef = useMemoFirebase(() => {
         if (!firestore || !userData?.subscriptionId) return null;
+        // Handle the placeholder 'null' case for anonymous users
+        if (userData.subscriptionId === 'null') return null;
         return doc(firestore, 'subscriptions', userData.subscriptionId);
     }, [firestore, userData]);
     const { data: subscriptionData, isLoading: isSubLoading } = useDoc(subscriptionDocRef);
@@ -291,16 +315,16 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </div>
 
                         {/* Subscriptions & Promotions */}
-                        <div className="px-4 pb-6 space-y-8">
+                         <div className="px-4 pb-6 space-y-8">
                            <div className="space-y-2">
                                 <h3 className="font-bold text-orange-400 text-lg animate-pulse-orange uppercase tracking-wider" style={{textShadow: '0 0 5px hsla(var(--primary), 0.7)'}}>Oferta Limitada</h3>
                                 <UrgencyPromotion />
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                                 {model.subscriptions.map(sub => (
                                     <div key={sub.id}>
-                                        <Button asChild className="w-full h-auto text-left p-4 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl shadow-lg transition-transform hover:scale-[1.03] hover:shadow-primary/40">
+                                        <Button asChild className="w-full h-auto text-left p-4 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl shadow-lg transition-transform duration-300 ease-in-out hover:scale-[1.03] hover:shadow-primary/40 active:scale-100">
                                             <Link href={sub.paymentUrl || "/pagamento"} target={sub.paymentUrl ? "_blank" : "_self"}>
                                                 <div className="flex-grow">
                                                     <p className="text-lg font-semibold" style={{textShadow: '0 1px 2px rgba(0,0,0,0.2)'}}>Desbloqueie Agora</p>
@@ -311,7 +335,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 </div>
                                             </Link>
                                         </Button>
-                                        <p className="text-xs text-neutral-500 mt-2 text-center uppercase tracking-wide">acesso imediato ao conteúdo pago!</p>
+                                         <p className="text-xs text-center uppercase tracking-wide text-neutral-500 mt-2">acesso imediato ao conteúdo pago!</p>
                                     </div>
                                 ))}
                                 
@@ -323,8 +347,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                     <AccordionContent className="space-y-6 pt-4">
                                     {model.promotions.map(promo => (
                                         <div key={promo.id}>
-                                            <Button asChild variant="secondary" className="w-full h-auto text-left p-4 bg-[#27272A] text-white rounded-xl hover:bg-neutral-700 shadow-md transition-transform hover:scale-[1.03] hover:shadow-lg">
-                                                <Link href={promo.paymentUrl || "/pagamento"} target={promo.paymentUrl ? "_blank" : "_self"}>
+                                            <Button asChild variant="secondary" className="w-full h-auto text-left p-4 bg-[#27272A] text-white rounded-xl hover:bg-neutral-700 shadow-md transition-transform duration-300 ease-in-out hover:scale-[1.03] hover:shadow-lg active:scale-100">
+                                                 <Link href={promo.paymentUrl || "/pagamento"} target={promo.paymentUrl ? "_blank" : "_self"}>
                                                     <div className="flex-grow space-y-1">
                                                         <p className="font-semibold text-lg">Garanta seu Desconto</p>
                                                          {promo.name.includes('Popular') && (
@@ -336,7 +360,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="font-headline text-4xl font-bold">R$ {promo.price}</p>
-                                                        <p className="text-sm font-semibold bg-green-500 text-green-950 rounded-md px-2 py-0.5 inline-block mt-1">{promo.discount}</p>
+                                                         <p className="text-sm font-semibold bg-green-500 text-green-950 rounded-md px-2 py-0.5 inline-block mt-2">{promo.discount}</p>
                                                     </div>
                                                 </Link>
                                             </Button>
@@ -400,7 +424,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </TabsContent>
                     <TabsContent value="photos" className="mt-4">
                         {isLoadingSubscription ? (
-                            <div className="flex items-center justify-center p-8"><p>Verificando assinatura...</p></div>
+                            <div className="flex items-center justify-center p-8"><p>Verificando acesso...</p></div>
                         ) : isSubscribed ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                                 {model.photos.map(photo => (
@@ -424,7 +448,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </TabsContent>
                     <TabsContent value="videos" className="mt-4">
                          {isLoadingSubscription ? (
-                            <div className="flex items-center justify-center p-8"><p>Verificando assinatura...</p></div>
+                            <div className="flex items-center justify-center p-8"><p>Verificando acesso...</p></div>
                         ) : isSubscribed ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                                 {model.videos.map(video => (

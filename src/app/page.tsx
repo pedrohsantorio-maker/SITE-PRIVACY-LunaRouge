@@ -31,17 +31,14 @@ export default function LandingPage() {
           <span className="transition-all duration-300 ease-in-out hover:text-primary hover:scale-105 inline-block cursor-pointer">Conteúdo Exclusivo.</span> <span className="transition-all duration-300 ease-in-out hover:text-primary hover:scale-105 inline-block cursor-pointer">Conexão Real.</span>
         </h1>
         <p className="max-w-2xl text-lg md:text-xl font-light mb-6" style={{ animation: 'fadeInUp 0.8s ease-out 0.4s forwards', opacity: 0 }}>
-          Crie sua conta para desbloquear conteúdo exclusivo: fotos, vídeos e atualizações diretas.
+          Acesso instantâneo ao universo privado da sua modelo favorita. Sem complicações!
         </p>
          <div className="mb-8 text-lg font-semibold text-primary" style={{ animation: 'fadeInUp 0.8s ease-out 0.5s forwards', opacity: 0 }}>
           Junte-se a mais de 265 mil fãs!
         </div>
         <div className="flex flex-col sm:flex-row gap-4" style={{ animation: 'fadeInUp 0.8s ease-out 0.6s forwards', opacity: 0 }}>
            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold transition-transform duration-300 ease-in-out hover:scale-105 active:scale-100">
-            <Link href="/signup">Criar Conta Grátis</Link>
-          </Button>
-          <Button asChild size="lg" variant="outline" className="text-lg bg-black/50 text-white border-white/30 hover:bg-white/10 hover:text-white font-bold transition-all duration-300 ease-in-out hover:scale-105 active:scale-100">
-            <Link href="/login">Já tenho conta</Link>
+            <Link href="/dashboard">Acessar Conteúdo</Link>
           </Button>
         </div>
          <p className="mt-6 text-xs text-neutral-400" style={{ animation: 'fadeInUp 0.8s ease-out 0.7s forwards', opacity: 0 }}>

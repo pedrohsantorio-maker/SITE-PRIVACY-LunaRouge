@@ -48,34 +48,45 @@ export async function POST(request: Request) {
     
     // Check if the event is a successful payment
     if (event === 'transaction_status_changed' && transaction?.status === 'paid') {
-      const userEmail = transaction.customer.email;
-      const planName = transaction.items[0]?.name?.toLowerCase() || 'unknown'; // e.g., '1 mês', '3 meses'
+      const userEmail = transaction.customer.email; // This might be null for anonymous users
+      const customUserId = transaction.customer.id; // Assuming the payment gateway can pass back a custom ID
 
-      if (!userEmail) {
-        console.error('Webhook Error: Customer email not found in payload.');
-        return NextResponse.json({ message: 'Customer email missing' }, { status: 400 });
-      }
+      let userId = customUserId;
+      let userDoc;
 
-      // 1. Find user by email
-      const usersRef = db.collection('users');
-      const userQuery = await usersRef.where('email', '==', userEmail).limit(1).get();
-
-      if (userQuery.empty) {
-        console.error(`Webhook Error: User with email ${userEmail} not found.`);
-        return NextResponse.json({ message: 'User not found' }, { status: 404 });
-      }
-
-      const userDoc = userQuery.docs[0];
-      const userId = userDoc.id;
-      const userData = userDoc.data();
-      const subscriptionId = userData.subscriptionId;
-
-      if (!subscriptionId) {
-        console.error(`Webhook Error: subscriptionId not found for user ${userId}.`);
-        return NextResponse.json({ message: 'Subscription ID missing for user' }, { status: 400 });
+      if (!userId && userEmail) {
+         // Fallback to email if custom ID is not available
+         const usersRef = db.collection('users');
+         const userQuery = await usersRef.where('email', '==', userEmail).limit(1).get();
+         if (!userQuery.empty) {
+            userDoc = userQuery.docs[0];
+            userId = userDoc.id;
+         }
+      } else if (userId) {
+         userDoc = await db.collection('users').doc(userId).get();
       }
       
-      // 2. Determine subscription duration
+
+      if (!userDoc || !userDoc.exists) {
+        console.error(`Webhook Error: User with ID ${userId} or email ${userEmail} not found.`);
+        return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      }
+      
+      userId = userDoc.id; // Ensure userId is the doc id
+      const userData = userDoc.data()!;
+      const planName = transaction.items[0]?.name?.toLowerCase() || 'unknown'; // e.g., '1 mês', '3 meses'
+
+      // Create a subscription document if one doesn't exist
+      let subscriptionId = userData.subscriptionId;
+      if (!subscriptionId || subscriptionId === 'null') {
+          const subscriptionRef = db.collection('subscriptions').doc();
+          subscriptionId = subscriptionRef.id;
+          // Update the user doc with the new subscriptionId immediately
+          await userDoc.ref.update({ subscriptionId: subscriptionId });
+          console.log(`Created new subscription ID ${subscriptionId} for user ${userId}`);
+      }
+      
+      // Determine subscription duration
       const now = new Date();
       let endDate = new Date(now);
       let planId: 'starter' | 'professional' | 'enterprise' = 'starter';
@@ -91,16 +102,18 @@ export async function POST(request: Request) {
          planId = 'enterprise';
       }
 
-      // 3. Update Subscription document
+      // Update Subscription document
       const subscriptionRef = db.collection('subscriptions').doc(subscriptionId);
       await subscriptionRef.set({
+        id: subscriptionId,
+        userId: userId,
         status: 'active',
         planId: planId,
         startDate: now.toISOString(),
         endDate: endDate.toISOString(),
       }, { merge: true });
       
-      // 4. Update User document with payment status and plan
+      // Update User document with payment status and plan
       await userDoc.ref.update({
         status: 'paid',
         plan: planId,
