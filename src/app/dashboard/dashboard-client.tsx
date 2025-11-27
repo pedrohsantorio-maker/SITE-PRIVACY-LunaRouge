@@ -196,7 +196,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
             const userDocRef = doc(firestore, 'users', user.uid);
             getDoc(userDocRef).then(async (docSnap) => {
                 if (!docSnap.exists()) {
-                    await setDoc(userDocRef, {
+                     await setDoc(userDocRef, {
                         id: user.uid,
                         name: 'Visitante',
                         email: `${user.uid}@anon.com`, 
@@ -421,8 +421,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </Tabs>
 
                 {/* Subscriptions & Promotions */}
-                <div ref={subscriptionsRef} className="px-4 pb-6 space-y-8 pt-8">
-                   <div className="space-y-2">
+                <Card ref={subscriptionsRef} className="bg-[#121212] border-neutral-800 rounded-xl px-4 pb-6 pt-8 space-y-8">
+                   <div className="space-y-2 text-center">
                         <h3 className="font-bold text-orange-400 text-lg animate-pulse-orange uppercase tracking-wider" style={{textShadow: '0 0 5px hsla(var(--primary), 0.7)'}}>Oferta Limitada</h3>
                         <UrgencyPromotion />
                     </div>
@@ -458,10 +458,10 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                             <div className="flex-grow space-y-1">
                                                 <p className="font-semibold text-lg">Garanta seu Desconto</p>
                                                  {promo.name.includes('Popular') && (
-                                                    <span className="text-xs font-bold bg-orange-500 text-black rounded-full px-2 py-0.5 inline-block uppercase">Mais Popular</span>
+                                                    <span className="text-xs font-bold bg-orange-500 text-black rounded-full px-2 py-0.5 inline-block">Mais Popular</span>
                                                 )}
                                                  {promo.name.includes('Super') && (
-                                                    <span className="text-xs font-bold bg-orange-500 text-black rounded-full px-2 py-0.5 inline-block uppercase">Melhor Valor</span>
+                                                    <span className="text-xs font-bold bg-orange-500 text-black rounded-full px-2 py-0.5 inline-block">Melhor Valor</span>
                                                 )}
                                             </div>
                                             <div className="text-right">
@@ -477,7 +477,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </AccordionItem>
                         </Accordion>
                     </div>
-                </div>
+                </Card>
 
             </div>
 
