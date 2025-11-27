@@ -82,6 +82,9 @@ type ModelData = {
     };
     subscriptions: SubscriptionPlan[];
     promotions: SubscriptionPlan[];
+    photos: Photo[];
+    videos: VideoItem[];
+    previewsGallery: GalleryItem[];
 };
 
 function FormattedStat({ value }: { value: number }) {
@@ -105,7 +108,7 @@ const LockedContent = ({ onUnlockClick }: { onUnlockClick: () => void }) => (
         <Lock className="w-12 h-12 text-primary" />
         <h3 className="mt-4 text-xl font-bold">Conteúdo Exclusivo</h3>
         <p className="mt-2 text-muted-foreground">Assine um de nossos planos para desbloquear fotos e vídeos exclusivos.</p>
-        <Button onClick={onUnlockClick} className="mt-6 font-bold">
+        <Button onClick={onUnlockClick} className="mt-6 font-bold btn-glow">
             Ver Planos de Assinatura
         </Button>
     </div>
@@ -357,7 +360,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         )}
                     </TabsContent>
                 </Tabs>
-
+                
                 {/* Subscriptions & Promotions */}
                 <div ref={subscriptionsRef} className="px-4 sm:px-0 py-8">
                   <Card className="bg-card border-border p-6 rounded-2xl">
@@ -386,7 +389,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                   {plan.equivalentPrice && (
                                     <p className="text-muted-foreground text-xs mb-4">{plan.equivalentPrice}</p>
                                   )}
-                                  <Button asChild className="w-full font-bold" size="lg">
+                                  <Button asChild className="w-full font-bold btn-glow" size="lg">
                                      <Link href={plan.paymentUrl || "/pagamento"} target={plan.paymentUrl ? "_blank" : "_self"}>
                                         Escolha o Plano
                                      </Link>
@@ -396,7 +399,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
                       </div>
                   </Card>
                 </div>
-
             </div>
 
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
