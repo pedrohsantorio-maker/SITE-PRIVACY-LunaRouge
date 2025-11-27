@@ -98,7 +98,7 @@ export const modelData = {
       id: 'lifetime',
       name: 'Vitalício',
       price: '89,90',
-      paymentUrl: 'https://compraseguraonline.org.ua/c/c7b830c4cd', // Assuming same link for now
+      paymentUrl: 'https://compraseguraonline.org.ua/c/cf7a8d8d48',
       tags: ['Exclusivo'],
     },
   ],
