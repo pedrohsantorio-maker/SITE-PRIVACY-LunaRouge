@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, DocumentData, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { cn } from '@/lib/utils';
 
 // Inline SVG for social icons to avoid installing a new library
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -49,6 +50,17 @@ type GalleryItem = {
     type: 'image' | 'video';
 };
 
+type SubscriptionPlan = {
+  name: string;
+  price: string;
+  id: string;
+  paymentUrl?: string;
+  duration: string;
+  equivalentPrice?: string;
+  discountTag?: string;
+  isFeatured?: boolean;
+}
+
 type ModelData = {
     name: string;
     handle: string;
@@ -68,22 +80,8 @@ type ModelData = {
     socials: {
         instagram: string;
     };
-    subscriptions: {
-        name: string;
-        price: string;
-        id: string;
-        paymentUrl?: string;
-    }[];
-    promotions: {
-        name: string;
-        price: string;
-        discount: string;
-        id: string;
-        paymentUrl?: string;
-    }[];
-    photos: Photo[];
-    previewsGallery: GalleryItem[];
-    videos: VideoItem[];
+    subscriptions: SubscriptionPlan[];
+    promotions: SubscriptionPlan[];
 };
 
 function FormattedStat({ value }: { value: number }) {
@@ -102,69 +100,8 @@ function FormattedStat({ value }: { value: number }) {
     return <span>{formattedValue}</span>;
 }
 
-function UrgencyPopup({ count, isVisible, onClose }: { count: number; isVisible: boolean; onClose: () => void; }) {
-    if (!isVisible) return null;
-    
-    return (
-        <div className="popup-container animate-pulse-popup">
-            <div className="popup-content animate-glow">
-                <span onClick={onClose} className="popup-close">&times;</span>
-                <h2>As assinaturas estão acabando!</h2>
-                <p>Só mais <span id="popup-count">{count}</span> assinaturas com este valor.</p>
-            </div>
-        </div>
-    );
-}
-
-function UrgencyPromotion() {
-    const [remainingCount, setRemainingCount] = useState(11);
-    const [isBlinking, setIsBlinking] = useState(false);
-    const [showPopup, setShowPopup] = useState(false);
-    const hasShownPopupRef = useRef(false);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setRemainingCount(prevCount => {
-                const newCount = prevCount > 2 ? prevCount - 1 : prevCount;
-
-                if (newCount <= 4 && !hasShownPopupRef.current) {
-                    setShowPopup(true);
-                    hasShownPopupRef.current = true;
-                }
-                
-                setIsBlinking(true);
-                setTimeout(() => setIsBlinking(false), 1000);
-
-                if (newCount <= 2) {
-                    clearInterval(interval);
-                }
-                return newCount;
-            });
-        }, Math.floor(Math.random() * (7000 - 4000 + 1)) + 4000); // Between 4-7 seconds
-
-        return () => clearInterval(interval);
-    }, []);
-
-    const handleClosePopup = () => {
-        setShowPopup(false);
-    };
-
-    return (
-        <>
-            <UrgencyPopup 
-                count={remainingCount} 
-                isVisible={showPopup} 
-                onClose={handleClosePopup}
-            />
-            <p className="text-sm font-semibold text-neutral-300 mt-1">
-                Só mais <span id="remaining-count" className={isBlinking ? 'animate-blink' : ''}>{remainingCount}</span> assinaturas com este valor.
-            </p>
-        </>
-    );
-}
-
 const LockedContent = ({ onUnlockClick }: { onUnlockClick: () => void }) => (
-    <div className="flex flex-col items-center justify-center text-center p-8 bg-[#18181B] rounded-lg mt-4">
+    <div className="flex flex-col items-center justify-center text-center p-8 bg-card rounded-lg mt-4">
         <Lock className="w-12 h-12 text-primary" />
         <h3 className="mt-4 text-xl font-bold">Conteúdo Exclusivo</h3>
         <p className="mt-2 text-muted-foreground">Assine um de nossos planos para desbloquear fotos e vídeos exclusivos.</p>
@@ -200,7 +137,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         id: user.uid,
                         name: 'Visitante',
                         email: `${user.uid}@anon.com`, 
-                        subscriptionId: 'null', 
+                        subscriptionId: 'null',
                         status: 'not_paid',
                         createdAt: serverTimestamp(),
                         lastActive: serverTimestamp()
@@ -235,8 +172,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
         subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-
-
     const overlayTexts = [
         "Um gostinho do que você vai receber...",
         "Se aqui já está assim, imagina no conteúdo exclusivo!",
@@ -259,10 +194,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
         }
     };
 
+    const allPlans = [...model.promotions, ...model.subscriptions];
+
 
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center p-0 sm:p-4">
-            <div className="w-full max-w-md space-y-4">
+            <div className="w-full max-w-2xl space-y-4">
                 <div ref={pageTopRef} />
                 <Card className="bg-[#121212] rounded-none sm:rounded-2xl overflow-hidden border-none sm:border-neutral-800">
                     <CardContent className="p-0">
@@ -300,7 +237,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             <div className="flex items-center gap-2">
                                 <h1 className="text-xl font-bold">{model.name}</h1>
                                 {model.isVerified &&
-                                    <div className="w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                                    <div className="w-4 h-4 bg-primary rounded-full flex items-center justify-center">
                                         <Check size={12} className="text-black" />
                                     </div>
                                 }
@@ -309,7 +246,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             
                             <p className="mt-2 text-sm text-neutral-300">
                                 {model.bio}
-                                <button className="text-orange-400 ml-1 font-semibold">Ler mais</button>
+                                <button className="text-primary ml-1 font-semibold">Ler mais</button>
                             </p>
 
                             <div className="flex items-center gap-3 mt-4">
@@ -322,7 +259,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
                 {/* Tabs Section */}
                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full px-4 sm:px-0">
-                    <TabsList className="grid w-full grid-cols-3 bg-[#121212] rounded-xl h-12">
+                    <TabsList className="grid w-full grid-cols-3 bg-card rounded-xl h-12">
                         <TabsTrigger value="previews" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400 text-xs sm:text-sm">
                             <Eye size={16} /> {model.stats.previews} Prévias
                         </TabsTrigger>
@@ -340,7 +277,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                              {model.previewsGallery.map(item => {
                                 const isRevealed = revealedPreviews.includes(item.id);
                                 return (
-                                    <Card key={item.id} onClick={() => handlePreviewClick(item)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
+                                    <Card key={item.id} onClick={() => handlePreviewClick(item)} className="bg-card rounded-xl overflow-hidden border-border shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
                                         <div className="relative group">
                                             <Image 
                                                 src={item.type === 'video' ? item.thumbnailUrl! : item.url}
@@ -373,7 +310,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         ) : isSubscribed ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                                 {model.photos.map(photo => (
-                                    <Card key={photo.id} onClick={() => setSelectedPhotoUrl(photo.url)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-transform hover:scale-105">
+                                    <Card key={photo.id} onClick={() => setSelectedPhotoUrl(photo.url)} className="bg-card rounded-xl overflow-hidden border-border shadow-lg cursor-pointer transition-transform hover:scale-105">
                                         <div className="relative">
                                             <Image 
                                                 src={photo.url}
@@ -397,7 +334,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         ) : isSubscribed ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                                 {model.videos.map(video => (
-                                    <Card key={video.id} onClick={() => setPlayingVideo(video)} className="bg-[#121212] rounded-xl overflow-hidden border-neutral-800 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
+                                    <Card key={video.id} onClick={() => setPlayingVideo(video)} className="bg-card rounded-xl overflow-hidden border-border shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
                                         <div className="relative group">
                                             <Image 
                                                 src={video.thumbnailUrl}
@@ -421,63 +358,39 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </Tabs>
 
                 {/* Subscriptions & Promotions */}
-                <Card ref={subscriptionsRef} className="bg-[#121212] border-neutral-800 rounded-xl px-4 pb-6 pt-8 space-y-8">
-                   <div className="space-y-2 text-center">
-                        <h3 className="font-bold text-orange-400 text-lg animate-pulse-orange uppercase tracking-wider" style={{textShadow: '0 0 5px hsla(var(--primary), 0.7)'}}>Oferta Limitada</h3>
-                        <UrgencyPromotion />
-                    </div>
-
-                    <div className="space-y-6">
-                        {model.subscriptions.map(sub => (
-                            <div key={sub.id}>
-                                <Button asChild className="w-full h-auto text-left p-4 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl shadow-lg transition-transform duration-300 ease-in-out hover:scale-[1.03] hover:shadow-primary/40 active:scale-100">
-                                    <Link href={sub.paymentUrl || "/pagamento"} target={sub.paymentUrl ? "_blank" : "_self"}>
-                                        <div className="flex-grow">
-                                            <p className="text-lg font-semibold" style={{textShadow: '0 1px 2px rgba(0,0,0,0.2)'}}>Desbloqueie Agora</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-headline text-4xl font-bold">R$ {sub.price}</p>
-                                            <p className="text-xs font-light -mt-1 opacity-90">por mês</p>
-                                        </div>
-                                    </Link>
-                                </Button>
-                                 <p className="text-xs text-center uppercase tracking-wide text-neutral-500 mt-2">acesso imediato ao conteúdo pago!</p>
-                            </div>
-                        ))}
-                        
-                        <Accordion type="single" collapsible defaultValue='item-1' className="w-full pt-4">
-                        <AccordionItem value="item-1" className="border-none">
-                            <AccordionTrigger className="text-sm font-semibold text-neutral-400 hover:no-underline [&[data-state=open]>svg]:text-orange-400 pt-0">
-                            Ver Pacotes com Desconto
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-6 pt-4">
-                            {model.promotions.map(promo => (
-                                <div key={promo.id}>
-                                    <Button asChild variant="secondary" className="w-full h-auto text-left p-4 bg-[#27272A] text-white rounded-xl hover:bg-neutral-700 shadow-md transition-transform duration-300 ease-in-out hover:scale-[1.03] hover:shadow-lg active:scale-100">
-                                         <Link href={promo.paymentUrl || "/pagamento"} target={promo.paymentUrl ? "_blank" : "_self"}>
-                                            <div className="flex-grow space-y-1">
-                                                <p className="font-semibold text-lg">Garanta seu Desconto</p>
-                                                 {promo.name.includes('Popular') && (
-                                                    <span className="text-xs font-bold bg-orange-500 text-black rounded-full px-2 py-0.5 inline-block">Mais Popular</span>
-                                                )}
-                                                 {promo.name.includes('Super') && (
-                                                    <span className="text-xs font-bold bg-orange-500 text-black rounded-full px-2 py-0.5 inline-block">Melhor Valor</span>
-                                                )}
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="font-headline text-4xl font-bold">R$ {promo.price}</p>
-                                                 <p className="text-sm font-semibold bg-green-500 text-green-950 rounded-md px-2 py-0.5 inline-block mt-2">{promo.discount}</p>
-                                            </div>
-                                        </Link>
-                                    </Button>
-                                     <p className="text-xs text-neutral-500 mt-2 text-center uppercase tracking-wide">{promo.name}</p>
-                                </div>
-                            ))}
-                            </AccordionContent>
-                        </AccordionItem>
-                        </Accordion>
-                    </div>
-                </Card>
+                <div ref={subscriptionsRef} className="px-4 sm:px-0 py-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {allPlans.sort((a,b) => b.price.localeCompare(a.price)).map(plan => (
+                          <div 
+                              key={plan.id}
+                              className={cn(
+                                  "relative bg-card rounded-xl p-6 text-center border transition-all duration-300",
+                                  plan.isFeatured ? "border-primary shadow-2xl shadow-primary/20" : "border-border"
+                              )}
+                          >
+                              {plan.discountTag && (
+                                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                      <div className="bg-primary text-primary-foreground text-xs font-bold uppercase px-4 py-1 rounded-full">
+                                          {plan.discountTag}
+                                      </div>
+                                  </div>
+                              )}
+                              <p className="font-semibold text-lg mb-2">{plan.duration}</p>
+                              <p className="text-5xl font-bold mb-2">
+                                  R$ {plan.price}
+                              </p>
+                              {plan.equivalentPrice && (
+                                <p className="text-muted-foreground text-sm mb-6">{plan.equivalentPrice}</p>
+                              )}
+                              <Button asChild className="w-full font-bold" size="lg">
+                                 <Link href={plan.paymentUrl || "/pagamento"} target={plan.paymentUrl ? "_blank" : "_self"}>
+                                    Escolha o Plano
+                                 </Link>
+                              </Button>
+                          </div>
+                      ))}
+                  </div>
+                </div>
 
             </div>
 
