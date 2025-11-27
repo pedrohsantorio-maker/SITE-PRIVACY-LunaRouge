@@ -194,7 +194,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
         }
     };
 
-    const allPlans = [...model.promotions, ...model.subscriptions];
+    const allPlans = [...model.subscriptions, ...model.promotions];
+    const durationMap: { [key: string]: number } = { '1 mês': 1, '3 meses': 3, '6 meses': 6 };
 
 
     return (
@@ -359,37 +360,41 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
                 {/* Subscriptions & Promotions */}
                 <div ref={subscriptionsRef} className="px-4 sm:px-0 py-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {allPlans.sort((a,b) => b.price.localeCompare(a.price)).map(plan => (
-                          <div 
-                              key={plan.id}
-                              className={cn(
-                                  "relative bg-card rounded-xl p-6 text-center border transition-all duration-300",
-                                  plan.isFeatured ? "border-primary shadow-2xl shadow-primary/20" : "border-border"
-                              )}
-                          >
-                              {plan.discountTag && (
-                                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                                      <div className="bg-primary text-primary-foreground text-xs font-bold uppercase px-4 py-1 rounded-full">
-                                          {plan.discountTag}
+                  <Card className="bg-card border-border p-6 rounded-2xl">
+                      <h2 className="text-xl font-bold text-center mb-2">OFERTA LIMITADA</h2>
+                      <p className="text-center text-muted-foreground mb-6">Acesso imediato ao conteúdo pago!</p>
+                      <div className="flex flex-col gap-4">
+                          {allPlans.sort((a,b) => durationMap[a.duration] - durationMap[b.duration]).map(plan => (
+                              <div 
+                                  key={plan.id}
+                                  className={cn(
+                                      "relative bg-[#1c1c1c] rounded-xl p-4 text-center border transition-all duration-300",
+                                      plan.isFeatured ? "border-primary shadow-lg shadow-primary/20" : "border-neutral-800"
+                                  )}
+                              >
+                                  {plan.discountTag && (
+                                      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                          <div className="bg-primary text-primary-foreground text-xs font-bold uppercase px-3 py-1 rounded-full">
+                                              {plan.discountTag}
+                                          </div>
                                       </div>
-                                  </div>
-                              )}
-                              <p className="font-semibold text-lg mb-2">{plan.duration}</p>
-                              <p className="text-5xl font-bold mb-2">
-                                  R$ {plan.price}
-                              </p>
-                              {plan.equivalentPrice && (
-                                <p className="text-muted-foreground text-sm mb-6">{plan.equivalentPrice}</p>
-                              )}
-                              <Button asChild className="w-full font-bold" size="lg">
-                                 <Link href={plan.paymentUrl || "/pagamento"} target={plan.paymentUrl ? "_blank" : "_self"}>
-                                    Escolha o Plano
-                                 </Link>
-                              </Button>
-                          </div>
-                      ))}
-                  </div>
+                                  )}
+                                  <p className="font-semibold text-base mb-1">{plan.duration}</p>
+                                  <p className="text-3xl font-bold mb-1">
+                                      R$ {plan.price}
+                                  </p>
+                                  {plan.equivalentPrice && (
+                                    <p className="text-muted-foreground text-xs mb-4">{plan.equivalentPrice}</p>
+                                  )}
+                                  <Button asChild className="w-full font-bold" size="lg">
+                                     <Link href={plan.paymentUrl || "/pagamento"} target={plan.paymentUrl ? "_blank" : "_self"}>
+                                        Escolha o Plano
+                                     </Link>
+                                  </Button>
+                              </div>
+                          ))}
+                      </div>
+                  </Card>
                 </div>
 
             </div>
