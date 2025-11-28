@@ -13,6 +13,7 @@ interface Stats {
   leadsUnpaid: number;
   conversionRate: number;
   siteAccesses: number;
+  subscriptionClicks: number;
 }
 
 const FIVE_MINUTES_AGO_IN_MS = Date.now() - (5 * 60 * 1000);
@@ -27,6 +28,7 @@ export function useDashboardStats(date: Date) {
     leadsUnpaid: 0,
     conversionRate: 0,
     siteAccesses: 0,
+    subscriptionClicks: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -46,6 +48,7 @@ export function useDashboardStats(date: Date) {
       const allLeads = snapshot.docs.map(doc => doc.data());
       const paidLeadsCount = allLeads.filter(lead => lead.status === 'paid').length;
       const totalLeadsCount = allLeads.length;
+      const subscriptionClicksCount = allLeads.filter(lead => lead.hasClickedSubscription).length;
 
       const leadsOnDate = allLeads.filter(lead => {
         if (!lead.createdAt) return false;
@@ -62,7 +65,8 @@ export function useDashboardStats(date: Date) {
         leadsPaid: paidLeadsCount,
         leadsUnpaid: totalLeadsCount - paidLeadsCount,
         conversionRate: totalLeadsCount > 0 ? (paidLeadsCount / totalLeadsCount) * 100 : 0,
-        leadsOnline: onlineLeads
+        leadsOnline: onlineLeads,
+        subscriptionClicks: subscriptionClicksCount,
       }));
       setIsLoading(false);
     }, (error) => {

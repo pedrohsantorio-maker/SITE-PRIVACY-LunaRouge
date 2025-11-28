@@ -31,7 +31,7 @@
         "status": {
           "type": "string",
           "description": "O status de pagamento da assinatura do usuário.",
-          "enum": ["paid", "not_paid"]
+          "enum": ["paid", "not_paid", "pix_generated"]
         },
         "plan": {
           "type": "string",
@@ -47,6 +47,10 @@
           "type": "string",
           "format": "date-time",
           "description": "A data em que a assinatura do usuário expira."
+        },
+        "hasClickedSubscription": {
+            "type": "boolean",
+            "description": "Indica se o usuário clicou em um botão de assinatura."
         }
       },
       "required": [

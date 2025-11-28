@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Users, UserCheck, UserX, Target, Percent, Calendar as CalendarIcon, Eye } from 'lucide-react';
+import { Users, UserCheck, UserX, Target, Percent, Calendar as CalendarIcon, Eye, Pointer } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 import { UsersTable } from '@/components/admin/users-table';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -47,6 +47,7 @@ export default function DashboardPage() {
             <StatCard title="Leads Pagos" value={stats.leadsPaid} icon={UserCheck} isLoading={isLoading} />
             <StatCard title="Não Pagos" value={stats.leadsUnpaid} icon={UserX} isLoading={isLoading} />
             <StatCard title="Taxa de Conversão" value={`${stats.conversionRate.toFixed(2)}%`} icon={Percent} isLoading={isLoading} />
+            <StatCard title="Cliques na Assinatura" value={stats.subscriptionClicks} icon={Pointer} isLoading={isLoading} />
             <StatCard title="Leads Online" value={stats.leadsOnline} icon={Target} isLoading={isLoading} note="Últimos 5 minutos" />
             <StatCard title="Acessos ao Site" value={stats.siteAccesses} icon={Eye} isLoading={isLoading} />
         </div>

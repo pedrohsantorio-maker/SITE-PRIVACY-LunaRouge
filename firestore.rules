@@ -11,10 +11,16 @@ service cloud.firestore {
     }
 
     // Usuários (Leads)
-    // Permite leitura pública para o painel de admin, mas escrita restrita ao dono.
     match /users/{userId} {
       allow read, list: if true;
-      allow create, update, delete: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn();
+      // Permite que o usuário atualize seus próprios dados, incluindo o novo campo 'hasClickedSubscription'
+      allow update: if isSignedIn() && isOwner(userId) && (
+          // Garante que apenas campos permitidos sejam atualizados
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['name', 'email', 'lastActive', 'hasClickedSubscription', 'status', 'plan', 'endDate', 'subscriptionId'])
+      );
+      allow delete: if isSignedIn() && isOwner(userId);
     }
     
     // Logs de Acesso ao Site

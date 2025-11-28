@@ -18,10 +18,24 @@ interface Lead {
   id: string;
   name: string;
   email: string;
-  status: 'paid' | 'not_paid';
+  status: 'paid' | 'not_paid' | 'pix_generated';
   plan: string;
   lastActive: { seconds: number };
+  hasClickedSubscription?: boolean;
 }
+
+function StatusBadge({ status }: { status: Lead['status'] }) {
+    switch (status) {
+        case 'paid':
+            return <Badge className="bg-green-600 hover:bg-green-700">Pago</Badge>;
+        case 'pix_generated':
+            return <Badge className="bg-yellow-500 hover:bg-yellow-600 text-black">Gerou PIX</Badge>;
+        case 'not_paid':
+        default:
+            return <Badge variant="secondary">Não Pago</Badge>;
+    }
+}
+
 
 const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
 
@@ -72,6 +86,7 @@ export function UsersTable({ date }: UsersTableProps) {
               <TableHead>Usuário</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Plano</TableHead>
+              <TableHead>Clicou?</TableHead>
               <TableHead>Atividade</TableHead>
             </TableRow>
           </TableHeader>
@@ -79,7 +94,7 @@ export function UsersTable({ date }: UsersTableProps) {
             {isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell colSpan={4}><Skeleton className="h-10 w-full" /></TableCell>
+                  <TableCell colSpan={5}><Skeleton className="h-10 w-full" /></TableCell>
                 </TableRow>
               ))
             ) : dailyLeads.length > 0 ? (
@@ -92,11 +107,14 @@ export function UsersTable({ date }: UsersTableProps) {
                       <div className="text-sm text-muted-foreground">{lead.email}</div>
                     </TableCell>
                     <TableCell>
-                        <Badge variant={lead.status === 'paid' ? 'default' : 'secondary'} className={lead.status === 'paid' ? 'bg-green-600' : ''}>
-                           {lead.status === 'paid' ? 'Pago' : 'Não Pago'}
-                        </Badge>
+                        <StatusBadge status={lead.status} />
                     </TableCell>
                     <TableCell className="capitalize">{lead.plan || 'N/A'}</TableCell>
+                    <TableCell>
+                      <Badge variant={lead.hasClickedSubscription ? 'default' : 'secondary'}>
+                        {lead.hasClickedSubscription ? 'Sim' : 'Não'}
+                      </Badge>
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <div className={`h-2 w-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
@@ -108,7 +126,7 @@ export function UsersTable({ date }: UsersTableProps) {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center">Nenhum lead encontrado para esta data.</TableCell>
+                <TableCell colSpan={5} className="text-center">Nenhum lead encontrado para esta data.</TableCell>
               </TableRow>
             )}
           </TableBody>

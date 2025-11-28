@@ -14,6 +14,7 @@ import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, DocumentData, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { trackSubscriptionClick } from '@/lib/tracking';
 
 // Inline SVG for social icons to avoid installing a new library
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -185,7 +186,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         subscriptionId: 'null',
                         status: 'not_paid',
                         createdAt: serverTimestamp(),
-                        lastActive: serverTimestamp()
+                        lastActive: serverTimestamp(),
+                        hasClickedSubscription: false
                     }, { merge: true });
                 }
             });
@@ -212,6 +214,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const isSubscribed = subscriptionData?.status === 'active';
     const isLoadingSubscription = isUserLoading || isUserDocLoading || isSubLoading;
     // --- End Subscription Logic ---
+
+    const handleSubscriptionClick = () => {
+        if (user && firestore) {
+            trackSubscriptionClick(firestore, user.uid);
+        }
+    };
 
     const handleUnlockClick = () => {
         subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -333,7 +341,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </div>
                         {model.subscriptions.filter(p => p.isFeatured).map(plan => (
                             <div key={plan.id}>
-                                <Button asChild className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg">
+                                <Button asChild className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg" onClick={handleSubscriptionClick}>
                                     <Link href={plan.paymentUrl || "#"} target="_blank">
                                         <span className="text-lg font-bold">{plan.name}</span>
                                         <div className="flex items-center gap-2">
@@ -369,7 +377,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 <AccordionContent>
                                     <div className="flex flex-col gap-3 pt-2">
                                     {model.promotions.map(plan => (
-                                        <Button key={plan.id} asChild variant="outline" className="w-full h-auto justify-between p-3 rounded-lg border border-primary/50 bg-card hover:bg-primary/10">
+                                        <Button key={plan.id} asChild variant="outline" className="w-full h-auto justify-between p-3 rounded-lg border border-primary/50 bg-card hover:bg-primary/10" onClick={handleSubscriptionClick}>
                                             <Link href={plan.paymentUrl || "#"} target="_blank">
                                                 <div className="flex items-center gap-2">
                                                     {plan.icon === 'Crown' && <Crown className="h-5 w-5 text-yellow-400" />}
@@ -421,7 +429,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 width={item.width}
                                                 height={item.height}
                                                 className={cn(
-                                                    'object-cover w-full h-auto aspect-square transition-all duration-500',
+                                                    'object-cover w-full h-auto transition-all duration-500',
                                                     !isRevealed ? 'blur-lg' : 'blur-none',
                                                     isWatched ? 'grayscale' : ''
                                                 )}
@@ -466,7 +474,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 data-ai-hint={photo.hint}
                                                 width={photo.width}
                                                 height={photo.height}
-                                                className="object-cover w-full h-auto aspect-square"
+                                                className="object-cover w-full h-auto"
                                             />
                                         </div>
                                     </Card>
@@ -490,7 +498,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 data-ai-hint={video.hint}
                                                 width={video.width}
                                                 height={video.height}
-                                                className="object-cover w-full h-auto aspect-square"
+                                                className="object-cover w-full h-auto"
                                             />
                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <PlayCircle size={48} className="text-white" />
@@ -522,7 +530,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </Accordion>
                      {mainPlan && (
                         <div className="mt-8">
-                            <Button asChild className="w-full h-auto text-left justify-center p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg btn-glow" size="lg">
+                            <Button asChild className="w-full h-auto text-left justify-center p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg btn-glow" size="lg" onClick={handleSubscriptionClick}>
                                 <Link href={mainPlan.paymentUrl || "#"} target="_blank">
                                     <div className="flex flex-col items-center">
                                       <span className="text-sm font-normal">Veja tudo por apenas</span>

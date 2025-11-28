@@ -21,6 +21,7 @@ interface Lead {
   plan: string;
   lastActive: { seconds: number; nanoseconds: number };
   endDate?: { seconds: number; nanoseconds: number } | string;
+  hasClickedSubscription?: boolean;
 }
 
 const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
@@ -62,6 +63,11 @@ function LeadRow({ lead }: { lead: Lead }) {
                 <StatusBadge status={lead.status} />
             </TableCell>
             <TableCell className="capitalize">{lead.plan || 'N/A'}</TableCell>
+            <TableCell>
+                <Badge variant={lead.hasClickedSubscription ? 'default' : 'secondary'}>
+                    {lead.hasClickedSubscription ? 'Sim' : 'Não'}
+                </Badge>
+            </TableCell>
             <TableCell>{format(createdAtDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</TableCell>
             <TableCell>{endDateText}</TableCell>
             <TableCell>
@@ -130,6 +136,7 @@ export default function AllLeadsPage() {
                                 <TableHead>Usuário</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Plano</TableHead>
+                                <TableHead>Clicou Assinatura?</TableHead>
                                 <TableHead>Data de Criação</TableHead>
                                 <TableHead>Vencimento do Plano</TableHead>
                                 <TableHead>Atividade</TableHead>
@@ -139,14 +146,14 @@ export default function AllLeadsPage() {
                             {isLoading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <TableRow key={i}>
-                                        <TableCell colSpan={6}><Skeleton className="h-10 w-full" /></TableCell>
+                                        <TableCell colSpan={7}><Skeleton className="h-10 w-full" /></TableCell>
                                     </TableRow>
                                 ))
                             ) : filteredLeads.length > 0 ? (
                                 filteredLeads.map(lead => <LeadRow key={lead.id} lead={lead} />)
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center">Nenhum lead encontrado.</TableCell>
+                                    <TableCell colSpan={7} className="text-center">Nenhum lead encontrado.</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
