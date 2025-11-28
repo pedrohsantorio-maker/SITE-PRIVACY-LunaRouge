@@ -174,6 +174,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [playingVideo, setPlayingVideo] = useState<VideoItem | GalleryItem | null>(null);
     const [revealedPreviews, setRevealedPreviews] = useState<string[]>([]);
     const [watchedPreviews, setWatchedPreviews] = useState<string[]>([]);
+    const [timedOutPreviews, setTimedOutPreviews] = useState<string[]>([]);
     const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState('previews');
     const [socialProof, setSocialProof] = useState<SocialProofNotification | null>(null);
@@ -291,6 +292,15 @@ export function DashboardClient({ model }: { model: ModelData }) {
     };
 
     const handlePreviewClick = (item: GalleryItem) => {
+        if (timedOutPreviews.includes(item.id)) {
+            toast({
+                title: "Prévia expirada!",
+                description: "Assine um plano para ver este e outros conteúdos quantas vezes quiser.",
+                variant: "destructive"
+            });
+            return;
+        }
+
         if (item.type === 'video' && watchedPreviews.includes(item.id)) {
             toast({
                 title: "Prévia já assistida!",
@@ -306,6 +316,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
             }
         } else {
             setRevealedPreviews(prev => [...prev, item.id]);
+            // Start a 7-second timer to re-blur the preview
+            setTimeout(() => {
+                setRevealedPreviews(prev => prev.filter(id => id !== item.id));
+                setTimedOutPreviews(prev => [...prev, item.id]);
+            }, 7000);
         }
     };
 
@@ -472,6 +487,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                              {model.previewsGallery.map(item => {
                                 const isRevealed = revealedPreviews.includes(item.id);
                                 const isWatched = item.type === 'video' && watchedPreviews.includes(item.id);
+                                const isTimedOut = timedOutPreviews.includes(item.id);
                                 return (
                                     <Card key={item.id} onClick={() => handlePreviewClick(item)} className="bg-card rounded-xl overflow-hidden border-border shadow-lg cursor-pointer transition-all duration-300 hover:shadow-primary/40 hover:scale-105">
                                         <div className="relative group">
@@ -484,11 +500,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                 className={cn(
                                                     'object-cover w-full h-auto transition-all duration-500',
                                                     !isRevealed ? 'blur-lg' : 'blur-none',
-                                                    isWatched ? 'grayscale' : ''
+                                                    (isWatched || isTimedOut) ? 'grayscale blur-lg' : ''
                                                 )}
                                             />
                                             {/* Not Revealed Overlay */}
-                                            {!isRevealed && (
+                                            {!isRevealed && !isTimedOut && (
                                                 <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center p-2 sm:p-4 transition-opacity duration-300">
                                                     <p className="text-white font-semibold text-xs sm:text-sm">{getOverlayText(item.id)}</p>
                                                     <p className="text-primary font-bold text-xs mt-2 uppercase animate-pulse-reveal">Clique para revelar</p>
@@ -500,8 +516,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                                     <PlayCircle size={48} className="text-white" />
                                                 </div>
                                             )}
-                                             {/* Watched Video Overlay */}
-                                            {isWatched && (
+                                             {/* Watched or TimedOut Video/Image Overlay */}
+                                            {(isWatched || isTimedOut) && (
                                                  <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-center p-4">
                                                     <Lock className="w-10 h-10 text-primary" />
                                                     <p className="text-white font-bold text-sm mt-2">Assine para ver mais</p>
@@ -674,3 +690,5 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
+    
