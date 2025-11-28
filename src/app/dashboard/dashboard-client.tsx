@@ -396,7 +396,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             <div key={plan.id}>
                                 <Button asChild className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg" onClick={handleSubscriptionClick}>
                                     <Link href={plan.paymentUrl || "#"} target="_blank">
-                                        <span className="text-lg font-bold">{plan.name}</span>
+                                        <span className="text-lg font-bold uppercase">{plan.name}</span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-xl font-bold">R$ {plan.price}</span>
                                             <ArrowRight className="h-5 w-5" />
@@ -434,7 +434,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                             <Link href={plan.paymentUrl || "#"} target="_blank">
                                                 <div className="flex items-center gap-2">
                                                     {plan.icon === 'Crown' && <Crown className="h-5 w-5 text-yellow-400" />}
-                                                    <span className="font-bold">{plan.name}</span>
+                                                    <span className="font-bold uppercase">{plan.name}</span>
                                                     {plan.tags?.map(tag => (
                                                         <span key={tag} className={cn('text-xs font-semibold px-2 py-0.5 rounded-full', getTagClass(tag))}>
                                                             {tag} {tag === 'Mais popular' && '🔥'}
