@@ -156,6 +156,18 @@ const getTagClass = (tag: string) => {
     }
 };
 
+// --- Social Proof Popup Data and Logic ---
+const socialProofNames = ["Miguel", "Arthur", "Heitor", "Bernardo", "Davi", "Lucas", "Gabriel", "Pedro", "Enzo", "Matheus", "Rafael", "Guilherme", "Nicolas", "João", "Gustavo"];
+const socialProofPlans = ["30 Dias", "3 Meses", "1 Ano", "Vitalício"];
+
+type SocialProofNotification = {
+    id: number;
+    name: string;
+    plan: string;
+    time: number; // Time in seconds ago
+};
+// --- End Social Proof Data ---
+
 export function DashboardClient({ model }: { model: ModelData }) {
     const [isBioExpanded, setIsBioExpanded] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -164,6 +176,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [watchedPreviews, setWatchedPreviews] = useState<string[]>([]);
     const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState('previews');
+    const [socialProof, setSocialProof] = useState<SocialProofNotification | null>(null);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const pageTopRef = useRef<HTMLDivElement>(null);
     const subscriptionsRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
@@ -214,6 +228,45 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const isSubscribed = subscriptionData?.status === 'active';
     const isLoadingSubscription = isUserLoading || isUserDocLoading || isSubLoading;
     // --- End Subscription Logic ---
+    
+    // --- Social Proof Popup Logic ---
+    const scheduleNextPopup = () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        const randomInterval = Math.floor(Math.random() * (60000 - 15000 + 1)) + 15000; // 15s to 60s
+        
+        timeoutRef.current = setTimeout(() => {
+            const randomName = socialProofNames[Math.floor(Math.random() * socialProofNames.length)];
+            const randomPlan = socialProofPlans[Math.floor(Math.random() * socialProofPlans.length)];
+            const randomTime = Math.floor(Math.random() * 5) + 1; // 1 to 5 minutes ago
+
+            setSocialProof({
+                id: Date.now(),
+                name: randomName,
+                plan: randomPlan,
+                time: randomTime,
+            });
+
+            // Hide the popup after 5 seconds and schedule the next one
+            setTimeout(() => {
+                setSocialProof(null);
+                scheduleNextPopup();
+            }, 5000);
+
+        }, randomInterval);
+    };
+
+    useEffect(() => {
+        scheduleNextPopup();
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
+    // --- End Social Proof Popup Logic ---
 
     const handleSubscriptionClick = () => {
         if (user && firestore) {
@@ -544,6 +597,24 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </div>
 
             </div>
+             {/* --- Social Proof Popup --- */}
+             {socialProof && (
+                <div key={socialProof.id} className="social-proof-popup">
+                    <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 animate-pulse-orange"></div>
+                        <div>
+                            <p className="font-bold text-sm text-foreground">
+                                {socialProof.name} <span className="font-normal text-muted-foreground">assinou</span> <span className="text-primary">{socialProof.plan}</span>
+                            </p>
+                            <p className="text-xs text-muted-foreground">há {socialProof.time} minuto{socialProof.time > 1 ? 's' : ''}</p>
+                        </div>
+                    </div>
+                     <button onClick={() => setSocialProof(null)} className="absolute top-1 right-1 text-muted-foreground hover:text-foreground">
+                        <X size={14} />
+                    </button>
+                </div>
+            )}
+            {/* --- End Social Proof Popup --- */}
 
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-0 max-w-lg w-full">
