@@ -60,10 +60,10 @@ export const modelData = {
   bio: 'Oi, meu amor! 🔥💦 Sou a Luna, e hoje vou revelar um lado meu que vai te deixar sem fôlego… vídeos gozando com meus ficantes, trisal com amigas safadas e momentos íntimos onde me entrego de corpo e alma. 😏 Cada centímetro do meu corpo é pura tentação e minhas fotos peladas são um convite exclusivo para você explorar seus desejos mais secretos tudo sem censura! Se você tem coragem de se perder nessa paixão sem limites, vem comigo... Estou te esperando para uma experiência única e irresistível.😈',
   stats: {
     posts: 121,
-    videos: videoLinks.length,
+    videos: 267,
     likes: 265800,
     previews: 7,
-    photos: photoLinks.length,
+    photos: 378,
   },
   socials: {
       instagram: "https://www.instagram.com/luna__vipp?igsh=MTA0dmFxdnE3bncwcQ%3D%3D&utm_source=qr",
@@ -81,7 +81,7 @@ export const modelData = {
   promotions: [
     {
       id: 'quarterly',
-      name: '3 Meses',
+      name: '3 MESES',
       price: '19,90',
       paymentUrl: 'https://compraseguraonline.org.ua/c/691c74249a',
       tags: ['Mais popular'],
@@ -89,14 +89,14 @@ export const modelData = {
     },
     {
       id: 'annual',
-      name: '1 Ano',
+      name: '1 ANO',
       price: '49,90',
       paymentUrl: 'https://compraseguraonline.org.ua/c/c7b830c4cd',
       tags: ['Melhor oferta'],
     },
     {
       id: 'lifetime',
-      name: 'Vitalício',
+      name: 'VITALÍCIO',
       price: '89,90',
       paymentUrl: 'https://compraseguraonline.org.ua/c/cf7a8d8d48',
       tags: ['Exclusivo'],
