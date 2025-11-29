@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown, FireExtinguisher, Flame } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown, Flame } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -394,7 +394,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                    <Card className="bg-card border-none p-6 rounded-2xl">
                         <h2 className="text-xl font-bold mb-4 uppercase">PLANOS</h2>
                         <div className="flex flex-wrap items-center gap-2 mb-4">
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-bold text-primary">
+                            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold tag-promo">
                                 VEJA TUDO AGORA 🔥
                             </span>
                             <span className="inline-flex items-center gap-1.5 tag-promo px-3 py-1.5 text-sm font-bold">
@@ -420,7 +420,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             </div>
                         ))}
 
-                        <div className="flex items-center justify-around text-sm font-semibold mt-4 mb-6">
+                        <div className="flex items-center justify-around text-base font-bold mt-4 mb-6">
                             <div className="flex items-center gap-2 text-green-400">
                                 <Lock size={16} />
                                 <span>Pagamento 100% seguro</span>
