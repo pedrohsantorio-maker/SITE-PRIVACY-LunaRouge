@@ -102,10 +102,6 @@ const faqData = [
         answer: "Fique tranquilo, o pagamento é único e não há renovação automática. Você paga uma vez e tem acesso pelo período escolhido, sem surpresas ou cobranças futuras."
     },
     {
-        question: "Tem reembolso?",
-        answer: "Devido à natureza do conteúdo digital, que é consumido instantaneamente, não oferecemos reembolso. Garantimos a qualidade e o acesso imediato a todo o material prometido."
-    },
-    {
         question: "Como funciona a 'chamada de vídeo'?",
         answer: "A chamada de vídeo é um bônus especial para quem adquire o plano principal. É um evento exclusivo e agendado onde você poderá interagir em uma sala de vídeo. As datas e horários são divulgados com antecedência para os assinantes."
     },
@@ -400,7 +396,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                  {/* Subscriptions & Promotions */}
                 <div ref={subscriptionsRef} className="px-4 sm:px-0 py-4">
                    <Card className="bg-card border-none p-6 rounded-2xl">
-                        <h2 className="text-xl font-bold mb-4">PLANOS</h2>
+                        <h2 className="text-xl font-bold mb-4 uppercase">PLANOS</h2>
                         <div className="flex flex-wrap items-center gap-2 mb-4">
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                                 VEJA TUDO AGORA 🔥🔥
@@ -690,5 +686,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
+    
 
     
