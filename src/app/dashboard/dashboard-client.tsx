@@ -179,6 +179,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [remainingCount, setRemainingCount] = useState(11);
     const [isUrgencyPopupOpen, setIsUrgencyPopupOpen] = useState(false);
     const [isRejectionPopupOpen, setIsRejectionPopupOpen] = useState(false);
+    const [hasUrgencyPopupBeenShown, setHasUrgencyPopupBeenShown] = useState(false);
 
 
     // --- Subscription Logic ---
@@ -230,18 +231,19 @@ export function DashboardClient({ model }: { model: ModelData }) {
     // --- Scarcity Countdown Logic ---
     useEffect(() => {
         if (remainingCount <= 4) {
-            if (!isUrgencyPopupOpen && !isRejectionPopupOpen) {
+            if (!hasUrgencyPopupBeenShown) {
                 setIsUrgencyPopupOpen(true);
+                setHasUrgencyPopupBeenShown(true);
             }
             return;
         }
-    
+
         const timer = setTimeout(() => {
             setRemainingCount(prev => prev - 1);
         }, 10000); // 10 segundos
-    
+
         return () => clearTimeout(timer);
-    }, [remainingCount, isUrgencyPopupOpen, isRejectionPopupOpen]);
+    }, [remainingCount, hasUrgencyPopupBeenShown]);
     // --- End Scarcity Countdown Logic ---
 
 
