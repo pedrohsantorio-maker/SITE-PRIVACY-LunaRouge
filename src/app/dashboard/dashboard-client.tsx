@@ -3,13 +3,15 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown, Flame } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown, Flame, AlertTriangle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from '@/components/ui/alert-dialog';
+
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, DocumentData, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
@@ -174,6 +176,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const pageTopRef = useRef<HTMLDivElement>(null);
     const subscriptionsRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
+    const [remainingCount, setRemainingCount] = useState(7);
+    const [isSoldOut, setIsSoldOut] = useState(false);
 
 
     // --- Subscription Logic ---
@@ -222,6 +226,24 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const isLoadingSubscription = isUserLoading || isUserDocLoading || isSubLoading;
     // --- End Subscription Logic ---
     
+    // --- Scarcity Countdown Logic ---
+    useEffect(() => {
+        if (remainingCount <= 0) {
+            setIsSoldOut(true);
+            return;
+        }
+
+        const randomInterval = Math.floor(Math.random() * (15000 - 5000 + 1)) + 5000; // 5s to 15s
+
+        const timer = setTimeout(() => {
+            setRemainingCount(prev => prev - 1);
+        }, randomInterval);
+
+        return () => clearTimeout(timer);
+    }, [remainingCount]);
+    // --- End Scarcity Countdown Logic ---
+
+
     // --- Social Proof Popup Logic ---
     const scheduleNextPopup = () => {
         if (timeoutRef.current) {
@@ -395,10 +417,15 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         <h2 className="text-xl font-bold mb-4 uppercase">PLANOS</h2>
                         <div className="flex flex-wrap items-center gap-2 mb-4">
                             
-                            <span className="inline-flex items-center gap-1.5 tag-promo px-3 py-1.5 text-sm font-bold">
-                               <Flame className="h-4 w-4" /> Promocional
+                            <span className="inline-flex items-center gap-1.5 tag-promo px-3 py-1.5 text-lg font-bold">
+                               <Flame className="h-5 w-5" /> Promocional
                             </span>
                         </div>
+                        {remainingCount > 0 && (
+                             <p className="text-center text-sm text-muted-foreground mb-4">
+                                Restam apenas <span id="remaining-count" className="animate-blink">{remainingCount}</span> vagas com o valor promocional!
+                            </p>
+                        )}
                         {model.subscriptions.filter(p => p.isFeatured).map(plan => (
                             <div key={plan.id}>
                                 <Button asChild className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg" onClick={handleSubscriptionClick}>
@@ -418,13 +445,13 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             </div>
                         ))}
 
-                        <div className="flex items-center justify-around text-base font-bold mt-4 mb-6">
+                        <div className="flex items-center justify-around text-lg font-bold mt-4 mb-6">
                             <div className="flex items-center gap-2 text-green-400">
-                                <Lock size={16} />
+                                <Lock size={20} />
                                 <span>Pagamento 100% seguro</span>
                             </div>
                             <div className="flex items-center gap-2 text-green-400">
-                                <Sparkles size={16} />
+                                <Sparkles size={20} />
                                 <span>Acesso imediato</span>
                             </div>
                         </div>
@@ -624,6 +651,22 @@ export function DashboardClient({ model }: { model: ModelData }) {
             )}
             {/* --- End Social Proof Popup --- */}
 
+            <AlertDialog open={isSoldOut} onOpenChange={setIsSoldOut}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                           <AlertTriangle className="text-yellow-500"/> Vagas Esgotadas!
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            As vagas com valor promocional se esgotaram. Mas não se preocupe, novas oportunidades podem surgir em breve!
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <Button onClick={() => setIsSoldOut(false)}>Entendi</Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-0 max-w-lg w-full">
                     <DialogTitle className="sr-only">Foto de Perfil de {model.name}</DialogTitle>
@@ -682,5 +725,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
+    
 
     
