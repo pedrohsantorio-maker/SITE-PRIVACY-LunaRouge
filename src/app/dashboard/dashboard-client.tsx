@@ -102,10 +102,6 @@ const faqData = [
         answer: "Fique tranquilo, o pagamento é único e não há renovação automática. Você paga uma vez e tem acesso pelo período escolhido, sem surpresas ou cobranças futuras."
     },
     {
-        question: "Como funciona a 'chamada de vídeo'?",
-        answer: "A chamada de vídeo é um bônus especial para quem adquire o plano principal. É um evento exclusivo e agendado onde você poderá interagir em uma sala de vídeo. As datas e horários são divulgados com antecedência para os assinantes."
-    },
-    {
         question: "Posso pedir conteúdo personalizado?",
         answer: "No momento, não trabalhamos com pedidos de conteúdo personalizado. No entanto, o acervo é atualizado com frequência com novidades exclusivas para os assinantes."
     }
@@ -686,6 +682,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
+    
 
     
 
