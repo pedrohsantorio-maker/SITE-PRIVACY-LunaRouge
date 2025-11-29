@@ -3,26 +3,29 @@ import { NextResponse } from 'next/server';
 import { initializeApp, getApps, App, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
-// IMPORTANT: Replace with your actual service account credentials in a secure way (e.g., environment variables)
-// Do not hardcode credentials in your source code in a real production environment.
+// A variável de ambiente é lida e analisada com segurança.
 const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT 
   ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
   : undefined;
 
 let adminApp: App;
 
+/**
+ * Inicializa a aplicação de administração do Firebase de forma segura.
+ * Garante que a aplicação seja inicializada apenas uma vez.
+ */
 function initializeFirebaseAdmin(): App {
-  if (adminApp) return adminApp;
-
+  // Retorna a app existente se já foi inicializada.
   if (getApps().some(app => app.name === 'firebase-admin-app')) {
-    adminApp = getApps().find(app => app.name === 'firebase-admin-app')!;
-    return adminApp;
+    return getApps().find(app => app.name === 'firebase-admin-app')!;
   }
   
+  // Lança um erro se as credenciais da conta de serviço não estiverem configuradas.
   if (!serviceAccount) {
-    throw new Error('Firebase service account credentials are not set in environment variables.');
+    throw new Error('As credenciais da conta de serviço do Firebase não estão definidas nas variáveis de ambiente.');
   }
 
+  // Inicializa a app com as credenciais.
   adminApp = initializeApp({
     credential: cert(serviceAccount),
   }, 'firebase-admin-app');

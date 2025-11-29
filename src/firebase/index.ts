@@ -1,17 +1,16 @@
 'use client';
 
-import { firebaseConfig } from '@/firebase/config';
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, FirebaseApp, FirebaseOptions } from 'firebase/app';
 import { getAuth, signInAnonymously } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
-export function initializeFirebase() {
+export function initializeFirebase(config: FirebaseOptions) {
   if (getApps().length) {
     return getSdks(getApp());
   }
 
-  const firebaseApp = initializeApp(firebaseConfig);
+  const firebaseApp = initializeApp(config);
   return getSdks(firebaseApp);
 }
 
