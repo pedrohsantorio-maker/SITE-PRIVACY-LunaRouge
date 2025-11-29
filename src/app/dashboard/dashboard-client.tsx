@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
 
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, DocumentData, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -177,7 +177,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const subscriptionsRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
     const [remainingCount, setRemainingCount] = useState(11);
-    const [isSoldOut, setIsSoldOut] = useState(false);
+    const [isUrgencyPopupOpen, setIsUrgencyPopupOpen] = useState(false);
 
 
     // --- Subscription Logic ---
@@ -229,7 +229,10 @@ export function DashboardClient({ model }: { model: ModelData }) {
     // --- Scarcity Countdown Logic ---
     useEffect(() => {
         if (remainingCount <= 4) {
-            return; // Para o contador quando chega a 4
+             if (!isUrgencyPopupOpen) {
+                setIsUrgencyPopupOpen(true);
+            }
+            return; 
         }
 
         const timer = setTimeout(() => {
@@ -237,7 +240,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
         }, 10000); // 10 segundos
 
         return () => clearTimeout(timer);
-    }, [remainingCount]);
+    }, [remainingCount, isUrgencyPopupOpen]);
     // --- End Scarcity Countdown Logic ---
 
 
@@ -287,6 +290,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
     };
 
     const handleUnlockClick = () => {
+        subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const handleGuaranteeVagaClick = () => {
+        setIsUrgencyPopupOpen(false);
         subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
@@ -648,18 +656,19 @@ export function DashboardClient({ model }: { model: ModelData }) {
             )}
             {/* --- End Social Proof Popup --- */}
 
-            <AlertDialog open={isSoldOut} onOpenChange={setIsSoldOut}>
+            <AlertDialog open={isUrgencyPopupOpen} onOpenChange={setIsUrgencyPopupOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle className="flex items-center gap-2">
-                           <AlertTriangle className="text-yellow-500"/> Vagas Esgotadas!
+                           <AlertTriangle className="text-yellow-500"/> Vagas Quase Esgotadas!
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            As vagas com valor promocional se esgotaram. Mas não se preocupe, novas oportunidades podem surgir em breve!
+                            As vagas com valor promocional estão acabando. Não perca a chance de ter acesso ao conteúdo mais exclusivo. Assine agora!
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <Button onClick={() => setIsSoldOut(false)}>Entendi</Button>
+                        <AlertDialogCancel onClick={() => setIsUrgencyPopupOpen(false)}>DEIXAR PARA DEPOIS</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleGuaranteeVagaClick} className="bg-primary hover:bg-primary/90">GARANTIR MINHA VAGA</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -722,7 +731,3 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
-
-    
-
-    
