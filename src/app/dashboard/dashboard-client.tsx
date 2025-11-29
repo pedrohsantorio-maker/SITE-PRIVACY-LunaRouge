@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown, FireExtinguisher, Flame } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -394,10 +394,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
                    <Card className="bg-card border-none p-6 rounded-2xl">
                         <h2 className="text-xl font-bold mb-4 uppercase">PLANOS</h2>
                         <div className="flex flex-wrap items-center gap-2 mb-4">
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                                VEJA TUDO AGORA 🔥🔥
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-bold text-primary">
+                                VEJA TUDO AGORA 🔥
                             </span>
-                            <span className="tag-promo">Promocional</span>
+                            <span className="inline-flex items-center gap-1.5 tag-promo px-3 py-1.5 text-sm font-bold">
+                               <Flame className="h-4 w-4" /> Promocional
+                            </span>
                         </div>
                         {model.subscriptions.filter(p => p.isFeatured).map(plan => (
                             <div key={plan.id}>
@@ -418,13 +420,13 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             </div>
                         ))}
 
-                        <div className="flex items-center justify-around text-xs text-muted-foreground mt-2 mb-6">
-                            <div className="flex items-center gap-2">
-                                <Lock size={14} className="text-green-500" />
+                        <div className="flex items-center justify-around text-sm font-semibold mt-4 mb-6">
+                            <div className="flex items-center gap-2 text-green-400">
+                                <Lock size={16} />
                                 <span>Pagamento 100% seguro</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Sparkles size={14} className="text-green-500" />
+                            <div className="flex items-center gap-2 text-green-400">
+                                <Sparkles size={16} />
                                 <span>Acesso imediato</span>
                             </div>
                         </div>
@@ -432,7 +434,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
                             <AccordionItem value="item-1" className="border-b-0">
                                 <AccordionTrigger className="font-bold text-lg py-2 hover:no-underline">
-                                    Promoções
+                                    Outras Opções
                                 </AccordionTrigger>
                                 <AccordionContent>
                                     <div className="flex flex-col gap-3 pt-2">
@@ -682,9 +684,5 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
-
-    
-
-    
 
     

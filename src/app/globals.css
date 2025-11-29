@@ -173,7 +173,7 @@
   }
 
   .tag-promo {
-    @apply bg-teal-100 text-teal-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full dark:bg-teal-900 dark:text-teal-300;
+    @apply bg-teal-500/20 text-teal-300;
   }
   .tag-hot {
     @apply bg-orange-100 text-orange-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full dark:bg-orange-900 dark:text-orange-300;
@@ -185,3 +185,5 @@
       @apply bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300;
   }
 }
+
+    
