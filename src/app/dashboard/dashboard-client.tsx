@@ -176,7 +176,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const pageTopRef = useRef<HTMLDivElement>(null);
     const subscriptionsRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
-    const [remainingCount, setRemainingCount] = useState(7);
+    const [remainingCount, setRemainingCount] = useState(11);
     const [isSoldOut, setIsSoldOut] = useState(false);
 
 
@@ -228,16 +228,13 @@ export function DashboardClient({ model }: { model: ModelData }) {
     
     // --- Scarcity Countdown Logic ---
     useEffect(() => {
-        if (remainingCount <= 0) {
-            setIsSoldOut(true);
-            return;
+        if (remainingCount <= 4) {
+            return; // Para o contador quando chega a 4
         }
-
-        const randomInterval = Math.floor(Math.random() * (15000 - 5000 + 1)) + 5000; // 5s to 15s
 
         const timer = setTimeout(() => {
             setRemainingCount(prev => prev - 1);
-        }, randomInterval);
+        }, 10000); // 10 segundos
 
         return () => clearTimeout(timer);
     }, [remainingCount]);
