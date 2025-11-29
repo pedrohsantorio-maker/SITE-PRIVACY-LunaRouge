@@ -400,7 +400,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                  {/* Subscriptions & Promotions */}
                 <div ref={subscriptionsRef} className="px-4 sm:px-0 py-4">
                    <Card className="bg-card border-none p-6 rounded-2xl">
-                        <h2 className="text-xl font-bold mb-4">Assinaturas</h2>
+                        <h2 className="text-xl font-bold mb-4">PLANOS</h2>
                         <div className="flex flex-wrap items-center gap-2 mb-4">
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                                 VEJA TUDO AGORA 🔥🔥
