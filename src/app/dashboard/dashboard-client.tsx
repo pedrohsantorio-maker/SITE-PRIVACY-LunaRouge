@@ -251,7 +251,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
             clearTimeout(timeoutRef.current);
         }
 
-        const randomInterval = Math.floor(Math.random() * (60000 - 15000 + 1)) + 15000; // 15s to 60s
+        const randomInterval = Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000; // 5s to 10s
         
         timeoutRef.current = setTimeout(() => {
             const randomName = socialProofNames[Math.floor(Math.random() * socialProofNames.length)];
