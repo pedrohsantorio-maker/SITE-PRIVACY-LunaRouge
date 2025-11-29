@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
 
-import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useDoc, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
 import { doc, DocumentData, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -192,16 +192,23 @@ export function DashboardClient({ model }: { model: ModelData }) {
             const userDocRef = doc(firestore, 'users', user.uid);
             getDoc(userDocRef).then(async (docSnap) => {
                 if (!docSnap.exists()) {
-                     await setDoc(userDocRef, {
-                        id: user.uid,
+                    const userData = {
                         name: 'Visitante',
-                        email: `${user.uid}@anon.com`, 
+                        email: `${user.uid}@anon.com`,
                         subscriptionId: 'null',
                         status: 'not_paid',
                         createdAt: serverTimestamp(),
                         lastActive: serverTimestamp(),
                         hasClickedSubscription: false
-                    }, { merge: true });
+                    };
+                    await setDoc(userDocRef, userData, { merge: true }).catch(error => {
+                        const permissionError = new FirestorePermissionError({
+                            path: userDocRef.path,
+                            operation: 'create',
+                            requestResourceData: userData
+                        });
+                        errorEmitter.emit('permission-error', permissionError);
+                    });
                 }
             });
         }
@@ -681,7 +688,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={handleLeaveForLater}>DEIXAR PARA DEPOIS</AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => handleLeaveForLater()}>DEIXAR PARA DEPOIS</AlertDialogCancel>
                         <AlertDialogAction onClick={() => handleGuaranteeVagaClick()} className="bg-primary hover:bg-primary/90">GARANTIR MINHA VAGA</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -698,7 +705,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={handleLoseOpportunity}>Não, perder oportunidade</AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => handleLoseOpportunity()}>Não, perder oportunidade</AlertDialogCancel>
                         <AlertDialogAction onClick={() => handleGuaranteeVagaClick()} className="bg-primary hover:bg-primary/90">Sim, quero garantir!</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
