@@ -1,3 +1,4 @@
+
 import { PlaceHolderImages } from "./placeholder-images";
 
 const profileImage = PlaceHolderImages.find(img => img.id === 'model-profile');
@@ -74,7 +75,7 @@ export const modelData = {
       name: '30 Dias',
       price: '14,90',
       paymentUrl: 'https://compraseguraonline.org.ua/c/013c371992',
-      tags: ['+ CHAMADA DE VÍDEO COMIGO HOJE!'],
+      tags: [],
       isFeatured: true,
     },
   ],
