@@ -230,16 +230,16 @@ export function DashboardClient({ model }: { model: ModelData }) {
     // --- Scarcity Countdown Logic ---
     useEffect(() => {
         if (remainingCount <= 4) {
-             if (!isUrgencyPopupOpen && !isRejectionPopupOpen) {
+            if (!isUrgencyPopupOpen && !isRejectionPopupOpen) {
                 setIsUrgencyPopupOpen(true);
             }
-            return; 
+            return;
         }
-
+    
         const timer = setTimeout(() => {
             setRemainingCount(prev => prev - 1);
         }, 10000); // 10 segundos
-
+    
         return () => clearTimeout(timer);
     }, [remainingCount, isUrgencyPopupOpen, isRejectionPopupOpen]);
     // --- End Scarcity Countdown Logic ---
@@ -680,7 +680,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={handleLeaveForLater}>DEIXAR PARA DEPOIS</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleGuaranteeVagaClick} className="bg-primary hover:bg-primary/90">GARANTIR MINHA VAGA</AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleGuaranteeVagaClick()} className="bg-primary hover:bg-primary/90">GARANTIR MINHA VAGA</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -697,7 +697,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={handleLoseOpportunity}>Não, perder oportunidade</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleGuaranteeVagaClick} className="bg-primary hover:bg-primary/90">Sim, quero garantir!</AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleGuaranteeVagaClick()} className="bg-primary hover:bg-primary/90">Sim, quero garantir!</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
