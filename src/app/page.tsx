@@ -2,13 +2,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/logo';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function LandingPage() {
-  const heroImage = {
-      imageUrl: "https://imgur.com/Xwd7qSZ.jpeg",
-      description: "Woman in a futuristic setting",
-      imageHint: "futuristic woman"
-  };
+  const heroImage = PlaceHolderImages.find(img => img.id === 'model-landing-hero');
 
   return (
     <div className="relative min-h-screen w-full">
