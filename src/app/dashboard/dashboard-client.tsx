@@ -178,6 +178,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const { toast } = useToast();
     const [remainingCount, setRemainingCount] = useState(11);
     const [isUrgencyPopupOpen, setIsUrgencyPopupOpen] = useState(false);
+    const [isRejectionPopupOpen, setIsRejectionPopupOpen] = useState(false);
 
 
     // --- Subscription Logic ---
@@ -229,7 +230,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     // --- Scarcity Countdown Logic ---
     useEffect(() => {
         if (remainingCount <= 4) {
-             if (!isUrgencyPopupOpen) {
+             if (!isUrgencyPopupOpen && !isRejectionPopupOpen) {
                 setIsUrgencyPopupOpen(true);
             }
             return; 
@@ -240,7 +241,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
         }, 10000); // 10 segundos
 
         return () => clearTimeout(timer);
-    }, [remainingCount, isUrgencyPopupOpen]);
+    }, [remainingCount, isUrgencyPopupOpen, isRejectionPopupOpen]);
     // --- End Scarcity Countdown Logic ---
 
 
@@ -295,8 +296,19 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
     const handleGuaranteeVagaClick = () => {
         setIsUrgencyPopupOpen(false);
+        setIsRejectionPopupOpen(false);
         subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
+    
+    const handleLeaveForLater = () => {
+        setIsUrgencyPopupOpen(false);
+        setIsRejectionPopupOpen(true);
+    };
+
+    const handleLoseOpportunity = () => {
+        setIsRejectionPopupOpen(false);
+    };
+
 
     const overlayTexts = [
         "Um gostinho do que você vai receber...",
@@ -501,7 +513,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                            <Camera size={16} /> {model.stats.photos} Fotos
                            {!isSubscribed && <Lock className="w-3 h-3 ml-1" />}
                         </TabsTrigger>
-                        <TabsTrigger value="videos" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400 text-xs sm:text-sm">
+                        <TabsTrigger value="videos" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400 text-xs sm:text_sm">
                             <Video size={16} /> {model.stats.videos} Vídeos
                              {!isSubscribed && <Lock className="w-3 h-3 ml-1" />}
                         </TabsTrigger>
@@ -667,11 +679,29 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setIsUrgencyPopupOpen(false)}>DEIXAR PARA DEPOIS</AlertDialogCancel>
+                        <AlertDialogCancel onClick={handleLeaveForLater}>DEIXAR PARA DEPOIS</AlertDialogCancel>
                         <AlertDialogAction onClick={handleGuaranteeVagaClick} className="bg-primary hover:bg-primary/90">GARANTIR MINHA VAGA</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            
+            <AlertDialog open={isRejectionPopupOpen} onOpenChange={setIsRejectionPopupOpen}>
+                 <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                           <AlertTriangle className="text-primary"/> Você tem certeza?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Vai mesmo perder a oportunidade de garantir o conteúdo mais exclusivo por apenas <span className="font-bold text-primary">R$ {mainPlan?.price || '14,90'}</span>?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={handleLoseOpportunity}>Não, perder oportunidade</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleGuaranteeVagaClick} className="bg-primary hover:bg-primary/90">Sim, quero garantir!</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
 
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-0 max-w-lg w-full">
