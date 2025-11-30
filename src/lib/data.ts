@@ -74,7 +74,7 @@ export const modelData = {
       id: 'monthly',
       name: '30 Dias',
       price: '14,90',
-      paymentUrl: process.env.PAYMENT_URL_MONTHLY,
+      paymentUrl: process.env.PAYMENT_MONTHLY,
       tags: [],
       isFeatured: true,
     },
@@ -84,7 +84,7 @@ export const modelData = {
       id: 'quarterly',
       name: '3 MESES',
       price: '19,90',
-      paymentUrl: process.env.PAYMENT_URL_QUARTERLY,
+      paymentUrl: process.env.PAYMENT_QUARTERLY,
       tags: ['Mais popular'],
       icon: 'Crown',
     },
@@ -92,14 +92,14 @@ export const modelData = {
       id: 'annual',
       name: '1 ANO',
       price: '49,90',
-      paymentUrl: process.env.PAYMENT_URL_ANNUAL,
+      paymentUrl: process.env.PAYMENT_ANNUAL,
       tags: ['Melhor oferta'],
     },
     {
       id: 'lifetime',
       name: 'VITALÍCIO',
       price: '89,90',
-      paymentUrl: process.env.PAYMENT_URL_LIFETIME,
+      paymentUrl: process.env.PAYMENT_LIFETIME,
       tags: ['Exclusivo'],
     },
   ],
@@ -131,3 +131,5 @@ export const modelData = {
       height: 800,
   })),
 };
+
+    
