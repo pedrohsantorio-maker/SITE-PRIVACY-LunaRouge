@@ -172,6 +172,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [socialProof, setSocialProof] = useState<SocialProofNotification | null>(null);
     const [remainingCount, setRemainingCount] = useState(11);
     const [isUrgencyPopupOpen, setIsUrgencyPopupOpen] = useState(false);
+    const [isSecondUrgencyPopupOpen, setIsSecondUrgencyPopupOpen] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const pageTopRef = useRef<HTMLDivElement>(null);
     const subscriptionsRef = useRef<HTMLDivElement>(null);
@@ -181,15 +182,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
     useEffect(() => {
         const interval = setInterval(() => {
             setRemainingCount(prevCount => {
-                const nextCount = prevCount - 1;
-                if (nextCount === 4) {
+                if (prevCount <= 4) {
+                    clearInterval(interval);
                     setIsUrgencyPopupOpen(true);
+                    return 4;
                 }
-                if (nextCount >= 4) {
-                    return nextCount;
-                }
-                clearInterval(interval);
-                return prevCount;
+                return prevCount - 1;
             });
         }, 10000); // 10 seconds
 
@@ -293,7 +291,13 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
      const handleGuaranteeClick = () => {
         setIsUrgencyPopupOpen(false);
+        setIsSecondUrgencyPopupOpen(false);
         subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+    
+    const handleRejectClick = () => {
+        setIsUrgencyPopupOpen(false);
+        setIsSecondUrgencyPopupOpen(true);
     };
 
     const overlayTexts = [
@@ -366,8 +370,27 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             <Button onClick={handleGuaranteeClick} size="lg" className="w-full btn-glow text-lg">
                                 Garantir Minha Vaga
                             </Button>
-                            <Button onClick={() => setIsUrgencyPopupOpen(false)} size="lg" variant="ghost" className="w-full text-lg">
+                            <Button onClick={handleRejectClick} size="lg" variant="ghost" className="w-full text-lg">
                                 Recusar Oferta
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+             {isSecondUrgencyPopupOpen && (
+                <div className="fullscreen-popup-final">
+                    <div className="popup-content">
+                        <Flame className="h-16 w-16 text-red-500 animate-pulse" />
+                        <h2 className="text-3xl font-bold mt-4 text-red-400">TEM CERTEZA?</h2>
+                        <p className="text-muted-foreground mt-2 text-lg">
+                           Esta é uma oferta única. Você realmente deseja perder a chance de ter acesso a todo o conteúdo por um valor tão baixo?
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-md">
+                            <Button onClick={handleGuaranteeClick} size="lg" className="w-full btn-glow text-lg">
+                                Não, quero garantir meu plano!
+                            </Button>
+                            <Button onClick={() => setIsSecondUrgencyPopupOpen(false)} size="lg" variant="destructive" className="w-full text-lg">
+                                Sim, quero perder
                             </Button>
                         </div>
                     </div>
