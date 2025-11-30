@@ -4,8 +4,8 @@ import { initializeApp, getApps, App, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
 // A variável de ambiente é lida e analisada com segurança.
-const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT 
-  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+const serviceAccount = process.env.FB_SA 
+  ? JSON.parse(process.env.FB_SA)
   : undefined;
 
 let adminApp: App;
