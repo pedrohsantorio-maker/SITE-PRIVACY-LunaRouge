@@ -185,7 +185,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
      useEffect(() => {
         const interval = setInterval(() => {
             setRemainingCount(prevCount => {
-                if (prevCount <= 4) {
+                const nextCount = prevCount - 1;
+                if (nextCount <= 4) {
                     if (!hasUrgencyPopupBeenShown) {
                         setIsUrgencyPopupOpen(true);
                         setHasUrgencyPopupBeenShown(true);
@@ -193,7 +194,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     clearInterval(interval);
                     return 4;
                 }
-                return prevCount - 1;
+                return nextCount;
             });
         }, 7000); // 7 seconds
 
