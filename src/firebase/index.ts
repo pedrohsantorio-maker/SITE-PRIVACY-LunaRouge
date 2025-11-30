@@ -1,10 +1,12 @@
 'use client';
 
 import { initializeApp, getApps, getApp, FirebaseApp, FirebaseOptions } from 'firebase/app';
-import { getAuth, signInAnonymously } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'
 
-// IMPORTANT: DO NOT MODIFY THIS FUNCTION
+// IMPORTANTE: NÃO MODIFIQUE ESTA FUNÇÃO
+// Esta função agora apenas inicializa o app e retorna os SDKs,
+// a lógica de login foi movida para o provider.
 export function initializeFirebase(config: FirebaseOptions) {
   if (getApps().length) {
     return getSdks(getApp());
@@ -16,13 +18,6 @@ export function initializeFirebase(config: FirebaseOptions) {
 
 export function getSdks(firebaseApp: FirebaseApp) {
   const auth = getAuth(firebaseApp);
-  // Automatically sign in users anonymously if they aren't signed in.
-  if (!auth.currentUser) {
-    signInAnonymously(auth).catch((error) => {
-      console.error("Anonymous sign-in failed on initialization:", error);
-    });
-  }
-
   return {
     firebaseApp,
     auth: auth,
