@@ -1,3 +1,4 @@
+
 import { PlaceHolderImages } from "./placeholder-images";
 
 const profileImage = PlaceHolderImages.find(img => img.id === 'model-profile');
@@ -73,8 +74,8 @@ export const modelData = {
       id: 'monthly',
       name: '30 Dias',
       price: '14,90',
-      paymentUrl: 'https://compraseguraonline.org.ua/c/013c371992',
-      tags: ['+ CHAMADA DE VÍDEO COMIGO HOJE!'],
+      paymentUrl: process.env.PAYMENT_MONTHLY,
+      tags: [],
       isFeatured: true,
     },
   ],
@@ -83,7 +84,7 @@ export const modelData = {
       id: 'quarterly',
       name: '3 MESES',
       price: '19,90',
-      paymentUrl: 'https://compraseguraonline.org.ua/c/691c74249a',
+      paymentUrl: process.env.PAYMENT_QUARTERLY,
       tags: ['Mais popular'],
       icon: 'Crown',
     },
@@ -91,14 +92,14 @@ export const modelData = {
       id: 'annual',
       name: '1 ANO',
       price: '49,90',
-      paymentUrl: 'https://compraseguraonline.org.ua/c/c7b830c4cd',
+      paymentUrl: process.env.PAYMENT_ANNUAL,
       tags: ['Melhor oferta'],
     },
     {
       id: 'lifetime',
       name: 'VITALÍCIO',
       price: '89,90',
-      paymentUrl: 'https://compraseguraonline.org.ua/c/cf7a8d8d48',
+      paymentUrl: process.env.PAYMENT_LIFETIME,
       tags: ['Exclusivo'],
     },
   ],
@@ -130,3 +131,5 @@ export const modelData = {
       height: 800,
   })),
 };
+
+    

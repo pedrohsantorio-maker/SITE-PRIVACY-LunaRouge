@@ -10,8 +10,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc, DocumentData, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
+
+import { useUser, useFirestore, useDoc, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
+import { doc, type DocumentData, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { trackSubscriptionClick } from '@/lib/tracking';
@@ -172,19 +174,23 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [socialProof, setSocialProof] = useState<SocialProofNotification | null>(null);
     const [remainingCount, setRemainingCount] = useState(11);
     const [isUrgencyPopupOpen, setIsUrgencyPopupOpen] = useState(false);
-    const [isSecondUrgencyPopupOpen, setIsSecondUrgencyPopupOpen] = useState(false);
+    const [isRejectionPopupOpen, setIsRejectionPopupOpen] = useState(false);
+    const [hasUrgencyPopupBeenShown, setHasUrgencyPopupBeenShown] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const pageTopRef = useRef<HTMLDivElement>(null);
     const subscriptionsRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
 
     // --- Remaining Subscriptions Counter & Popup---
-    useEffect(() => {
+     useEffect(() => {
         const interval = setInterval(() => {
             setRemainingCount(prevCount => {
                 if (prevCount <= 4) {
+                    if (!hasUrgencyPopupBeenShown) {
+                        setIsUrgencyPopupOpen(true);
+                        setHasUrgencyPopupBeenShown(true);
+                    }
                     clearInterval(interval);
-                    setIsUrgencyPopupOpen(true);
                     return 4;
                 }
                 return prevCount - 1;
@@ -192,7 +198,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
         }, 7000); // 7 seconds
 
         return () => clearInterval(interval);
-    }, []);
+    }, [hasUrgencyPopupBeenShown]);
+
 
     // --- Subscription Logic ---
     const firestore = useFirestore();
@@ -204,16 +211,23 @@ export function DashboardClient({ model }: { model: ModelData }) {
             const userDocRef = doc(firestore, 'users', user.uid);
             getDoc(userDocRef).then(async (docSnap) => {
                 if (!docSnap.exists()) {
-                     await setDoc(userDocRef, {
-                        id: user.uid,
+                    const userData = {
                         name: 'Visitante',
-                        email: `${user.uid}@anon.com`, 
+                        email: `${user.uid}@anon.com`,
                         subscriptionId: 'null',
                         status: 'not_paid',
                         createdAt: serverTimestamp(),
                         lastActive: serverTimestamp(),
                         hasClickedSubscription: false
-                    }, { merge: true });
+                    };
+                    await setDoc(userDocRef, userData, { merge: true }).catch(error => {
+                        const permissionError = new FirestorePermissionError({
+                            path: userDocRef.path,
+                            operation: 'create',
+                            requestResourceData: userData
+                        });
+                        errorEmitter.emit('permission-error', permissionError);
+                    });
                 }
             });
         }
@@ -240,13 +254,14 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const isLoadingSubscription = isUserLoading || isUserDocLoading || isSubLoading;
     // --- End Subscription Logic ---
     
+
     // --- Social Proof Popup Logic ---
     const scheduleNextPopup = () => {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
 
-        const randomInterval = Math.floor(Math.random() * (60000 - 15000 + 1)) + 15000; // 15s to 60s
+        const randomInterval = Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000; // 5s to 10s
         
         timeoutRef.current = setTimeout(() => {
             const randomName = socialProofNames[Math.floor(Math.random() * socialProofNames.length)];
@@ -289,15 +304,19 @@ export function DashboardClient({ model }: { model: ModelData }) {
         subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-     const handleGuaranteeClick = () => {
+    const handleGuaranteeVagaClick = () => {
         setIsUrgencyPopupOpen(false);
-        setIsSecondUrgencyPopupOpen(false);
+        setIsRejectionPopupOpen(false);
         subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
     
-    const handleRejectClick = () => {
+    const handleLeaveForLater = () => {
         setIsUrgencyPopupOpen(false);
-        setIsSecondUrgencyPopupOpen(true);
+        setIsRejectionPopupOpen(true);
+    };
+
+    const handleLoseOpportunity = () => {
+        setIsRejectionPopupOpen(false);
     };
 
     const overlayTexts = [
@@ -367,17 +386,17 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             Restam apenas <span className="font-bold text-white">{remainingCount}</span> assinaturas promocionais. Garanta seu acesso exclusivo por apenas <span className="font-bold text-white">R$ 14,90</span>!
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-sm">
-                            <Button onClick={handleGuaranteeClick} size="lg" className="w-full btn-glow text-lg">
+                            <Button onClick={handleGuaranteeVagaClick} size="lg" className="w-full btn-glow text-lg">
                                 Garantir Minha Vaga
                             </Button>
-                            <Button onClick={handleRejectClick} size="lg" variant="ghost" className="w-full text-lg">
+                            <Button onClick={handleLeaveForLater} size="lg" variant="ghost" className="w-full text-lg">
                                 Recusar Oferta
                             </Button>
                         </div>
                     </div>
                 </div>
             )}
-             {isSecondUrgencyPopupOpen && (
+             {isRejectionPopupOpen && (
                 <div className="fullscreen-popup-final">
                     <div className="popup-content">
                         <Flame className="h-16 w-16 text-red-500 animate-pulse" />
@@ -386,10 +405,10 @@ export function DashboardClient({ model }: { model: ModelData }) {
                            Esta é uma oferta única. Você realmente deseja perder a chance de ter acesso a todo o conteúdo por um valor tão baixo?
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-md">
-                            <Button onClick={handleGuaranteeClick} size="lg" className="w-full btn-glow text-lg">
+                            <Button onClick={handleGuaranteeVagaClick} size="lg" className="w-full btn-glow text-lg">
                                 Não, quero garantir meu plano!
                             </Button>
-                            <Button onClick={() => setIsSecondUrgencyPopupOpen(false)} size="lg" variant="destructive" className="w-full text-lg">
+                            <Button onClick={() => setIsRejectionPopupOpen(false)} size="lg" variant="destructive" className="w-full text-lg">
                                 Sim, quero perder
                             </Button>
                         </div>
@@ -461,10 +480,16 @@ export function DashboardClient({ model }: { model: ModelData }) {
                    <Card className="bg-card border-none p-6 rounded-2xl">
                         <h2 className="text-xl font-bold mb-4 uppercase">PLANOS</h2>
                         <div className="flex flex-wrap items-center gap-2 mb-4">
-                            <span className="inline-flex items-center gap-1.5 tag-promo px-3 py-1.5 text-sm font-bold">
-                               <Flame className="h-4 w-4" /> Promocional
+                            
+                            <span className="inline-flex items-center gap-1.5 tag-promo px-3 py-1.5 text-lg font-bold">
+                               <Flame className="h-5 w-5" /> Promocional
                             </span>
                         </div>
+                        {remainingCount > 0 && (
+                             <p className="text-center text-sm text-muted-foreground mb-4">
+                                Restam apenas <span id="remaining-count" className="animate-blink">{remainingCount}</span> vagas com o valor promocional!
+                            </p>
+                        )}
                         {model.subscriptions.filter(p => p.isFeatured).map(plan => (
                             <div key={plan.id}>
                                 <Button asChild className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg" onClick={handleSubscriptionClick}>
@@ -484,13 +509,13 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             </div>
                         ))}
 
-                        <div className="flex items-center justify-around text-base font-bold mt-4 mb-6">
+                        <div className="flex items-center justify-around text-lg font-bold mt-4 mb-6">
                             <div className="flex items-center gap-2 text-green-400">
-                                <Lock size={16} />
+                                <Lock size={20} />
                                 <span>Pagamento 100% seguro</span>
                             </div>
                             <div className="flex items-center gap-2 text-green-400">
-                                <Sparkles size={16} />
+                                <Sparkles size={20} />
                                 <span>Acesso imediato</span>
                             </div>
                         </div>
@@ -543,7 +568,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                            <Camera size={16} /> {model.stats.photos} Fotos
                            {!isSubscribed && <Lock className="w-3 h-3 ml-1" />}
                         </TabsTrigger>
-                        <TabsTrigger value="videos" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400 text-xs sm:text-sm">
+                        <TabsTrigger value="videos" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-neutral-800 data-[state=active]:text-white data-[state=active]:shadow-none rounded-lg text-neutral-400 text-xs sm:text_sm">
                             <Video size={16} /> {model.stats.videos} Vídeos
                              {!isSubscribed && <Lock className="w-3 h-3 ml-1" />}
                         </TabsTrigger>
@@ -698,6 +723,41 @@ export function DashboardClient({ model }: { model: ModelData }) {
             )}
             {/* --- End Social Proof Popup --- */}
 
+            <AlertDialog open={isUrgencyPopupOpen} onOpenChange={setIsUrgencyPopupOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                           <AlertTriangle className="text-yellow-500"/> Vagas Quase Esgotadas!
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            As vagas com valor promocional estão acabando. Não perca a chance de ter acesso ao conteúdo mais exclusivo. Assine agora!
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => handleLeaveForLater()}>DEIXAR PARA DEPOIS</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleGuaranteeVagaClick()} className="bg-primary hover:bg-primary/90">GARANTIR MINHA VAGA</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            
+            <AlertDialog open={isRejectionPopupOpen} onOpenChange={setIsRejectionPopupOpen}>
+                 <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                           <AlertTriangle className="text-primary"/> Você tem certeza?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Vai mesmo perder a oportunidade de garantir o conteúdo mais exclusivo por apenas <span className="font-bold text-primary">R$ {mainPlan?.price || '14,90'}</span>?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => handleLoseOpportunity()}>Não, perder oportunidade</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleGuaranteeVagaClick()} className="bg-primary hover:bg-primary/90">Sim, quero garantir!</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-0 max-w-lg w-full">
                     <DialogTitle className="sr-only">Foto de Perfil de {model.name}</DialogTitle>
@@ -756,8 +816,3 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
-
-    
-
-    
-
