@@ -177,16 +177,17 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const subscriptionsRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
 
-     // --- Remaining Subscriptions Counter ---
+    // --- Remaining Subscriptions Counter & Popup---
     useEffect(() => {
         const interval = setInterval(() => {
             setRemainingCount(prevCount => {
                 if (prevCount > 4) {
-                    return prevCount - 1;
-                }
-                // When count reaches 4, show the popup and stop the interval
-                if (prevCount === 5) { // It will be 4 in the next state update
-                    setIsUrgencyPopupOpen(true);
+                    const nextCount = prevCount - 1;
+                    if (nextCount === 4) {
+                        setIsUrgencyPopupOpen(true);
+                        clearInterval(interval); 
+                    }
+                    return nextCount;
                 }
                 clearInterval(interval);
                 return prevCount;
@@ -731,5 +732,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
+    
 
     
