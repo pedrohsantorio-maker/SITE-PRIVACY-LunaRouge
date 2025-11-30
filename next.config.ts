@@ -1,6 +1,5 @@
 
 import type {NextConfig} from 'next';
-require('dotenv').config();
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -43,15 +42,6 @@ pathname: '/**',
         pathname: '/**',
       }
     ],
-  },
-  // Expor variáveis de ambiente para o cliente de forma segura
-  env: {
-    NEXT_PUBLIC_FB_AK: process.env.FB_AK,
-    NEXT_PUBLIC_FB_AD: process.env.FB_AD,
-    NEXT_PUBLIC_FB_PID: process.env.FB_PID,
-    NEXT_PUBLIC_FB_SB: process.env.FB_SB,
-    NEXT_PUBLIC_FB_MSID: process.env.FB_MSID,
-    NEXT_PUBLIC_FB_APPID: process.env.FB_APPID,
   },
 };
 

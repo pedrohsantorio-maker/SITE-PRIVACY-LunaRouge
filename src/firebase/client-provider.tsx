@@ -23,12 +23,12 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
     try {
       // As variáveis de ambiente públicas são injetadas pelo Next.js durante o build.
       const config: FirebaseOptions = {
-        apiKey: process.env.NEXT_PUBLIC_FB_AK,
-        authDomain: process.env.NEXT_PUBLIC_FB_AD,
-        projectId: process.env.NEXT_PUBLIC_FB_PID,
-        storageBucket: process.env.NEXT_PUBLIC_FB_SB,
-        messagingSenderId: process.env.NEXT_PUBLIC_FB_MSID,
-        appId: process.env.NEXT_PUBLIC_FB_APPID,
+        apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+        authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+        appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
       };
 
       // Validação crucial: Garante que a API key exista antes de inicializar.
