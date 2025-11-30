@@ -181,12 +181,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
     useEffect(() => {
         const interval = setInterval(() => {
             setRemainingCount(prevCount => {
-                if (prevCount > 4) {
-                    const nextCount = prevCount - 1;
-                    if (nextCount === 4) {
-                        setIsUrgencyPopupOpen(true);
-                        clearInterval(interval); 
-                    }
+                const nextCount = prevCount - 1;
+                if (nextCount === 4) {
+                    setIsUrgencyPopupOpen(true);
+                }
+                if (nextCount >= 4) {
                     return nextCount;
                 }
                 clearInterval(interval);
@@ -360,7 +359,9 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     <div className="popup-content">
                         <AlertTriangle className="h-16 w-16 text-yellow-400 animate-pulse" />
                         <h2 className="text-3xl font-bold mt-4">ÚLTIMA CHANCE!</h2>
-                        <p className="text-muted-foreground mt-2 text-lg">Restam apenas <span className="font-bold text-white">{remainingCount}</span> assinaturas promocionais. Não perca a oportunidade de ter acesso exclusivo!</p>
+                        <p className="text-muted-foreground mt-2 text-lg">
+                            Restam apenas <span className="font-bold text-white">{remainingCount}</span> assinaturas promocionais. Garanta seu acesso exclusivo por apenas <span className="font-bold text-white">R$ 14,90</span>!
+                        </p>
                         <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-sm">
                             <Button onClick={handleGuaranteeClick} size="lg" className="w-full btn-glow text-lg">
                                 Garantir Minha Vaga
