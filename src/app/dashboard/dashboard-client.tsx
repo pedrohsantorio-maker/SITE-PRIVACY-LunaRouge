@@ -189,7 +189,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 }
                 return prevCount - 1;
             });
-        }, 10000); // 10 seconds
+        }, 7000); // 7 seconds
 
         return () => clearInterval(interval);
     }, []);
@@ -760,3 +760,4 @@ export function DashboardClient({ model }: { model: ModelData }) {
     
 
     
+
