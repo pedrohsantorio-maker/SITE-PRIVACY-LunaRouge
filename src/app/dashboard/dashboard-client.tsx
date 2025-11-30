@@ -394,9 +394,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
                    <Card className="bg-card border-none p-6 rounded-2xl">
                         <h2 className="text-xl font-bold mb-4 uppercase">PLANOS</h2>
                         <div className="flex flex-wrap items-center gap-2 mb-4">
-                            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold tag-promo">
-                                VEJA TUDO AGORA 🔥
-                            </span>
                             <span className="inline-flex items-center gap-1.5 tag-promo px-3 py-1.5 text-sm font-bold">
                                <Flame className="h-4 w-4" /> Promocional
                             </span>
