@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown, Flame } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown, Flame, AlertTriangle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -171,6 +171,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [activeTab, setActiveTab] = useState('previews');
     const [socialProof, setSocialProof] = useState<SocialProofNotification | null>(null);
     const [remainingCount, setRemainingCount] = useState(11);
+    const [isUrgencyPopupOpen, setIsUrgencyPopupOpen] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const pageTopRef = useRef<HTMLDivElement>(null);
     const subscriptionsRef = useRef<HTMLDivElement>(null);
@@ -182,6 +183,10 @@ export function DashboardClient({ model }: { model: ModelData }) {
             setRemainingCount(prevCount => {
                 if (prevCount > 4) {
                     return prevCount - 1;
+                }
+                // When count reaches 4, show the popup and stop the interval
+                if (prevCount === 5) { // It will be 4 in the next state update
+                    setIsUrgencyPopupOpen(true);
                 }
                 clearInterval(interval);
                 return prevCount;
@@ -286,6 +291,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
         subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+     const handleGuaranteeClick = () => {
+        setIsUrgencyPopupOpen(false);
+        subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     const overlayTexts = [
         "Um gostinho do que você vai receber...",
         "Se aqui já está assim, imagina no conteúdo exclusivo!",
@@ -344,6 +354,23 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center p-0 sm:p-4">
+             {isUrgencyPopupOpen && (
+                <div className="fullscreen-popup">
+                    <div className="popup-content">
+                        <AlertTriangle className="h-16 w-16 text-yellow-400 animate-pulse" />
+                        <h2 className="text-3xl font-bold mt-4">ÚLTIMA CHANCE!</h2>
+                        <p className="text-muted-foreground mt-2 text-lg">Restam apenas <span className="font-bold text-white">{remainingCount}</span> assinaturas promocionais. Não perca a oportunidade de ter acesso exclusivo!</p>
+                        <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-sm">
+                            <Button onClick={handleGuaranteeClick} size="lg" className="w-full btn-glow text-lg">
+                                Garantir Minha Vaga
+                            </Button>
+                            <Button onClick={() => setIsUrgencyPopupOpen(false)} size="lg" variant="ghost" className="w-full text-lg">
+                                Recusar Oferta
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="w-full max-w-2xl space-y-4">
                 <div ref={pageTopRef} />
                 <Card className="bg-[#121212] rounded-none sm:rounded-2xl overflow-hidden border-none sm:border-neutral-800">
