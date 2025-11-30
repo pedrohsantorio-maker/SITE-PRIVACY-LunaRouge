@@ -170,11 +170,26 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState('previews');
     const [socialProof, setSocialProof] = useState<SocialProofNotification | null>(null);
+    const [remainingCount, setRemainingCount] = useState(11);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const pageTopRef = useRef<HTMLDivElement>(null);
     const subscriptionsRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
 
+     // --- Remaining Subscriptions Counter ---
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setRemainingCount(prevCount => {
+                if (prevCount > 4) {
+                    return prevCount - 1;
+                }
+                clearInterval(interval);
+                return prevCount;
+            });
+        }, 10000); // 10 seconds
+
+        return () => clearInterval(interval);
+    }, []);
 
     // --- Subscription Logic ---
     const firestore = useFirestore();
@@ -455,6 +470,14 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>
+
+                        <Card className="mt-6 bg-transparent border-primary/30 text-center">
+                            <CardContent className="p-3">
+                                <p className="text-sm font-bold text-primary animate-pulse-orange">
+                                    🔥 RESTAM APENAS <span id="remaining-count" className="animate-blink">{remainingCount}</span> ASSINATURAS PROMOCIONAIS!
+                                </p>
+                            </CardContent>
+                        </Card>
                     </Card>
                 </div>
 
