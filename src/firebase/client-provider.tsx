@@ -20,34 +20,28 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // A verificação `typeof window !== 'undefined'` é uma segurança extra.
-    // O useEffect com array de dependências vazio já garante a execução no cliente.
-    if (typeof window !== 'undefined') {
-      // Função para buscar a configuração do Firebase da nossa API route.
-      const fetchFirebaseConfig = async () => {
-        try {
-          const res = await fetch('/api/firebase-config');
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error || 'Falha ao buscar a configuração do Firebase.');
-          }
-          const config: FirebaseOptions = await res.json();
-          
-          // Validação crucial: Garante que a API key exista antes de inicializar.
-          if (!config.apiKey) {
-            throw new Error('Chave de API do Firebase ausente na configuração recebida do servidor.');
-          }
-          
-          // Inicializa o Firebase com a configuração recebida.
-          setFirebaseServices(initializeFirebase(config));
-
-        } catch (e: any) {
-          console.error("Erro na inicialização do Firebase:", e.message);
-          setError("Não foi possível inicializar o Firebase. Verifique as variáveis de ambiente no servidor e os logs.");
-        }
+    try {
+      // As variáveis de ambiente públicas são injetadas pelo Next.js durante o build.
+      const config: FirebaseOptions = {
+        apiKey: process.env.NEXT_PUBLIC_FB_AK,
+        authDomain: process.env.NEXT_PUBLIC_FB_AD,
+        projectId: process.env.NEXT_PUBLIC_FB_PID,
+        storageBucket: process.env.NEXT_PUBLIC_FB_SB,
+        messagingSenderId: process.env.NEXT_PUBLIC_FB_MSID,
+        appId: process.env.NEXT_PUBLIC_FB_APPID,
       };
 
-      fetchFirebaseConfig();
+      // Validação crucial: Garante que a API key exista antes de inicializar.
+      if (!config.apiKey || !config.projectId) {
+        throw new Error('A configuração do Firebase (variáveis de ambiente NEXT_PUBLIC_...) não está definida. Verifique seu arquivo .env ou as configurações do ambiente de hospedagem.');
+      }
+      
+      // Inicializa o Firebase com a configuração.
+      setFirebaseServices(initializeFirebase(config));
+
+    } catch (e: any) {
+      console.error("Erro na inicialização do Firebase:", e.message);
+      setError("Não foi possível inicializar o Firebase. Verifique as variáveis de ambiente no servidor e os logs do build.");
     }
   }, []); // O array vazio garante que isso rode apenas uma vez, no cliente.
 

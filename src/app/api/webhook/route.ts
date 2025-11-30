@@ -16,19 +16,22 @@ let adminApp: App;
  */
 function initializeFirebaseAdmin(): App {
   // Retorna a app existente se já foi inicializada.
-  if (getApps().some(app => app.name === 'firebase-admin-app')) {
-    return getApps().find(app => app.name === 'firebase-admin-app')!;
+  const adminAppName = 'firebase-admin-app-webhook';
+  const existingApp = getApps().find(app => app.name === adminAppName);
+  if (existingApp) {
+    return existingApp;
   }
   
   // Lança um erro se as credenciais da conta de serviço não estiverem configuradas.
   if (!serviceAccount) {
-    throw new Error('As credenciais da conta de serviço do Firebase não estão definidas nas variáveis de ambiente.');
+    throw new Error('As credenciais da conta de serviço do Firebase (FB_SA) não estão definidas nas variáveis de ambiente do servidor.');
   }
 
   // Inicializa a app com as credenciais.
   adminApp = initializeApp({
     credential: cert(serviceAccount),
-  }, 'firebase-admin-app');
+    databaseURL: `https://${process.env.NEXT_PUBLIC_FB_PID}.firebaseio.com`
+  }, adminAppName);
 
   return adminApp;
 }
