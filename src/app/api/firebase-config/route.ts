@@ -12,8 +12,8 @@ export async function GET() {
 
   // Validação para garantir que as variáveis de ambiente estão definidas no servidor
   if (!config.apiKey || !config.projectId) {
-    console.error('Firebase server environment variables are not set.');
-    return NextResponse.json({ error: 'Firebase configuration is missing on the server.' }, { status: 500 });
+    console.error('Firebase server environment variables are not set. Check your .env file or hosting provider settings.');
+    return NextResponse.json({ error: 'Firebase configuration is missing on the server. Please check environment variables.' }, { status: 500 });
   }
 
   return NextResponse.json(config);
