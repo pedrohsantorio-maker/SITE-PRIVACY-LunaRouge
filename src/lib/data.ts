@@ -1,4 +1,5 @@
 
+
 import { PlaceHolderImages } from "./placeholder-images";
 
 const profileImage = PlaceHolderImages.find(img => img.id === 'model-profile');
@@ -74,7 +75,7 @@ export const modelData = {
       id: 'monthly',
       name: '30 Dias',
       price: '14,90',
-      paymentUrl: process.env.NEXT_PUBLIC_PAYMENT_MONTHLY,
+      paymentUrl: `pagamento`,
       tags: [],
       isFeatured: true,
     },
@@ -84,7 +85,7 @@ export const modelData = {
       id: 'quarterly',
       name: '3 MESES',
       price: '19,90',
-      paymentUrl: process.env.NEXT_PUBLIC_PAYMENT_QUARTERLY,
+      paymentUrl: `pagamento`,
       tags: ['Mais popular'],
       icon: 'Crown',
     },
@@ -92,14 +93,14 @@ export const modelData = {
       id: 'annual',
       name: '1 ANO',
       price: '49,90',
-      paymentUrl: process.env.NEXT_PUBLIC_PAYMENT_ANNUAL,
+      paymentUrl: `pagamento`,
       tags: ['Melhor oferta'],
     },
     {
       id: 'lifetime',
       name: 'VITALÍCIO',
       price: '89,90',
-      paymentUrl: process.env.NEXT_PUBLIC_PAYMENT_LIFETIME,
+      paymentUrl: `pagamento`,
       tags: ['Exclusivo'],
     },
   ],

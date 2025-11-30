@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
 
 import { useUser, useFirestore, useDoc, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
-import { doc, type DocumentData, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, type DocumentData, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { trackSubscriptionClick } from '@/lib/tracking';
@@ -295,9 +295,21 @@ export function DashboardClient({ model }: { model: ModelData }) {
     }, []);
     // --- End Social Proof Popup Logic ---
 
-    const handleSubscriptionClick = () => {
+    const handleSubscriptionClick = (plan: Plan) => {
         if (user && firestore) {
-            trackSubscriptionClick(firestore, user.uid);
+            const userDocRef = doc(firestore, "users", user.uid);
+            updateDoc(userDocRef, {
+                hasClickedSubscription: true,
+                plan: plan.id, // Store the plan id
+            }).catch(error => {
+                 const permissionError = new FirestorePermissionError({
+                    path: userDocRef.path,
+                    operation: 'update',
+                    requestResourceData: { hasClickedSubscription: true, plan: plan.id },
+                });
+                errorEmitter.emit('permission-error', permissionError);
+                console.error("Failed to track subscription click:", error);
+            });
         }
     };
 
@@ -493,8 +505,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         )}
                         {model.subscriptions.filter(p => p.isFeatured).map(plan => (
                             <div key={plan.id}>
-                                <Button asChild className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg" onClick={handleSubscriptionClick}>
-                                    <Link href={plan.paymentUrl || "#"} target="_blank">
+                                <Button asChild className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg" onClick={() => handleSubscriptionClick(plan)}>
+                                    <Link href={plan.paymentUrl || "#"}>
                                         <span className="text-lg font-bold uppercase">{plan.name}</span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-xl font-bold">R$ {plan.price}</span>
@@ -529,8 +541,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 <AccordionContent>
                                     <div className="flex flex-col gap-3 pt-2">
                                     {model.promotions.map(plan => (
-                                        <Button key={plan.id} asChild variant="outline" className="w-full h-auto justify-between p-3 rounded-lg border border-primary/50 bg-card hover:bg-primary/10" onClick={handleSubscriptionClick}>
-                                            <Link href={plan.paymentUrl || "#"} target="_blank">
+                                        <Button key={plan.id} asChild variant="outline" className="w-full h-auto justify-between p-3 rounded-lg border border-primary/50 bg-card hover:bg-primary/10" onClick={() => handleSubscriptionClick(plan)}>
+                                            <Link href={plan.paymentUrl || "#"}>
                                                 <div className="flex items-center gap-2">
                                                     {plan.icon === 'Crown' && <Crown className="h-5 w-5 text-yellow-400" />}
                                                     <span className="font-bold uppercase">{plan.name}</span>
@@ -691,8 +703,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </Accordion>
                      {mainPlan && (
                         <div className="mt-8">
-                            <Button asChild className="w-full h-auto text-left justify-center p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg btn-glow" size="lg" onClick={handleSubscriptionClick}>
-                                <Link href={mainPlan.paymentUrl || "#"} target="_blank">
+                            <Button asChild className="w-full h-auto text-left justify-center p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg btn-glow" size="lg" onClick={() => handleSubscriptionClick(mainPlan)}>
+                                <Link href={mainPlan.paymentUrl || "#"}>
                                     <div className="flex flex-col items-center">
                                       <span className="text-sm font-normal">Veja tudo por apenas</span>
                                       <span className="text-xl font-bold">R$ {mainPlan.price}</span>
