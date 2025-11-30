@@ -425,7 +425,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             <Button onClick={handleGuaranteeVagaClick} size="lg" className="w-full btn-glow text-lg">
                                 Não, quero garantir meu plano!
                             </Button>
-                            <Button onClick={() => setIsRejectionPopupOpen(false)} size="lg" variant="destructive" className="w-full text-lg">
+                            <Button onClick={handleLoseOpportunity} size="lg" variant="destructive" className="w-full text-lg">
                                 Sim, quero perder
                             </Button>
                         </div>
@@ -733,24 +733,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </div>
             )}
             {/* --- End Social Proof Popup --- */}
-
-            <AlertDialog open={isRejectionPopupOpen} onOpenChange={setIsRejectionPopupOpen}>
-                 <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2">
-                           <AlertTriangle className="text-primary"/> Você tem certeza?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Vai mesmo perder a oportunidade de garantir o conteúdo mais exclusivo por apenas <span className="font-bold text-primary">R$ {mainPlan?.price || '14,90'}</span>?
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => handleLoseOpportunity()}>Não, perder oportunidade</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleGuaranteeVagaClick()} className="bg-primary hover:bg-primary/90">Sim, quero garantir!</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-
 
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-0 max-w-lg w-full">
