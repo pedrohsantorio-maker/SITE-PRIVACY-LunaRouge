@@ -506,7 +506,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         {model.subscriptions.filter(p => p.isFeatured).map(plan => (
                             <div key={plan.id}>
                                 <Button asChild className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg" onClick={() => handleSubscriptionClick(plan)}>
-                                    <Link href={plan.paymentUrl || "#"}>
+                                    <Link href={plan.paymentUrl || "#"} target="_blank" rel="noopener noreferrer">
                                         <span className="text-lg font-bold uppercase">{plan.name}</span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-xl font-bold">R$ {plan.price}</span>
@@ -542,7 +542,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                     <div className="flex flex-col gap-3 pt-2">
                                     {model.promotions.map(plan => (
                                         <Button key={plan.id} asChild variant="outline" className="w-full h-auto justify-between p-3 rounded-lg border border-primary/50 bg-card hover:bg-primary/10" onClick={() => handleSubscriptionClick(plan)}>
-                                            <Link href={plan.paymentUrl || "#"}>
+                                            <Link href={plan.paymentUrl || "#"} target="_blank" rel="noopener noreferrer">
                                                 <div className="flex items-center gap-2">
                                                     {plan.icon === 'Crown' && <Crown className="h-5 w-5 text-yellow-400" />}
                                                     <span className="font-bold uppercase">{plan.name}</span>
@@ -704,7 +704,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                      {mainPlan && (
                         <div className="mt-8">
                             <Button asChild className="w-full h-auto text-left justify-center p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg btn-glow" size="lg" onClick={() => handleSubscriptionClick(mainPlan)}>
-                                <Link href={mainPlan.paymentUrl || "#"}>
+                                <Link href={mainPlan.paymentUrl || "#"} target="_blank" rel="noopener noreferrer">
                                     <div className="flex flex-col items-center">
                                       <span className="text-sm font-normal">Veja tudo por apenas</span>
                                       <span className="text-xl font-bold">R$ {mainPlan.price}</span>
