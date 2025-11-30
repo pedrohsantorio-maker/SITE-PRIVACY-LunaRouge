@@ -311,6 +311,10 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 console.error("Failed to track subscription click:", error);
             });
         }
+        
+        if (plan.paymentUrl) {
+            window.open(plan.paymentUrl, '_blank');
+        }
     };
 
     const handleUnlockClick = () => {
@@ -505,14 +509,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         )}
                         {model.subscriptions.filter(p => p.isFeatured).map(plan => (
                             <div key={plan.id}>
-                                <Button asChild className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg" onClick={() => handleSubscriptionClick(plan)}>
-                                    <Link href={plan.paymentUrl || "#"} target="_blank" rel="noopener noreferrer">
-                                        <span className="text-lg font-bold uppercase">{plan.name}</span>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xl font-bold">R$ {plan.price}</span>
-                                            <ArrowRight className="h-5 w-5" />
-                                        </div>
-                                    </Link>
+                                <Button className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg" onClick={() => handleSubscriptionClick(plan)}>
+                                    <span className="text-lg font-bold uppercase">{plan.name}</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xl font-bold">R$ {plan.price}</span>
+                                        <ArrowRight className="h-5 w-5" />
+                                    </div>
                                 </Button>
                                 {plan.tags?.map(tag => (
                                 <div key={tag} className="inline-flex items-center gap-1.5 rounded-full bg-primary/20 text-primary-foreground px-3 py-1 text-xs font-bold mb-4">
@@ -541,19 +543,17 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 <AccordionContent>
                                     <div className="flex flex-col gap-3 pt-2">
                                     {model.promotions.map(plan => (
-                                        <Button key={plan.id} asChild variant="outline" className="w-full h-auto justify-between p-3 rounded-lg border border-primary/50 bg-card hover:bg-primary/10" onClick={() => handleSubscriptionClick(plan)}>
-                                            <Link href={plan.paymentUrl || "#"} target="_blank" rel="noopener noreferrer">
-                                                <div className="flex items-center gap-2">
-                                                    {plan.icon === 'Crown' && <Crown className="h-5 w-5 text-yellow-400" />}
-                                                    <span className="font-bold uppercase">{plan.name}</span>
-                                                    {plan.tags?.map(tag => (
-                                                        <span key={tag} className={cn('text-xs font-semibold px-2 py-0.5 rounded-full', getTagClass(tag))}>
-                                                            {tag} {tag === 'Mais popular' && '🔥'}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                                <span className="font-bold text-lg">R$ {plan.price}</span>
-                                            </Link>
+                                        <Button key={plan.id} variant="outline" className="w-full h-auto justify-between p-3 rounded-lg border border-primary/50 bg-card hover:bg-primary/10" onClick={() => handleSubscriptionClick(plan)}>
+                                            <div className="flex items-center gap-2">
+                                                {plan.icon === 'Crown' && <Crown className="h-5 w-5 text-yellow-400" />}
+                                                <span className="font-bold uppercase">{plan.name}</span>
+                                                {plan.tags?.map(tag => (
+                                                    <span key={tag} className={cn('text-xs font-semibold px-2 py-0.5 rounded-full', getTagClass(tag))}>
+                                                        {tag} {tag === 'Mais popular' && '🔥'}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <span className="font-bold text-lg">R$ {plan.price}</span>
                                         </Button>
                                     ))}
                                     </div>
@@ -703,14 +703,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </Accordion>
                      {mainPlan && (
                         <div className="mt-8">
-                            <Button asChild className="w-full h-auto text-left justify-center p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg btn-glow" size="lg" onClick={() => handleSubscriptionClick(mainPlan)}>
-                                <Link href={mainPlan.paymentUrl || "#"} target="_blank" rel="noopener noreferrer">
-                                    <div className="flex flex-col items-center">
-                                      <span className="text-sm font-normal">Veja tudo por apenas</span>
-                                      <span className="text-xl font-bold">R$ {mainPlan.price}</span>
-                                    </div>
-                                    <ArrowRight className="h-5 w-5 ml-4" />
-                                </Link>
+                            <Button className="w-full h-auto text-left justify-center p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg btn-glow" size="lg" onClick={() => handleSubscriptionClick(mainPlan)}>
+                                <div className="flex flex-col items-center">
+                                  <span className="text-sm font-normal">Veja tudo por apenas</span>
+                                  <span className="text-xl font-bold">R$ {mainPlan.price}</span>
+                                </div>
+                                <ArrowRight className="h-5 w-5 ml-4" />
                             </Button>
                         </div>
                     )}
@@ -736,23 +734,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
             )}
             {/* --- End Social Proof Popup --- */}
 
-            <AlertDialog open={isUrgencyPopupOpen} onOpenChange={setIsUrgencyPopupOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2">
-                           <AlertTriangle className="text-yellow-500"/> Vagas Quase Esgotadas!
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            As vagas com valor promocional estão acabando. Não perca a chance de ter acesso ao conteúdo mais exclusivo. Assine agora!
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => handleLeaveForLater()}>DEIXAR PARA DEPOIS</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleGuaranteeVagaClick()} className="bg-primary hover:bg-primary/90">GARANTIR MINHA VAGA</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-            
             <AlertDialog open={isRejectionPopupOpen} onOpenChange={setIsRejectionPopupOpen}>
                  <AlertDialogContent>
                     <AlertDialogHeader>
