@@ -198,6 +198,13 @@
     transform: translateY(20px);
   }
 
+  .upsell-popup {
+    @apply relative max-w-md w-full;
+    background-color: #fcefee;
+    color: #333;
+    border: 2px solid #f9d7dd;
+   }
+
   .fullscreen-popup-final {
     @apply fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm;
     animation: fadeIn 0.2s ease-out forwards;
