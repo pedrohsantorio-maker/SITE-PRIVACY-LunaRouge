@@ -12,8 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
 
-import { useUser, useFirestore, useDoc, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
-import { doc, type DocumentData, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc, type DocumentData, serverTimestamp } from 'firebase/firestore';
+import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { trackSubscriptionClick } from '@/lib/tracking';
@@ -202,44 +203,40 @@ export function DashboardClient({ model }: { model: ModelData }) {
     }, [hasUrgencyPopupBeenShown]);
 
 
-    // --- Subscription Logic ---
+    // --- Subscription & User Logic ---
     const firestore = useFirestore();
     const { user, isUserLoading } = useUser();
 
-    // Anonymous User Handling
-    useEffect(() => {
-        if (!isUserLoading && user && firestore) {
-            const userDocRef = doc(firestore, 'users', user.uid);
-            getDoc(userDocRef).then(async (docSnap) => {
-                if (!docSnap.exists()) {
-                    const userData = {
-                        name: 'Visitante',
-                        email: `${user.uid}@anon.com`,
-                        subscriptionId: 'null',
-                        status: 'not_paid',
-                        createdAt: serverTimestamp(),
-                        lastActive: serverTimestamp(),
-                        hasClickedSubscription: false
-                    };
-                    await setDoc(userDocRef, userData, { merge: true }).catch(error => {
-                        const permissionError = new FirestorePermissionError({
-                            path: userDocRef.path,
-                            operation: 'create',
-                            requestResourceData: userData
-                        });
-                        errorEmitter.emit('permission-error', permissionError);
-                    });
-                }
-            });
-        }
-    }, [isUserLoading, user, firestore]);
-
-    // Get user data to find the subscriptionId
+    // Create a stable reference to the user document
     const userDocRef = useMemoFirebase(() => {
         if (!firestore || !user) return null;
         return doc(firestore, 'users', user.uid);
     }, [firestore, user]);
+    
+    // Use the useDoc hook to get real-time user data and loading status
     const { data: userData, isLoading: isUserDocLoading } = useDoc(userDocRef);
+
+    // Effect to create a new user document if one doesn't exist
+    useEffect(() => {
+        // We proceed only if we have a user and the document loading has finished.
+        if (user && userDocRef && !isUserDocLoading) {
+            // If data is null after loading, it means the document doesn't exist.
+            if (userData === null) {
+                const newUserData = {
+                    name: 'Visitante',
+                    email: user.isAnonymous ? `${user.uid}@anon.com` : (user.email || `${user.uid}@anon.com`),
+                    subscriptionId: 'null',
+                    status: 'not_paid',
+                    createdAt: serverTimestamp(),
+                    lastActive: serverTimestamp(),
+                    hasClickedSubscription: false,
+                };
+                // Use a non-blocking write operation to create the document
+                setDocumentNonBlocking(userDocRef, newUserData, { merge: true });
+            }
+        }
+    }, [user, userDocRef, userData, isUserDocLoading]);
+
 
     // Get subscription data using the subscriptionId from the user data
     const subscriptionDocRef = useMemoFirebase(() => {
@@ -296,19 +293,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
     // --- End Social Proof Popup Logic ---
 
     const handleSubscriptionClick = (plan: Plan) => {
-        if (user && firestore) {
-            const userDocRef = doc(firestore, "users", user.uid);
-            updateDoc(userDocRef, {
+        if (userDocRef) {
+            // Use a non-blocking update to track the click
+            updateDocumentNonBlocking(userDocRef, {
                 hasClickedSubscription: true,
                 plan: plan.id, // Store the plan id
-            }).catch(error => {
-                 const permissionError = new FirestorePermissionError({
-                    path: userDocRef.path,
-                    operation: 'update',
-                    requestResourceData: { hasClickedSubscription: true, plan: plan.id },
-                });
-                errorEmitter.emit('permission-error', permissionError);
-                console.error("Failed to track subscription click:", error);
             });
         }
         
@@ -792,3 +781,5 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
+    
