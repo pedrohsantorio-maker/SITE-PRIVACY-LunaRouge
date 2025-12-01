@@ -13,11 +13,10 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
 
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc, type DocumentData, serverTimestamp } from 'firebase/firestore';
-import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { doc, type DocumentData } from 'firebase/firestore';
+import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { trackSubscriptionClick } from '@/lib/tracking';
 
 // Inline SVG for social icons to avoid installing a new library
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -215,28 +214,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
     
     // Use the useDoc hook to get real-time user data and loading status
     const { data: userData, isLoading: isUserDocLoading } = useDoc(userDocRef);
-
-    // Effect to create a new user document if one doesn't exist
-    useEffect(() => {
-        // We proceed only if we have a user and the document loading has finished.
-        if (user && userDocRef && !isUserDocLoading) {
-            // If data is null after loading, it means the document doesn't exist.
-            if (userData === null) {
-                const newUserData = {
-                    name: 'Visitante',
-                    email: user.isAnonymous ? `${user.uid}@anon.com` : (user.email || `${user.uid}@anon.com`),
-                    subscriptionId: 'null',
-                    status: 'not_paid',
-                    createdAt: serverTimestamp(),
-                    lastActive: serverTimestamp(),
-                    hasClickedSubscription: false,
-                };
-                // Use a non-blocking write operation to create the document
-                setDocumentNonBlocking(userDocRef, newUserData, { merge: true });
-            }
-        }
-    }, [user, userDocRef, userData, isUserDocLoading]);
-
 
     // Get subscription data using the subscriptionId from the user data
     const subscriptionDocRef = useMemoFirebase(() => {
@@ -781,5 +758,3 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
-
-    

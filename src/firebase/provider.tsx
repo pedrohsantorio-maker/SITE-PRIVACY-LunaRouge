@@ -2,7 +2,7 @@
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
-import { Firestore, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { Firestore, doc, serverTimestamp, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 
@@ -64,35 +64,56 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     userError: null,
   });
 
-  // Effect to subscribe to Firebase auth state changes
+  // Effect to subscribe to Firebase auth state changes and create user document
   useEffect(() => {
-    if (!auth) { // If no Auth service instance, cannot determine user state
-      setUserAuthState({ user: null, isUserLoading: false, userError: new Error("Auth service not provided.") });
+    if (!auth || !firestore) { // If no Auth service instance, cannot determine user state
+      setUserAuthState({ user: null, isUserLoading: false, userError: new Error("Auth or Firestore service not provided.") });
       return;
     }
 
-    setUserAuthState({ user: null, isUserLoading: true, userError: null }); // Reset on auth instance change
+    const handleUser = async (firebaseUser: User | null) => {
+       if (firebaseUser) {
+           // User is signed in.
+           const userRef = doc(firestore, 'users', firebaseUser.uid);
+           const userDoc = await getDoc(userRef);
 
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (firebaseUser) => { // Auth state determined
-        if (firebaseUser) {
+           if (!userDoc.exists()) {
+               // User document doesn't exist, create it.
+               const newUserData = {
+                   name: 'Visitante',
+                   email: firebaseUser.isAnonymous ? `${firebaseUser.uid}@anon.com` : (firebaseUser.email || `${firebaseUser.uid}@anon.com`),
+                   subscriptionId: 'null',
+                   status: 'not_paid',
+                   createdAt: serverTimestamp(),
+                   lastActive: serverTimestamp(),
+                   hasClickedSubscription: false,
+               };
+               try {
+                   await setDoc(userRef, newUserData);
+               } catch (e) {
+                   console.error("FirebaseProvider: Error creating user document:", e);
+               }
+           }
            setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
-        } else {
-            // If no user, sign in anonymously
-            signInAnonymously(auth).catch((error) => {
-                console.error("Anonymous sign-in failed:", error);
-                 setUserAuthState({ user: null, isUserLoading: false, userError: error });
-            })
-        }
-      },
-      (error) => { // Auth listener error
+       } else {
+           // No user signed in, attempt anonymous sign-in
+           try {
+               await signInAnonymously(auth);
+               // onAuthStateChanged will be re-triggered with the new user
+           } catch (error) {
+               console.error("FirebaseProvider: Anonymous sign-in failed:", error);
+               setUserAuthState({ user: null, isUserLoading: false, userError: error as Error });
+           }
+       }
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, handleUser, (error) => {
         console.error("FirebaseProvider: onAuthStateChanged error:", error);
         setUserAuthState({ user: null, isUserLoading: false, userError: error });
-      }
-    );
-    return () => unsubscribe(); // Cleanup
-  }, [auth]); // Depends on the auth instance
+    });
+
+    return () => unsubscribe();
+  }, [auth, firestore]);
 
 
   // Effect to update user's lastActive timestamp
