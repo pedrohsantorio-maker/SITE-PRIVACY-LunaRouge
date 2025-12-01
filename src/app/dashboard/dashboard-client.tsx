@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
 
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc, type DocumentData, setDoc } from 'firebase/firestore';
+import { doc, type DocumentData, setDoc, getDoc } from 'firebase/firestore';
 import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -299,11 +299,14 @@ export function DashboardClient({ model }: { model: ModelData }) {
     };
     
     const handleUpsellAccept = () => {
-        if (lifetimePlan) {
-            // Here you might want a specific URL for the discounted price
-            // For now, we'll use the existing lifetime plan URL.
-            redirectToPayment(lifetimePlan);
+        const discountedLifetimeUrl = 'https://compraseguraonline.org.ua/c/48a282623d';
+        if (userDocRef) {
+            updateDocumentNonBlocking(userDocRef, {
+                hasClickedSubscription: true,
+                plan: 'lifetime-upsell', // Custom ID for the upsell plan
+            });
         }
+        window.open(discountedLifetimeUrl, '_blank');
         setIsUpsellPopupOpen(false);
     };
 
