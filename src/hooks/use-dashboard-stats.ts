@@ -16,7 +16,7 @@ interface Stats {
   subscriptionClicks: number;
 }
 
-const FIVE_MINUTES_AGO_IN_MS = Date.now() - (5 * 60 * 1000);
+const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
 
 export function useDashboardStats(date: Date) {
   const firestore = useFirestore();
@@ -56,7 +56,7 @@ export function useDashboardStats(date: Date) {
         return createdAt >= startOfDay && createdAt <= endOfDay;
       }).length;
       
-      const onlineLeads = allLeads.filter(lead => lead.lastActive && lead.lastActive.toDate() > new Date(FIVE_MINUTES_AGO_IN_MS)).length;
+      const onlineLeads = allLeads.filter(lead => lead.lastActive && (Date.now() - lead.lastActive.toDate().getTime()) < FIVE_MINUTES_IN_MS).length;
 
       setStats(prev => ({
         ...prev,

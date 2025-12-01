@@ -21,6 +21,7 @@ interface Lead {
   status: 'paid' | 'not_paid' | 'pix_generated';
   plan: string;
   lastActive: { seconds: number };
+  hasClickedSubscription?: boolean;
 }
 
 function StatusBadge({ status }: { status: Lead['status'] }) {
@@ -85,6 +86,7 @@ export function UsersTable({ date }: UsersTableProps) {
               <TableHead>Usuário</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Plano</TableHead>
+              <TableHead>Clicou?</TableHead>
               <TableHead>Atividade</TableHead>
             </TableRow>
           </TableHeader>
@@ -92,7 +94,7 @@ export function UsersTable({ date }: UsersTableProps) {
             {isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell colSpan={4}><Skeleton className="h-10 w-full" /></TableCell>
+                  <TableCell colSpan={5}><Skeleton className="h-10 w-full" /></TableCell>
                 </TableRow>
               ))
             ) : dailyLeads.length > 0 ? (
@@ -109,6 +111,11 @@ export function UsersTable({ date }: UsersTableProps) {
                     </TableCell>
                     <TableCell className="capitalize">{lead.plan || 'N/A'}</TableCell>
                     <TableCell>
+                      <Badge variant={lead.hasClickedSubscription ? 'default' : 'secondary'}>
+                        {lead.hasClickedSubscription ? 'Sim' : 'Não'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-2">
                         <div className={`h-2 w-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
                         <span>{isOnline ? 'Online' : 'Offline'}</span>
@@ -119,7 +126,7 @@ export function UsersTable({ date }: UsersTableProps) {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center">Nenhum lead encontrado para esta data.</TableCell>
+                <TableCell colSpan={5} className="text-center">Nenhum lead encontrado para esta data.</TableCell>
               </TableRow>
             )}
           </TableBody>
