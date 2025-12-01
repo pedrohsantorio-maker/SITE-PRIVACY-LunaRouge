@@ -208,7 +208,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
     // Anonymous User Handling
     useEffect(() => {
-        if (!isUserLoading && user && user.isAnonymous && firestore) {
+        if (!isUserLoading && user && firestore) {
             const userDocRef = doc(firestore, 'users', user.uid);
             getDoc(userDocRef).then(async (docSnap) => {
                 if (!docSnap.exists()) {
@@ -217,7 +217,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         email: `${user.uid}@anon.com`,
                         subscriptionId: 'null',
                         status: 'not_paid',
-                        createdAt: serverTimestamp(), // Use server timestamp for consistency
+                        createdAt: serverTimestamp(),
                         lastActive: serverTimestamp(),
                         hasClickedSubscription: false
                     };
