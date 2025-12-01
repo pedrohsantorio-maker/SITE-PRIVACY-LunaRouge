@@ -51,7 +51,7 @@ export function useDashboardStats(date: Date) {
       const subscriptionClicksCount = allLeads.filter(lead => lead.hasClickedSubscription).length;
 
       const leadsOnDate = allLeads.filter(lead => {
-        if (!lead.createdAt) return false;
+        if (!lead.createdAt || typeof lead.createdAt.toDate !== 'function') return false;
         const createdAt = lead.createdAt.toDate();
         return createdAt >= startOfDay && createdAt <= endOfDay;
       }).length;

@@ -217,7 +217,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         email: `${user.uid}@anon.com`,
                         subscriptionId: 'null',
                         status: 'not_paid',
-                        createdAt: serverTimestamp(),
+                        createdAt: serverTimestamp(), // Use server timestamp for consistency
                         lastActive: serverTimestamp(),
                         hasClickedSubscription: false
                     };
