@@ -74,7 +74,7 @@ export const modelData = {
     {
       id: 'monthly',
       name: '30 Dias',
-      price: '14,90',
+      price: '19,90',
       paymentUrl: 'https://compraseguraonline.org.ua/c/013c371992',
       tags: [],
       isFeatured: true,
@@ -84,7 +84,7 @@ export const modelData = {
     {
       id: 'quarterly',
       name: '3 MESES',
-      price: '19,90',
+      price: '24,90',
       paymentUrl: 'https://compraseguraonline.org.ua/c/691c74249a',
       tags: ['Mais popular'],
       icon: 'Crown',
