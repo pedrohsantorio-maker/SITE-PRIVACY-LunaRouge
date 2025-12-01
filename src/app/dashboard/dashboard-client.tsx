@@ -366,7 +366,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         <AlertTriangle className="h-16 w-16 text-yellow-400 animate-pulse" />
                         <h2 className="text-3xl font-bold mt-4">ÚLTIMA CHANCE!</h2>
                         <p className="text-muted-foreground mt-2 text-lg">
-                            Restam apenas <span className="font-bold text-white">{remainingCount}</span> assinaturas promocionais. Garanta seu acesso exclusivo por apenas <span className="font-bold text-white">R$ 14,90</span>!
+                            Restam apenas <span className="font-bold text-white">{remainingCount}</span> assinaturas promocionais. Garanta seu acesso exclusivo por apenas <span className="font-bold text-white">R$ 19,90</span>!
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-sm">
                             <Button onClick={handleGuaranteeVagaClick} size="lg" className="w-full btn-glow text-lg">
