@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
 
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc, type DocumentData } from 'firebase/firestore';
+import { doc, type DocumentData, setDoc } from 'firebase/firestore';
 import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -289,7 +289,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
     const handleSubscriptionClick = (plan: Plan) => {
         // Exclude lifetime plan from showing the upsell popup
-        if (plan.id === 'lifetime') {
+        if (plan.id === 'lifetime' || !firestore || !user) {
             redirectToPayment(plan);
             return;
         }
@@ -395,18 +395,18 @@ export function DashboardClient({ model }: { model: ModelData }) {
             {isUpsellPopupOpen && selectedPlanForUpsell && lifetimePlan && (
                 <div className="fullscreen-popup">
                     <div className="popup-content upsell-popup">
-                        <button onClick={() => setIsUpsellPopupOpen(false)} className="absolute top-2 right-2 text-gray-500 hover:text-white">
+                        <button onClick={() => setIsUpsellPopupOpen(false)} className="absolute top-2 right-2 text-muted-foreground hover:text-foreground">
                             <X size={24} />
                         </button>
                         <h2 className="text-2xl font-bold text-yellow-400">VOCÊ LIBEROU UM DESCONTO DE 60%!</h2>
-                        <p className="mt-2 text-lg">PARA LEVAR O PLANO COMPLETO!</p>
-                        <p className="mt-4 text-base">DE <span className="line-through">R$ {lifetimePlan.price}</span> POR APENAS:</p>
-                        <p className="text-6xl font-bold text-green-400 my-2">R$ {discountedLifetimePrice}</p>
-                        <p className="text-center text-sm font-semibold">VOCÊ VAI RECEBER TODOS OS BÔNUS, ATUALIZAÇÕES E ACESSO VITALÍCIO. APROVEITE! 🙌</p>
+                        <p className="mt-2 text-lg text-foreground">PARA LEVAR O PLANO COMPLETO!</p>
+                        <p className="mt-4 text-base text-muted-foreground">DE <span className="line-through">R$ {lifetimePlan.price}</span> POR APENAS:</p>
+                        <p className="text-6xl font-bold text-green-400 my-2">R$ {discountedLifetimePrice.replace('.',',')}</p>
+                        <p className="text-center text-sm font-semibold text-foreground">VOCÊ VAI RECEBER TODOS OS BÔNUS, ATUALIZAÇÕES E ACESSO VITALÍCIO. APROVEITE! 🙌</p>
                         <Button onClick={handleUpsellAccept} size="lg" className="w-full mt-6 bg-green-500 hover:bg-green-600 text-white text-lg font-bold">
                             VOU APROVEITAR O DESCONTO!
                         </Button>
-                        <Button onClick={handleUpsellDecline} variant="ghost" size="lg" className="w-full mt-2 text-white hover:bg-transparent hover:text-gray-300">
+                        <Button onClick={handleUpsellDecline} variant="link" size="lg" className="w-full mt-2 text-muted-foreground hover:text-foreground">
                             Não, quero o básico de R$ {selectedPlanForUpsell.price}
                         </Button>
                     </div>
