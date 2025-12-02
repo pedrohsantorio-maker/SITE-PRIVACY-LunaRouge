@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown, Flame, AlertTriangle } from 'lucide-react';
+import { Heart, Users, Rss, ChevronDown, ChevronUp, MoreVertical, Image as ImageIcon, Video, Lock, Check, Newspaper, Bookmark, DollarSign, Eye, X, PlayCircle, Camera, VideoOff, ArrowRight, Sparkles, Crown, Flame, AlertTriangle, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,7 +13,8 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
 
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc, type DocumentData, setDoc, getDoc } from 'firebase/firestore';
+import type { DocumentData } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -289,7 +290,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
     
     const handleSubscriptionClick = (plan: Plan) => {
         // Condition to bypass upsell: if the plan is 'lifetime' or if we don't have a user context yet.
-        if (plan.id === 'lifetime' || !firestore || !user || !lifetimePlan) {
+        if (plan.id === 'lifetime' || isLoadingSubscription || !firestore || !user || !lifetimePlan) {
             redirectToPayment(plan);
             return;
         }
@@ -531,12 +532,23 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         )}
                         {model.subscriptions.filter(p => p.isFeatured).map(plan => (
                             <div key={plan.id}>
-                                <Button className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" size="lg" onClick={() => handleSubscriptionClick(plan)}>
-                                    <span className="text-lg font-bold uppercase">{plan.name}</span>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xl font-bold">R$ {plan.price}</span>
-                                        <ArrowRight className="h-5 w-5" />
-                                    </div>
+                                <Button 
+                                    className="w-full h-auto text-left justify-between p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg mb-2 btn-glow" 
+                                    size="lg" 
+                                    onClick={() => handleSubscriptionClick(plan)}
+                                    disabled={isLoadingSubscription}
+                                >
+                                    {isLoadingSubscription ? (
+                                        <Loader2 className="h-6 w-6 animate-spin" />
+                                    ) : (
+                                        <>
+                                            <span className="text-lg font-bold uppercase">{plan.name}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xl font-bold">R$ {plan.price}</span>
+                                                <ArrowRight className="h-5 w-5" />
+                                            </div>
+                                        </>
+                                    )}
                                 </Button>
                                 {plan.tags?.map(tag => (
                                 <div key={tag} className="inline-flex items-center gap-1.5 rounded-full bg-primary/20 text-primary-foreground px-3 py-1 text-xs font-bold mb-4">
@@ -565,9 +577,19 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 <AccordionContent>
                                     <div className="flex flex-col gap-3 pt-2">
                                     {model.promotions.map(plan => (
-                                        <Button key={plan.id} variant="outline" className="w-full h-auto justify-between p-3 rounded-lg border border-primary/50 bg-card hover:bg-primary/10" onClick={() => handleSubscriptionClick(plan)}>
+                                        <Button 
+                                            key={plan.id} 
+                                            variant="outline" 
+                                            className="w-full h-auto justify-between p-3 rounded-lg border border-primary/50 bg-card hover:bg-primary/10" 
+                                            onClick={() => handleSubscriptionClick(plan)}
+                                            disabled={isLoadingSubscription}
+                                        >
                                             <div className="flex items-center gap-2">
-                                                {plan.icon === 'Crown' && <Crown className="h-5 w-5 text-yellow-400" />}
+                                                {isLoadingSubscription ? (
+                                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                                ) : (
+                                                    plan.icon === 'Crown' && <Crown className="h-5 w-5 text-yellow-400" />
+                                                )}
                                                 <span className="font-bold uppercase">{plan.name}</span>
                                                 {plan.tags?.map(tag => (
                                                     <span key={tag} className={cn('text-xs font-semibold px-2 py-0.5 rounded-full', getTagClass(tag))}>
@@ -657,7 +679,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </TabsContent>
                     <TabsContent value="photos" className="mt-4">
                         {isLoadingSubscription ? (
-                            <div className="flex items-center justify-center p-8"><p>Verificando acesso...</p></div>
+                             <div className="flex flex-col items-center justify-center text-center p-8 bg-card rounded-lg mt-4">
+                                <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                                <h3 className="mt-4 text-xl font-bold">Verificando seu acesso...</h3>
+                                <p className="mt-2 text-muted-foreground">Aguarde um instante.</p>
+                            </div>
                         ) : isSubscribed ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                                 {model.photos.map(photo => (
@@ -681,7 +707,11 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </TabsContent>
                     <TabsContent value="videos" className="mt-4">
                          {isLoadingSubscription ? (
-                            <div className="flex items-center justify-center p-8"><p>Verificando acesso...</p></div>
+                            <div className="flex flex-col items-center justify-center text-center p-8 bg-card rounded-lg mt-4">
+                                <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                                <h3 className="mt-4 text-xl font-bold">Verificando seu acesso...</h3>
+                                <p className="mt-2 text-muted-foreground">Aguarde um instante.</p>
+                            </div>
                         ) : isSubscribed ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                                 {model.videos.map(video => (
@@ -725,12 +755,23 @@ export function DashboardClient({ model }: { model: ModelData }) {
                     </Accordion>
                      {mainPlan && (
                         <div className="mt-8">
-                            <Button className="w-full h-auto text-left justify-center p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg btn-glow" size="lg" onClick={() => handleSubscriptionClick(mainPlan)}>
-                                <div className="flex flex-col items-center">
-                                  <span className="text-sm font-normal">Veja tudo por apenas</span>
-                                  <span className="text-xl font-bold">R$ {mainPlan.price}</span>
-                                </div>
-                                <ArrowRight className="h-5 w-5 ml-4" />
+                            <Button 
+                                className="w-full h-auto text-left justify-center p-4 bg-primary hover:bg-primary/90 rounded-lg shadow-lg btn-glow" 
+                                size="lg" 
+                                onClick={() => handleSubscriptionClick(mainPlan)}
+                                disabled={isLoadingSubscription}
+                            >
+                                {isLoadingSubscription ? (
+                                    <Loader2 className="h-6 w-6 animate-spin" />
+                                ) : (
+                                    <>
+                                        <div className="flex flex-col items-center">
+                                        <span className="text-sm font-normal">Veja tudo por apenas</span>
+                                        <span className="text-xl font-bold">R$ {mainPlan.price}</span>
+                                        </div>
+                                        <ArrowRight className="h-5 w-5 ml-4" />
+                                    </>
+                                )}
                             </Button>
                         </div>
                     )}
