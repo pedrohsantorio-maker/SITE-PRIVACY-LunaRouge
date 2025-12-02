@@ -120,7 +120,7 @@ export const modelData = {
       hint: img.imageHint,
       width: 600,
       height: 600,
-      type: isVideo ? 'video' : 'image',
+      type: (isVideo ? 'video' : 'image') as 'video' | 'image',
     }
   }),
   videos: videoLinks.map((video, index) => ({
