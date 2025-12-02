@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Users, UserCheck, UserX, Target, Percent, Calendar as CalendarIcon, Eye, Pointer } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
-import { UsersTable } from '@/components/admin/users-table';
+import { UsersTable } from '@/app/admin/users-table';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
