@@ -3,11 +3,6 @@ import { NextResponse } from 'next/server';
 import { initializeApp, getApps, type App, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
-// A variável de ambiente é lida e analisada com segurança.
-const serviceAccount = process.env.FB_SA 
-  ? JSON.parse(process.env.FB_SA)
-  : undefined;
-
 let adminApp: App;
 
 /**
@@ -16,17 +11,20 @@ let adminApp: App;
  */
 function initializeFirebaseAdmin(): App {
   // Se já existirem apps inicializadas, verifica se a nossa app específica existe e a retorna.
-  if (getApps().length) {
-    return getApps().find(app => app.name === 'firebase-admin-app-webhook') || initializeApp({
-      credential: cert(serviceAccount),
-      databaseURL: `https://${process.env.NEXT_PUBLIC_FB_PID}.firebaseio.com`
-    }, 'firebase-admin-app-webhook');
+  const existingApp = getApps().find(app => app.name === 'firebase-admin-app-webhook');
+  if (existingApp) {
+    return existingApp;
   }
+  
+  // A variável de ambiente é lida e analisada com segurança DENTRO da função.
+  const serviceAccountString = process.env.FB_SA;
 
   // Lança um erro se as credenciais da conta de serviço não estiverem configuradas.
-  if (!serviceAccount) {
+  if (!serviceAccountString) {
     throw new Error('As credenciais da conta de serviço do Firebase (FB_SA) não estão definidas nas variáveis de ambiente do servidor.');
   }
+
+  const serviceAccount = JSON.parse(serviceAccountString);
 
   // Inicializa a app se nenhuma outra existir.
   adminApp = initializeApp({
