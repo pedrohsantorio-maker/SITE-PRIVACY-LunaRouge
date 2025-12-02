@@ -12,29 +12,31 @@ let adminApp: App;
 
 /**
  * Inicializa a aplicação de administração do Firebase de forma segura.
- * Garante que a aplicação seja inicializada apenas uma vez.
+ * Garante que a aplicação seja inicializada apenas uma vez (padrão singleton).
  */
 function initializeFirebaseAdmin(): App {
-  // Retorna a app existente se já foi inicializada.
-  const adminAppName = 'firebase-admin-app-webhook';
-  const existingApp = getApps().find(app => app.name === adminAppName);
-  if (existingApp) {
-    return existingApp;
+  // Se já existirem apps inicializadas, verifica se a nossa app específica existe e a retorna.
+  if (getApps().length) {
+    return getApps().find(app => app.name === 'firebase-admin-app-webhook') || initializeApp({
+      credential: cert(serviceAccount),
+      databaseURL: `https://${process.env.NEXT_PUBLIC_FB_PID}.firebaseio.com`
+    }, 'firebase-admin-app-webhook');
   }
-  
+
   // Lança um erro se as credenciais da conta de serviço não estiverem configuradas.
   if (!serviceAccount) {
     throw new Error('As credenciais da conta de serviço do Firebase (FB_SA) não estão definidas nas variáveis de ambiente do servidor.');
   }
 
-  // Inicializa a app com as credenciais.
+  // Inicializa a app se nenhuma outra existir.
   adminApp = initializeApp({
     credential: cert(serviceAccount),
     databaseURL: `https://${process.env.NEXT_PUBLIC_FB_PID}.firebaseio.com`
-  }, adminAppName);
+  }, 'firebase-admin-app-webhook');
 
   return adminApp;
 }
+
 
 /**
  * Handles POST requests for the payment gateway webhook.
