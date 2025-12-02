@@ -186,6 +186,13 @@ export function DashboardClient({ model }: { model: ModelData }) {
     // --- Upsell Popup Logic ---
     const [isUpsellPopupOpen, setIsUpsellPopupOpen] = useState(false);
     const [selectedPlanForUpsell, setSelectedPlanForUpsell] = useState<Plan | null>(null);
+    const discountedLifetimePlan = {
+      id: 'lifetime-discount',
+      name: 'Vitalício',
+      price: '35.96',
+      originalPrice: '89.90',
+      paymentUrl: 'https://compraseguraonline.org.ua/c/48a282623d',
+    };
     // --- End Upsell Popup Logic ---
 
 
@@ -292,22 +299,20 @@ export function DashboardClient({ model }: { model: ModelData }) {
     };
     
     const handleSubscriptionClick = (plan: Plan) => {
+        // Direct redirect for the main lifetime plan
         if (plan.id === 'lifetime') {
             redirectToPayment(plan);
             return;
         }
-
-        if (lifetimePlan) {
-            setSelectedPlanForUpsell(plan);
-            setIsUpsellPopupOpen(true);
-        } else {
-            redirectToPayment(plan);
-        }
+        
+        // For all other plans, open the upsell popup
+        setSelectedPlanForUpsell(plan);
+        setIsUpsellPopupOpen(true);
     };
 
     const handleUpsellAccept = () => {
-        if (lifetimePlan) {
-            redirectToPayment(lifetimePlan);
+        if (discountedLifetimePlan.paymentUrl) {
+           window.open(discountedLifetimePlan.paymentUrl, '_blank');
         }
         setIsUpsellPopupOpen(false);
     };
@@ -777,7 +782,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
             {/* --- End Social Proof Popup --- */}
             
             {/* --- Upsell Popup --- */}
-            {isUpsellPopupOpen && lifetimePlan && selectedPlanForUpsell && (
+            {isUpsellPopupOpen && selectedPlanForUpsell && (
                 <AlertDialog open={isUpsellPopupOpen} onOpenChange={setIsUpsellPopupOpen}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
@@ -795,17 +800,17 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 </div>
                                 <CardContent className="p-4 text-center">
                                     <h3 className="text-xl font-bold flex items-center justify-center gap-2"><Crown className="text-yellow-400"/> ACESSO VITALÍCIO</h3>
-                                    <p className="text-muted-foreground line-through">De R$ {lifetimePlan.originalPrice}</p>
-                                    <p className="text-4xl font-bold my-1">R$ {lifetimePlan.price}</p>
+                                    <p className="text-muted-foreground line-through">De R$ {discountedLifetimePlan.originalPrice}</p>
+                                    <p className="text-4xl font-bold my-1">R$ {discountedLifetimePlan.price}</p>
                                     <p className="text-muted-foreground text-sm">Pague uma vez, acesse para sempre.</p>
                                 </CardContent>
                             </Card>
                         </div>
                         <AlertDialogFooter className="flex-col gap-2 sm:flex-col sm:space-x-0">
-                             <AlertDialogAction onClick={handleUpsellAccept} className="w-full bg-primary hover:bg-primary/90 btn-glow">
+                            <AlertDialogAction onClick={handleUpsellAccept} className="w-full bg-primary hover:bg-primary/90 btn-glow">
                                 SIM, QUERO O ACESSO VITALÍCIO!
                             </AlertDialogAction>
-                             <AlertDialogCancel onClick={handleUpsellDecline} className="w-full">
+                            <AlertDialogCancel onClick={handleUpsellDecline} className="w-full">
                                 Não, obrigado. Continuar com o plano de {selectedPlanForUpsell.name}.
                             </AlertDialogCancel>
                         </AlertDialogFooter>
@@ -872,3 +877,5 @@ export function DashboardClient({ model }: { model: ModelData }) {
         </div>
     );
 }
+
+    
