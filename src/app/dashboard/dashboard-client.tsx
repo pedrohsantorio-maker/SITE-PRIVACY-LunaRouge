@@ -177,8 +177,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const [isUrgencyPopupOpen, setIsUrgencyPopupOpen] = useState(false);
     const [isRejectionPopupOpen, setIsRejectionPopupOpen] = useState(false);
     const [hasUrgencyPopupBeenShown, setHasUrgencyPopupBeenShown] = useState(false);
-    const [isUpsellPopupOpen, setIsUpsellPopupOpen] = useState(false);
-    const [selectedPlanForUpsell, setSelectedPlanForUpsell] = useState<Plan | null>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const pageTopRef = useRef<HTMLDivElement>(null);
     const subscriptionsRef = useRef<HTMLDivElement>(null);
@@ -233,7 +231,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
     // --- End Subscription Logic ---
     
     const lifetimePlan = model.promotions.find(p => p.id === 'lifetime');
-    const discountedLifetimePrice = (parseFloat(lifetimePlan?.price.replace(',', '.') || '89.90') * 0.40).toFixed(2).replace('.', ',');
 
 
     // --- Social Proof Popup Logic ---
@@ -274,8 +271,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
         };
     }, []);
     // --- End Social Proof Popup Logic ---
-
-    const redirectToPayment = (plan: Plan) => {
+    
+    const handleSubscriptionClick = (plan: Plan) => {
         if (userDocRef) {
             // Use a non-blocking update to track the click
             updateDocumentNonBlocking(userDocRef, {
@@ -287,38 +284,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
             window.open(plan.paymentUrl, '_blank');
         }
     };
-    
-    const handleSubscriptionClick = (plan: Plan) => {
-        // Condition to bypass upsell: if the plan is 'lifetime' or if we don't have a user context yet.
-        if (plan.id === 'lifetime' || isLoadingSubscription || !firestore || !user || !lifetimePlan) {
-            redirectToPayment(plan);
-            return;
-        }
-
-        // Otherwise, set state to show the upsell popup.
-        setSelectedPlanForUpsell(plan);
-        setIsUpsellPopupOpen(true);
-    };
-    
-    const handleUpsellAccept = () => {
-        const discountedLifetimeUrl = 'https://compraseguraonline.org.ua/c/48a282623d';
-        if (userDocRef) {
-            updateDocumentNonBlocking(userDocRef, {
-                hasClickedSubscription: true,
-                plan: 'lifetime-upsell', // Custom ID for the upsell plan
-            });
-        }
-        window.open(discountedLifetimeUrl, '_blank');
-        setIsUpsellPopupOpen(false);
-    };
-
-    const handleUpsellDecline = () => {
-        if (selectedPlanForUpsell) {
-            redirectToPayment(selectedPlanForUpsell);
-        }
-        setIsUpsellPopupOpen(false);
-    };
-
 
     const handleUnlockClick = () => {
         subscriptionsRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -397,26 +362,6 @@ export function DashboardClient({ model }: { model: ModelData }) {
 
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center p-0 sm:p-4">
-            {isUpsellPopupOpen && selectedPlanForUpsell && lifetimePlan && (
-                <div className="fullscreen-popup">
-                    <div className="popup-content upsell-popup">
-                        <button onClick={() => setIsUpsellPopupOpen(false)} className="absolute top-2 right-2 text-muted-foreground hover:text-foreground">
-                            <X size={24} />
-                        </button>
-                        <h2 className="text-2xl font-bold text-yellow-400">VOCÊ LIBEROU UM DESCONTO DE 60%!</h2>
-                        <p className="mt-2 text-lg text-foreground">PARA LEVAR O PLANO COMPLETO!</p>
-                        <p className="mt-4 text-base text-muted-foreground">DE <span className="line-through">R$ {lifetimePlan.price}</span> POR APENAS:</p>
-                        <p className="text-6xl font-bold text-green-400 my-2">R$ {discountedLifetimePrice.replace('.',',')}</p>
-                        <p className="text-center text-sm font-semibold text-foreground">VOCÊ VAI RECEBER TODOS OS BÔNUS, ATUALIZAÇÕES E ACESSO VITALÍCIO. APROVEITE! 🙌</p>
-                        <Button onClick={handleUpsellAccept} size="lg" className="w-full mt-6 bg-green-500 hover:bg-green-600 text-white text-lg font-bold">
-                            VOU APROVEITAR O DESCONTO!
-                        </Button>
-                        <Button onClick={handleUpsellDecline} variant="link" size="lg" className="w-full mt-2 text-muted-foreground hover:text-foreground">
-                            Não, quero o básico de R$ {selectedPlanForUpsell.price}
-                        </Button>
-                    </div>
-                </div>
-            )}
              {isUrgencyPopupOpen && (
                 <div className="fullscreen-popup">
                     <div className="popup-content">
