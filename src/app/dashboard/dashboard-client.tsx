@@ -292,18 +292,15 @@ export function DashboardClient({ model }: { model: ModelData }) {
     };
     
     const handleSubscriptionClick = (plan: Plan) => {
-        // Direct to checkout if it's the lifetime plan
         if (plan.id === 'lifetime') {
             redirectToPayment(plan);
             return;
         }
 
-        // For other plans, open the upsell popup if a lifetime plan exists
         if (lifetimePlan) {
             setSelectedPlanForUpsell(plan);
             setIsUpsellPopupOpen(true);
         } else {
-             // Fallback if there's no lifetime plan defined
             redirectToPayment(plan);
         }
     };
@@ -808,7 +805,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                              <AlertDialogAction onClick={handleUpsellAccept} className="w-full bg-primary hover:bg-primary/90 btn-glow">
                                 SIM, QUERO O ACESSO VITALÍCIO!
                             </AlertDialogAction>
-                             <AlertDialogCancel onClick={handleUpsellDecline} className="w-full" variant="outline">
+                             <AlertDialogCancel onClick={handleUpsellDecline} className="w-full">
                                 Não, obrigado. Continuar com o plano de {selectedPlanForUpsell.name}.
                             </AlertDialogCancel>
                         </AlertDialogFooter>
