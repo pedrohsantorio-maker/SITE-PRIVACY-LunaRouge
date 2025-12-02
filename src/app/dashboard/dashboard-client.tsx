@@ -286,14 +286,15 @@ export function DashboardClient({ model }: { model: ModelData }) {
             window.open(plan.paymentUrl, '_blank');
         }
     };
-
+    
     const handleSubscriptionClick = (plan: Plan) => {
-        // Exclude lifetime plan from showing the upsell popup
-        if (plan.id === 'lifetime' || !firestore || !user) {
+        // Condition to bypass upsell: if the plan is 'lifetime' or if we don't have a user context yet.
+        if (plan.id === 'lifetime' || !firestore || !user || !lifetimePlan) {
             redirectToPayment(plan);
             return;
         }
 
+        // Otherwise, set state to show the upsell popup.
         setSelectedPlanForUpsell(plan);
         setIsUpsellPopupOpen(true);
     };
