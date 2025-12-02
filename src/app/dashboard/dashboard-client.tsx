@@ -792,8 +792,8 @@ export function DashboardClient({ model }: { model: ModelData }) {
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <div className="flex flex-col items-center gap-4 py-4">
-                             <Card className="w-full bg-primary/10 border-primary shadow-lg relative">
-                                <div className="absolute top-2 -right-10 bg-red-600 text-white px-8 py-1 font-bold text-sm transform rotate-45">
+                             <Card className="w-full bg-primary/10 border-primary shadow-lg relative overflow-visible">
+                                <div className="absolute top-2 -right-10 bg-red-600 text-white px-8 py-1 font-bold text-sm transform rotate-45 z-10">
                                     60% OFF
                                 </div>
                                 <CardContent className="p-4 text-center">
@@ -804,7 +804,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 </CardContent>
                             </Card>
                         </div>
-                        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                        <AlertDialogFooter className="flex-col gap-2 sm:flex-col sm:space-x-0">
                              <AlertDialogAction onClick={handleUpsellAccept} className="w-full bg-primary hover:bg-primary/90 btn-glow">
                                 SIM, QUERO O ACESSO VITALÍCIO!
                             </AlertDialogAction>
