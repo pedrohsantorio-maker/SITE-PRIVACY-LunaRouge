@@ -59,6 +59,7 @@ type Plan = {
   id: string;
   name: string;
   price: string;
+  originalPrice?: string;
   paymentUrl?: string;
   tags?: string[];
   isFeatured?: boolean;
@@ -291,11 +292,14 @@ export function DashboardClient({ model }: { model: ModelData }) {
     };
     
     const handleSubscriptionClick = (plan: Plan) => {
-        if (plan.id === 'lifetime') {
+        // Direct to checkout for the main offer if it's already the lifetime plan,
+        // or if there's no lifetime plan defined for the upsell.
+        if (plan.id === 'lifetime' || !firestore || !user || !lifetimePlan) {
             redirectToPayment(plan);
             return;
         }
 
+        // For other plans, open the upsell popup
         setSelectedPlanForUpsell(plan);
         setIsUpsellPopupOpen(true);
     };
@@ -776,9 +780,9 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 <AlertDialog open={isUpsellPopupOpen} onOpenChange={setIsUpsellPopupOpen}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle className="text-2xl text-center font-bold text-primary">🔥 OFERTA DE 60% OFF! 🔥</AlertDialogTitle>
+                            <AlertDialogTitle className="text-2xl text-center font-bold text-primary">🔥 OFERTA EXCLUSIVA! 🔥</AlertDialogTitle>
                             <AlertDialogDescription className="text-center text-lg pt-2">
-                                Espere! Que tal trocar o plano <span className="font-bold text-foreground">{selectedPlanForUpsell.name}</span> pelo <span className="font-bold text-primary">ACESSO VITALÍCIO</span> com um desconto imperdível?
+                                Espere! Por que não ter <span className="font-bold text-primary">ACESSO VITALÍCIO</span> com um desconto imperdível de <span className="font-bold text-white">60% OFF</span>?
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <div className="flex flex-col items-center gap-4 py-4">
@@ -788,7 +792,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                                 </div>
                                 <CardContent className="p-4 text-center">
                                     <h3 className="text-xl font-bold flex items-center justify-center gap-2"><Crown className="text-yellow-400"/> ACESSO VITALÍCIO</h3>
-                                    <p className="text-muted-foreground line-through">De R$ 224,90</p>
+                                    <p className="text-muted-foreground line-through">De R$ {lifetimePlan.originalPrice}</p>
                                     <p className="text-4xl font-bold my-1">R$ {lifetimePlan.price}</p>
                                     <p className="text-muted-foreground text-sm">Pague uma vez, acesse para sempre.</p>
                                 </CardContent>
@@ -796,7 +800,7 @@ export function DashboardClient({ model }: { model: ModelData }) {
                         </div>
                         <AlertDialogFooter className="flex-col sm:flex-row gap-2">
                              <AlertDialogAction onClick={handleUpsellAccept} className="w-full bg-primary hover:bg-primary/90 btn-glow">
-                                SIM, QUERO O DESCONTO!
+                                SIM, QUERO O ACESSO VITALÍCIO!
                             </AlertDialogAction>
                              <AlertDialogCancel onClick={handleUpsellDecline} className="w-full" variant="outline">
                                 Não, obrigado. Continuar com o plano de {selectedPlanForUpsell.name}.
