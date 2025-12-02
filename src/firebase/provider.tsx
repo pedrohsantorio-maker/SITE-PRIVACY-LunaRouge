@@ -1,10 +1,17 @@
 'use client';
 
-import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
-import { FirebaseApp } from 'firebase/app';
-import { Firestore, doc, serverTimestamp, updateDoc, getDoc, setDoc } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
-import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+} from 'react';
+import type { DependencyList, ReactNode } from 'react';
+import { type FirebaseApp } from 'firebase/app';
+import { type Firestore, doc, serverTimestamp, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { type Auth, type User, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 export interface FirebaseServices {
   firebaseApp: FirebaseApp;

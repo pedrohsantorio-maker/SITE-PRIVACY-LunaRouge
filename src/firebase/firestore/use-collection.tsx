@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-  onSnapshot,
-} from 'firebase/firestore';
 import type {
   Query,
   DocumentData,
   FirestoreError,
   QuerySnapshot,
   CollectionReference,
+} from 'firebase/firestore';
+import {
+  onSnapshot,
 } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -30,24 +30,26 @@ export interface UseCollectionResult<T> {
 /* Internal implementation of Query:
   https://github.com/firebase/firebase-js-sdk/blob/c5f08a9bc5da0d2b0207802c972d53724ccef055/packages/firestore/src/lite-api/reference.ts#L143
 */
-export interface InternalQuery extends Query<DocumentData> {
+type InternalQueryPath = {
+  canonicalString(): string;
+  toString(): string;
+};
+
+type InternalQuery = Query<DocumentData> & {
   _query: {
-    path: {
-      canonicalString(): string;
-      toString(): string;
-    }
-  }
-}
+    path: InternalQueryPath;
+  };
+};
 
 /**
  * React hook to subscribe to a Firestore collection or query in real-time.
  * Handles nullable references/queries.
- * 
+ *
  *
  * IMPORTANT! YOU MUST MEMOIZE the inputted memoizedTargetRefOrQuery or BAD THINGS WILL HAPPEN
  * use useMemo to memoize it per React guidence.  Also make sure that it's dependencies are stable
  * references
- *  
+ *
  * @template T Optional type for document data. Defaults to any.
  * @param {CollectionReference<DocumentData> | Query<DocumentData> | null | undefined} targetRefOrQuery -
  * The Firestore CollectionReference or Query. Waits if null/undefined.
@@ -91,7 +93,7 @@ export function useCollection<T = any>(
         const path: string =
           memoizedTargetRefOrQuery.type === 'collection'
             ? (memoizedTargetRefOrQuery as CollectionReference).path
-            : (memoizedTargetRefOrQuery as unknown as InternalQuery)._query.path.canonicalString()
+            : (memoizedTargetRefOrQuery as InternalQuery)._query.path.canonicalString()
 
         const contextualError = new FirestorePermissionError({
           operation: 'list',
