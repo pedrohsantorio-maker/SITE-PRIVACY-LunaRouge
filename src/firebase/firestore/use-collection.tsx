@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Query,
   onSnapshot,
+} from 'firebase/firestore';
+import type {
+  Query,
   DocumentData,
   FirestoreError,
   QuerySnapshot,
