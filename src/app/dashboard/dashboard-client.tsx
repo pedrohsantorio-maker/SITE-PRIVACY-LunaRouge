@@ -292,16 +292,20 @@ export function DashboardClient({ model }: { model: ModelData }) {
     };
     
     const handleSubscriptionClick = (plan: Plan) => {
-        // Direct to checkout for the main offer if it's already the lifetime plan,
-        // or if there's no lifetime plan defined for the upsell.
-        if (plan.id === 'lifetime' || !firestore || !user || !lifetimePlan) {
+        // Direct to checkout if it's the lifetime plan
+        if (plan.id === 'lifetime') {
             redirectToPayment(plan);
             return;
         }
 
-        // For other plans, open the upsell popup
-        setSelectedPlanForUpsell(plan);
-        setIsUpsellPopupOpen(true);
+        // For other plans, open the upsell popup if a lifetime plan exists
+        if (lifetimePlan) {
+            setSelectedPlanForUpsell(plan);
+            setIsUpsellPopupOpen(true);
+        } else {
+             // Fallback if there's no lifetime plan defined
+            redirectToPayment(plan);
+        }
     };
 
     const handleUpsellAccept = () => {
@@ -780,13 +784,15 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 <AlertDialog open={isUpsellPopupOpen} onOpenChange={setIsUpsellPopupOpen}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle className="text-2xl text-center font-bold text-primary">🔥 OFERTA EXCLUSIVA! 🔥</AlertDialogTitle>
+                            <AlertDialogTitle className="text-2xl text-center font-bold text-primary flex items-center justify-center gap-2">
+                               <Flame /> OFERTA EXCLUSIVA! <Flame />
+                            </AlertDialogTitle>
                             <AlertDialogDescription className="text-center text-lg pt-2">
                                 Espere! Por que não ter <span className="font-bold text-primary">ACESSO VITALÍCIO</span> com um desconto imperdível de <span className="font-bold text-white">60% OFF</span>?
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <div className="flex flex-col items-center gap-4 py-4">
-                             <Card className="w-full bg-primary/10 border-primary shadow-lg relative overflow-hidden">
+                             <Card className="w-full bg-primary/10 border-primary shadow-lg relative">
                                 <div className="absolute top-2 -right-10 bg-red-600 text-white px-8 py-1 font-bold text-sm transform rotate-45">
                                     60% OFF
                                 </div>
