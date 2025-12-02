@@ -279,26 +279,23 @@ export function DashboardClient({ model }: { model: ModelData }) {
     // --- End Social Proof Popup Logic ---
     
     const redirectToPayment = (plan: Plan) => {
-        if (plan.paymentUrl) {
-            window.open(plan.paymentUrl, '_blank');
-        }
-    };
-    
-    const handleSubscriptionClick = (plan: Plan) => {
         if (userDocRef) {
             updateDocumentNonBlocking(userDocRef, {
                 hasClickedSubscription: true,
                 plan: plan.id,
             });
         }
-        
-        // Se for o plano vitalício ou se algo der errado (fallback), vai direto pro checkout
-        if (plan.id === 'lifetime' || !firestore || !user || !lifetimePlan) {
+        if (plan.paymentUrl) {
+            window.open(plan.paymentUrl, '_blank');
+        }
+    };
+    
+    const handleSubscriptionClick = (plan: Plan) => {
+        if (plan.id === 'lifetime') {
             redirectToPayment(plan);
             return;
         }
 
-        // Para outros planos, abre o popup de upsell
         setSelectedPlanForUpsell(plan);
         setIsUpsellPopupOpen(true);
     };
@@ -779,24 +776,27 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 <AlertDialog open={isUpsellPopupOpen} onOpenChange={setIsUpsellPopupOpen}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle className="text-2xl text-center font-bold text-primary">🔥 OFERTA EXCLUSIVA PARA VOCÊ! 🔥</AlertDialogTitle>
+                            <AlertDialogTitle className="text-2xl text-center font-bold text-primary">🔥 OFERTA DE 60% OFF! 🔥</AlertDialogTitle>
                             <AlertDialogDescription className="text-center text-lg pt-2">
-                                Espere! Vimos que você se interessou pelo plano <span className="font-bold text-foreground">{selectedPlanForUpsell.name}</span>. 
-                                Que tal ter <span className="font-bold text-primary">ACESSO VITALÍCIO</span> a todo o conteúdo por um valor único?
+                                Espere! Que tal trocar o plano <span className="font-bold text-foreground">{selectedPlanForUpsell.name}</span> pelo <span className="font-bold text-primary">ACESSO VITALÍCIO</span> com um desconto imperdível?
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <div className="flex flex-col items-center gap-4 py-4">
-                             <Card className="w-full bg-primary/10 border-primary shadow-lg">
+                             <Card className="w-full bg-primary/10 border-primary shadow-lg relative overflow-hidden">
+                                <div className="absolute top-2 -right-10 bg-red-600 text-white px-8 py-1 font-bold text-sm transform rotate-45">
+                                    60% OFF
+                                </div>
                                 <CardContent className="p-4 text-center">
                                     <h3 className="text-xl font-bold flex items-center justify-center gap-2"><Crown className="text-yellow-400"/> ACESSO VITALÍCIO</h3>
-                                    <p className="text-4xl font-bold my-2">R$ {lifetimePlan.price}</p>
-                                    <p className="text-muted-foreground">Pague uma vez, acesse para sempre. Sem mensalidades, sem preocupações.</p>
+                                    <p className="text-muted-foreground line-through">De R$ 224,90</p>
+                                    <p className="text-4xl font-bold my-1">R$ {lifetimePlan.price}</p>
+                                    <p className="text-muted-foreground text-sm">Pague uma vez, acesse para sempre.</p>
                                 </CardContent>
                             </Card>
                         </div>
                         <AlertDialogFooter className="flex-col sm:flex-row gap-2">
                              <AlertDialogAction onClick={handleUpsellAccept} className="w-full bg-primary hover:bg-primary/90 btn-glow">
-                                QUERO O ACESSO VITALÍCIO!
+                                SIM, QUERO O DESCONTO!
                             </AlertDialogAction>
                              <AlertDialogCancel onClick={handleUpsellDecline} className="w-full" variant="outline">
                                 Não, obrigado. Continuar com o plano de {selectedPlanForUpsell.name}.
