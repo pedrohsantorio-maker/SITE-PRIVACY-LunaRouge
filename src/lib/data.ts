@@ -101,7 +101,7 @@ export const modelData = {
       name: 'VITALÍCIO',
       price: '35.96',
       originalPrice: '89.90',
-      paymentUrl: 'https://compraseguraonline.org.ua/c/cf7a8d8d48',
+      paymentUrl: 'https://compraseguraonline.org.ua/c/48a282623d',
       tags: ['Exclusivo'],
     },
   ],
