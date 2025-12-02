@@ -181,6 +181,12 @@ export function DashboardClient({ model }: { model: ModelData }) {
     const pageTopRef = useRef<HTMLDivElement>(null);
     const subscriptionsRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
+    
+    // --- Upsell Popup Logic ---
+    const [isUpsellPopupOpen, setIsUpsellPopupOpen] = useState(false);
+    const [selectedPlanForUpsell, setSelectedPlanForUpsell] = useState<Plan | null>(null);
+    // --- End Upsell Popup Logic ---
+
 
     // --- Remaining Subscriptions Counter & Popup---
      useEffect(() => {
@@ -272,17 +278,43 @@ export function DashboardClient({ model }: { model: ModelData }) {
     }, []);
     // --- End Social Proof Popup Logic ---
     
-    const handleSubscriptionClick = (plan: Plan) => {
-        if (userDocRef) {
-            // Use a non-blocking update to track the click
-            updateDocumentNonBlocking(userDocRef, {
-                hasClickedSubscription: true,
-                plan: plan.id, // Store the plan id
-            });
-        }
+    const redirectToPayment = (plan: Plan) => {
         if (plan.paymentUrl) {
             window.open(plan.paymentUrl, '_blank');
         }
+    };
+    
+    const handleSubscriptionClick = (plan: Plan) => {
+        if (userDocRef) {
+            updateDocumentNonBlocking(userDocRef, {
+                hasClickedSubscription: true,
+                plan: plan.id,
+            });
+        }
+        
+        // Se for o plano vitalício ou se algo der errado (fallback), vai direto pro checkout
+        if (plan.id === 'lifetime' || !firestore || !user || !lifetimePlan) {
+            redirectToPayment(plan);
+            return;
+        }
+
+        // Para outros planos, abre o popup de upsell
+        setSelectedPlanForUpsell(plan);
+        setIsUpsellPopupOpen(true);
+    };
+
+    const handleUpsellAccept = () => {
+        if (lifetimePlan) {
+            redirectToPayment(lifetimePlan);
+        }
+        setIsUpsellPopupOpen(false);
+    };
+
+    const handleUpsellDecline = () => {
+        if (selectedPlanForUpsell) {
+            redirectToPayment(selectedPlanForUpsell);
+        }
+        setIsUpsellPopupOpen(false);
     };
 
     const handleUnlockClick = () => {
@@ -741,6 +773,39 @@ export function DashboardClient({ model }: { model: ModelData }) {
                 </div>
             )}
             {/* --- End Social Proof Popup --- */}
+            
+            {/* --- Upsell Popup --- */}
+            {isUpsellPopupOpen && lifetimePlan && selectedPlanForUpsell && (
+                <AlertDialog open={isUpsellPopupOpen} onOpenChange={setIsUpsellPopupOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle className="text-2xl text-center font-bold text-primary">🔥 OFERTA EXCLUSIVA PARA VOCÊ! 🔥</AlertDialogTitle>
+                            <AlertDialogDescription className="text-center text-lg pt-2">
+                                Espere! Vimos que você se interessou pelo plano <span className="font-bold text-foreground">{selectedPlanForUpsell.name}</span>. 
+                                Que tal ter <span className="font-bold text-primary">ACESSO VITALÍCIO</span> a todo o conteúdo por um valor único?
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <div className="flex flex-col items-center gap-4 py-4">
+                             <Card className="w-full bg-primary/10 border-primary shadow-lg">
+                                <CardContent className="p-4 text-center">
+                                    <h3 className="text-xl font-bold flex items-center justify-center gap-2"><Crown className="text-yellow-400"/> ACESSO VITALÍCIO</h3>
+                                    <p className="text-4xl font-bold my-2">R$ {lifetimePlan.price}</p>
+                                    <p className="text-muted-foreground">Pague uma vez, acesse para sempre. Sem mensalidades, sem preocupações.</p>
+                                </CardContent>
+                            </Card>
+                        </div>
+                        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                             <AlertDialogAction onClick={handleUpsellAccept} className="w-full bg-primary hover:bg-primary/90 btn-glow">
+                                QUERO O ACESSO VITALÍCIO!
+                            </AlertDialogAction>
+                             <AlertDialogCancel onClick={handleUpsellDecline} className="w-full" variant="outline">
+                                Não, obrigado. Continuar com o plano de {selectedPlanForUpsell.name}.
+                            </AlertDialogCancel>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
+
 
             <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-0 max-w-lg w-full">
