@@ -29,7 +29,7 @@ function initializeFirebaseAdmin(): App {
   // Inicializa a app se nenhuma outra existir.
   adminApp = initializeApp({
     credential: cert(serviceAccount),
-    databaseURL: `https://${process.env.NEXT_PUBLIC_FB_PID}.firebaseio.com`
+    databaseURL: `https://${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebaseio.com`
   }, 'firebase-admin-app-webhook');
 
   return adminApp;
